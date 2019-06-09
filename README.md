@@ -30,3 +30,6 @@ python3 bot.py
 ```
 ## Commands
 Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
+
+## License
+- [GNU GPL v3.0](https://github.com/Alessandro-S19/reaction-light/blob/master/LICENSE)
