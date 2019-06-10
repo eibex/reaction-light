@@ -5,12 +5,18 @@ from discord.ext import commands
 import rlightfm
 
 
+### Author: https://github.com/Alessandro-S19
+### Original Repository: https://github.com/Alessandro-S19/reaction-light
+### License: GNU GPL v3.0
+### Version: 0.0.1
+
+
 config = configparser.ConfigParser()
 config.read("config.ini")
 
 TOKEN = str(config.get("server", "token"))
 
-prefix = (str(config.get("server", "prefix")))
+prefix = str(config.get("server", "prefix"))
 
 Client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
@@ -22,8 +28,8 @@ admin_b = int(config.get("server_role", "admin_b"))
 admin_c = int(config.get("server_role", "admin_c"))
 logo = str(config.get("server", "logo"))
 
-# Colour palette
-botcolor = 0x2A00A4
+# Colour palette - changes embeds' sideline colour
+botcolor = 0xffff00
 
 
 def isadmin(ctx, msg=False):
@@ -34,7 +40,7 @@ def isadmin(ctx, msg=False):
         return False
 
 
-
+# Updates presence continuously to avoid periods without a presence being specified
 async def autopresence():
     threading.Timer(3600.0, autopresence).start()
     await bot.change_presence(activity=discord.Game(name="with (nuclear) reactions"))
