@@ -28,6 +28,10 @@ You can run the bot by using
 ```
 python3 bot.py
 ```
+Or
+```
+nohup python3 bot.py &
+```
 ## Commands
 Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
 
