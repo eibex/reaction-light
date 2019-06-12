@@ -5,6 +5,17 @@ wizard = {}
 wizardcache = {}
 cache = {}
 
+
+def readcache():
+    try:
+        with open("cache.csv", "r") as f:
+            r = csv.reader(f, delimiter=",")
+            for row in r:
+                cache[row[0]] = row[1]
+    except FileNotFoundError:
+        print("No cache.csv file found. It will be created on the next wizard run.")
+
+
 def get(user, channel):
     global wizard
     for i in wizard:
@@ -28,7 +39,7 @@ def getcombo(r):
 
 
 def addids(message_id, r):
-    with open("cache.csv", "w") as f:
+    with open("cache.csv", "a") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow([message_id, r])
 
@@ -89,7 +100,7 @@ def step2(r, role, emoji, done=False):
     global wizardcache
     if done:
         wizard[r][3] += 1  # Set step3 (was 2)
-        with open(str(r) + ".csv", "w") as f:
+        with open(str(r) + ".csv", "a") as f:
             w = csv.writer(f, delimiter=",")
             for i in wizardcache[r]:
                 w.writerow(i)
@@ -102,11 +113,6 @@ def step2(r, role, emoji, done=False):
 
 def end(r):
     del wizard[r]
+    readcache()
 
-try:
-    with open("cache.csv", "r") as f:
-        r = csv.reader(f, delimiter=",")
-        for row in r:
-            cache[row[0]] = row[1]
-except FileNotFoundError:
-    print("No cache.csv file found. It will be created on the next wizard run.")
+readcache()
