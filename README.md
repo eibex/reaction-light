@@ -1,7 +1,7 @@
-# Reaction Light
+# Reaction Light - Discord Role Bot
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
-Light yet powerful reaction role coded in discord.py (rewrite branch).
+Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 You can host the bost yourself by configurin the `config.ini` file or add the one hosted by myself.
 You can request to use the bot hosted by myself by sending an email to: reactionlight@outlook.com
 
