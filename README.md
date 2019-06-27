@@ -2,7 +2,7 @@
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
 Light yet powerful reaction role bot coded in discord.py (rewrite branch).
-You can host the bost yourself by configurin the `config.ini` file or add the one hosted by myself.
+You can host the bost yourself by configuring the `config.ini` file or add the one hosted by myself.
 You can request to use the bot hosted by myself by sending an email to reactionlight@outlook.com and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less.
 
 ## Requirements
