@@ -13,7 +13,7 @@ python3 -m pip install -U discord.py
 ```
 On Windows:
 ```
-py -3 -m pip install -U discord.py
+pip install -U discord.py
 ```
 ## Setup
 - Edit the `config.ini` file:
