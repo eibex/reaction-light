@@ -1,7 +1,9 @@
-# Reaction Light
-Light yet powerful reaction role coded in discord.py (rewrite branch).
-You can host the bost yourself by configurin the `config.ini` file or add the one hosted by myself.
-You can request to use the bot hosted by myself by sending an email to: reactionlight@outlook.com
+# Reaction Light - Discord Role Bot
+![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
+
+Light yet powerful reaction role bot coded in discord.py (rewrite branch).
+You can host the bost yourself by configuring the `config.ini` file or add the one hosted by myself.
+You can request to use the bot hosted by myself by sending an email to reactionlight@outlook.com and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less.
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher.
@@ -11,7 +13,7 @@ python3 -m pip install -U discord.py
 ```
 On Windows:
 ```
-py -3 -m pip install -U discord.py
+pip install -U discord.py
 ```
 ## Setup
 - Edit the `config.ini` file:
@@ -27,6 +29,10 @@ py -3 -m pip install -U discord.py
 You can run the bot by using
 ```
 python3 bot.py
+```
+Or
+```
+nohup python3 bot.py &
 ```
 ## Commands
 Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
