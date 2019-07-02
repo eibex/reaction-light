@@ -1,4 +1,7 @@
 # Reaction Light - Discord Role Bot
+![Python 3.5 3.6 3.7](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue.svg)
+![discord.py rewrite](https://img.shields.io/badge/discord.py-rewrite-blue.svg)
+
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
 Light yet powerful reaction role bot coded in discord.py (rewrite branch).
