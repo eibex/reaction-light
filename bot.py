@@ -117,14 +117,14 @@ async def on_raw_reaction_add(payload):
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
         if str(reaction) not in reactions:
-            print(reaction)
-            print(reactions)
             await msg.remove_reaction(reaction, user)
         else:
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
-            await member.add_roles(role)
+            print(user_id, bot.user.id)
+            if user_id != bot.user.id:
+                await member.add_roles(role)
 
 
 @bot.event
