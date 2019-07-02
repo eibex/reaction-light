@@ -1,7 +1,8 @@
-import threading
 import configparser
+from itertools import cycle
+import csv
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import rlightfm
 
 
@@ -27,6 +28,13 @@ admin_a = int(config.get("server_role", "admin_a"))
 admin_b = int(config.get("server_role", "admin_b"))
 admin_c = int(config.get("server_role", "admin_c"))
 logo = str(config.get("server", "logo"))
+activities = []
+with open("activities.csv", "r") as f:
+    reader = csv.reader(f, delimiter=",")
+    for row in reader:
+        activity = row[0]
+        activities.append(activity)
+activities = cycle(activities)
 
 # Colour palette - changes embeds' sideline colour
 botcolor = 0xffff00
@@ -40,15 +48,16 @@ def isadmin(ctx, msg=False):
         return False
 
 
-# Updates presence continuously to avoid periods without a presence being specified
-async def autopresence():
-    threading.Timer(3600.0, autopresence).start()
-    await bot.change_presence(activity=discord.Game(name="with (nuclear) reactions"))
+@tasks.loop(seconds=30)
+async def maintain_presence():
+    activity = next(activities)
+    await bot.change_presence(activity=discord.Game(name=activity))
 
 
 @bot.event
 async def on_ready():
-    await autopresence()
+    print("Reaction Light ready!")
+    maintain_presence.start()
 
 
 @bot.event
@@ -147,6 +156,27 @@ async def hlp(ctx):
         await ctx.send("Use `rl!new` to start creating a reaction message.")
     else:
         await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="reload")
+async def reload_config(ctx):
+    if isadmin(ctx):
+        global activities
+        global admin_a
+        global admin_b
+        global admin_c
+        global logo
+        admin_a = int(config.get("server_role", "admin_a"))
+        admin_b = int(config.get("server_role", "admin_b"))
+        admin_c = int(config.get("server_role", "admin_c"))
+        logo = str(config.get("server", "logo"))
+        activities = []
+        with open("activities.csv", "r") as f:
+            reader = csv.reader(f, delimiter=",")
+            for row in reader:
+                activity = row[0]
+                activities.append(activity)
+        activities = cycle(activities)
 
 
 @bot.command(name="kill")
