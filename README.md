@@ -56,7 +56,8 @@ User: 595907369242722304
 ```
 Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on your server (i.e. the Bot is not a Nitro user and cannot use emojis from other servers). Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
 ```
-Bot: Attach roles and emojis separated by a space (one combination per message). When you are done type `done`. Example:
+Bot: Attach roles and emojis separated by a space (one combination per message).
+When you are done type `done`. Example:
 :smile: `@Role`
 User: :rage: @AngryRole
 User: :sob: @SadRole
