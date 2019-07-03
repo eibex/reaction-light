@@ -6,10 +6,10 @@ from discord.ext import commands, tasks
 import rlightfm
 
 
-### Author: https://github.com/eibex
-### Original Repository: https://github.com/eibex/reaction-light
-### License: GNU GPL v3.0
-### Version: 0.0.1
+
+# Original Repository: https://github.com/eibex/reaction-light
+__author__ = "eibex"
+__version__ = "0.0.1"
 
 
 config = configparser.ConfigParser()
