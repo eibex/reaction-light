@@ -29,6 +29,8 @@ pip install -U discord.py
   - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
   - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
   - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+- Edit the `activities.csv` file:
+  - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds. Do not use commas `,`.
 
 ## Running the bot
 You can run the bot by using:
