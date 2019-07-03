@@ -46,11 +46,11 @@ Use `rl!help` to get started and follow the instructions. If the bot replies wit
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
 
 Initiate the message creation process with `rl!new`.
-```python
+```
 User: rl!new
 ```
 Next, you will be asked to provide the ID of the channel you want to send the message in. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
-```python
+```
 Bot: Please paste the channel ID where to send the auto-role message.
 User: 595907369242722304
 ```
