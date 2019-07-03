@@ -9,6 +9,17 @@ You can host the bost yourself by configuring the `config.ini` file or add the o
 
 You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
 
+## Contents
+- [Requirements](https://github.com/eibex/reaction-light#requirements)
+- [Setup](https://github.com/eibex/reaction-light#setup)
+- [Running the Bot](https://github.com/eibex/reaction-light#running-the-bot)
+- [Commands](https://github.com/eibex/reaction-light#commands)
+  - [Example](https://github.com/eibex/reaction-light#example)
+- [Troubleshooting](https://github.com/eibex/reaction-light#troubleshooting)
+- [Contribute](https://github.com/eibex/reaction-light#contribute)
+  - [TO-DO List](https://github.com/eibex/reaction-light#to-do-list)
+- [License](https://github.com/eibex/reaction-light#license)
+
 ## Requirements
 Discord.py requires Python 3.5.3 or higher.
 You can get discord.py via PyPI:
@@ -79,6 +90,8 @@ Finally, the bot will send the message to the channel specified in the first ste
 ## Troubleshooting
 **When I click one of the reactions the bot does not give me a role!**
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
+
+Post bugs and issues [here](https://github.com/eibex/reaction-light/issues).
 
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. PEP-8 styled code is not enforced but most welcome (human readability is required though).
