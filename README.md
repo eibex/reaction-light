@@ -80,5 +80,16 @@ Finally, the bot will send the message to the channel specified in the first ste
 **When I click one of the reactions the bot does not give me a role!**
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
 
+## Contribute
+If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. PEP-8 styled code is not enforced but most welcome (human readability is required though).
+
+### TO-DO List
+- [x] Listen only to process initiator in the channel the command was used
+- [ ] Edit feature of previous embeds
+- [ ] Use messages created by other users to manage roles and reactions
+- [ ] Message setup abort feature
+  - [ ] Delete entries to `*.csv` files when aborting
+- [ ] Delete entries to `*.csv` files when deleting a reaction role message
+
 ## License
 - [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
