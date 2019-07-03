@@ -20,26 +20,60 @@ On Windows:
 pip install -U discord.py
 ```
 ## Setup
+- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file)
 - Edit the `config.ini` file:
-- Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
-- Choose a prefix of your liking (default is `rl!`)
-- Name is redundant in current version
-- Choose a footer logo
-- Set the admin(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
-- Invite the bot to your server(s) with enough permissions (I use Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
-- On your Discord server, go to: Server Settings > Roles and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+  - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
+  - Choose a prefix of your liking (default is `rl!`)
+  - Name is not currently used and can be left blank
+  - URL of the footer logo
+  - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
+  - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+  - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
 ## Running the bot
-You can run the bot by using
+You can run the bot by using:
 ```
 python3 bot.py
 ```
-Or
+If you want to run it as a background task:
 ```
 nohup python3 bot.py &
 ```
 ## Commands
 Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
 
+### Example
+In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
+
+Initiate the message creation process with `rl!new`.
+```python
+User: rl!new
+```
+Next, you will be asked to provide the ID of the channel you want to send the message in. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
+```python
+Bot: Please paste the channel ID where to send the auto-role message.
+User: 595907369242722304
+```
+Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on your server (i.e. the Bot is not a Nitro user and cannot use emojis from other servers). Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
+```
+Bot: Attach roles and emojis separated by a space (one combination per message). When you are done type `done`. Example:
+:smile: `@Role`
+User: :rage: @AngryRole
+User: :sob: @SadRole
+User: :cry: @EvenSadderRole
+User: :joy: @HappyRole
+User: done
+```
+Next, you will be asked to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
+```
+Bot: What would you like the message to say? Formatting is: `Title // Message_content`
+User: Select your roles // Click on the buttons below to give yourself some roles!
+```
+Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
+
+## Troubleshooting
+**When I click one of the reactions the bot does not give me a role!**
+Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
+
 ## License
-- [GNU GPL v3.0](https://github.com/Alessandro-S19/reaction-light/blob/master/LICENSE)
+- [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
