@@ -1,9 +1,13 @@
 # Reaction Light - Discord Role Bot
+![Python 3.5 3.6 3.7](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue.svg)
+![discord.py rewrite](https://img.shields.io/badge/discord.py-rewrite-blue.svg)
+
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
 Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 You can host the bost yourself by configuring the `config.ini` file or add the one hosted by myself.
-You can request to use the bot hosted by myself by sending an email to reactionlight@outlook.com and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less.
+
+You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher.
