@@ -6,7 +6,6 @@ from discord.ext import commands, tasks
 import rlightfm
 
 
-
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
 __version__ = "0.0.1"
@@ -41,7 +40,8 @@ botcolor = 0xffff00
 
 
 def isadmin(ctx, msg=False):
-    check = [role.id for role in ctx.author.roles] if msg else [role.id for role in ctx.message.author.roles]
+    check = ([role.id for role in ctx.author.roles] if msg
+             else [role.id for role in ctx.message.author.roles])
     if admin_a in check or admin_b in check or admin_c in check:
         return True
     else:
@@ -72,24 +72,37 @@ async def on_message(message):
         if step is not None:
             if step == 1:
                 rlightfm.step1(r_id, msg[0])
-                await message.channel.send("Attach roles and emojis separated by a space (one combination per message)."
-                                        "When you are done type `done`. Example:\n :smile: `@Role`")
+                await message.channel.send("Attach roles and emojis separated "
+                                           "by a space (one combination per "
+                                           "message). When you are done type "
+                                           "`done`. Example:\n:smile: `@Role`")
             elif step == 2:
                 if msg[0].lower() != "done":
-                    rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
+                    rlightfm.step2(r_id,
+                                   str(message.role_mentions[0].id),
+                                   msg[0])
                 else:
                     rlightfm.step2(r_id, None, msg[0], done=True)
-                    em = discord.Embed(title="Title", description="Message_content", colour=botcolor)
+                    em = discord.Embed(title="Title",
+                                       description="Message_content",
+                                       colour=botcolor)
                     em.set_footer(text="Reaction Light", icon_url=logo)
-                    await message.channel.send("What would you like the message to say? Formatting is: `Title // Message_content`", embed=em)
+                    await message.channel.send("What would you like the "
+                                               "message to say? Formatting "
+                                               "is: `Title // "
+                                               "Message_content`",
+                                               embed=em)
             elif step == 3:
                 msg = message.content.split(" // ")
                 if len(msg) != 2:
-                    await message.channel.send("Formatting is: `Title // Message_content`")
+                    await message.channel.send("Formatting is: `Title // "
+                                               "Message_content`")
                 else:
                     title = msg[0]
                     content = msg[1]
-                    em = discord.Embed(title=title, description=content, colour=botcolor)
+                    em = discord.Embed(title=title,
+                                       description=content,
+                                       colour=botcolor)
                     em.set_footer(text="Reaction Light", icon_url=logo)
                     ch = bot.get_channel(int(rlightfm.getch(r_id)))
                     emb = await ch.send(embed=em)
@@ -111,7 +124,7 @@ async def on_raw_reaction_add(payload):
     user_id = payload.user_id
     guild_id = payload.guild_id
     r = rlightfm.getids(str(msg_id))
-    if r != None:
+    if r is not None:
         reactions = rlightfm.getreactions(r)
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
@@ -122,7 +135,8 @@ async def on_raw_reaction_add(payload):
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
-            await member.add_roles(role)
+            if user_id != bot.user.id:
+                await member.add_roles(role)
 
 
 @bot.event
@@ -132,7 +146,7 @@ async def on_raw_reaction_remove(payload):
     user_id = payload.user_id
     guild_id = payload.guild_id
     r = rlightfm.getids(str(msg_id))
-    if r != None:
+    if r is not None:
         reactions = rlightfm.getreactions(r)
         if str(reaction) in reactions:
             server = bot.get_guild(guild_id)
@@ -145,7 +159,8 @@ async def on_raw_reaction_remove(payload):
 async def new(ctx):
     if isadmin(ctx):
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
-        await ctx.send("Please paste the channel ID where to send the auto-role message.")
+        await ctx.send("Please paste the channel ID where to "
+                       "send the auto-role message.")
 
 
 @bot.command(name="help")
