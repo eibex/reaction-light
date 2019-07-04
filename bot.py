@@ -166,7 +166,10 @@ async def new(ctx):
 @bot.command(name="help")
 async def hlp(ctx):
     if isadmin(ctx):
-        await ctx.send("Use `rl!new` to start creating a reaction message.")
+        await ctx.send("Use `rl!new` to start creating a reaction message.\n"
+                       "Visit <https://github.com/eibex/reaction-light/"
+                       "blob/master/README.md#example> for a "
+                       "setup walkthrough.")
     else:
         await ctx.send("You do not have an admin role.")
 
