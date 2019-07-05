@@ -9,6 +9,7 @@ import rlightfm
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
 __version__ = "0.0.1"
+__license__ = "MIT"
 
 
 config = configparser.ConfigParser()
@@ -40,6 +41,7 @@ botcolor = 0xffff00
 
 
 def isadmin(ctx, msg=False):
+    # Checks if command author has one of config.ini admin role IDs
     check = ([role.id for role in ctx.author.roles] if msg
              else [role.id for role in ctx.message.author.roles])
     if admin_a in check or admin_b in check or admin_c in check:
@@ -50,6 +52,7 @@ def isadmin(ctx, msg=False):
 
 @tasks.loop(seconds=30)
 async def maintain_presence():
+    # Loops through the activities specified in activities.csv
     activity = next(activities)
     await bot.change_presence(activity=discord.Game(name=activity))
 
@@ -69,8 +72,8 @@ async def on_message(message):
         step = wizard[0]
         r_id = wizard[1]
         msg = message.content.split()
-        if step is not None:
-            if step == 1:
+        if step is not None:  # Checks if the setup process was started before.
+            if step == 1:     # If it was not, it ignores the message.
                 rlightfm.step1(r_id, msg[0])
                 await message.channel.send("Attach roles and emojis separated "
                                            "by a space (one combination per "
