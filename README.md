@@ -103,6 +103,7 @@ If you would like to contribute to this project, fork it and then create a pull 
 - [ ] Message setup abort feature
   - [ ] Delete entries to `*.csv` files when aborting
 - [ ] Delete entries to `*.csv` files when deleting a reaction role message
+- [ ] Your suggestions (open an issue [here](https://github.com/eibex/reaction-light/issues))
 
 ## License
 - [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
