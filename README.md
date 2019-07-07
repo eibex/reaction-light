@@ -106,4 +106,4 @@ If you would like to contribute to this project, fork it and then create a pull 
 - [ ] Your suggestions (open an issue [here](https://github.com/eibex/reaction-light/issues))
 
 ## License
-- [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
+[MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
