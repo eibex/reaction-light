@@ -32,18 +32,18 @@ pip install -U discord.py
 ```
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file)
-- Edit the `config.ini` file:
+- Run `setup.py` and follow the instructions or edit the `config.ini` file manually:
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
   - Name is not currently used and can be left blank
   - URL of the footer logo
   - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
-  - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
-  - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Edit the `activities.csv` file:
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
   - Do not use commas `,`.
+- Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+- On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
 ## Running the bot
 You can run the bot by using:
