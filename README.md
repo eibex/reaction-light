@@ -26,10 +26,6 @@ You can get discord.py via PyPI:
 ```
 python3 -m pip install -U discord.py
 ```
-On Windows:
-```
-pip install -U discord.py
-```
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file)
 - Run `setup.py` and follow the instructions or edit the `config.ini` file manually:
