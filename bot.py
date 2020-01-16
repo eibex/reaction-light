@@ -1,4 +1,5 @@
 import configparser
+from re import sub
 from itertools import cycle
 import csv
 import discord
@@ -197,6 +198,26 @@ async def reload_config(ctx):
                 activities.append(activity)
         activities = cycle(activities)
         await ctx.send("Configuration reloaded.")
+
+
+@bot.command(name="edit")
+async def edit_embed(ctx):
+    if isadmin(ctx):
+        msg = ctx.message.content.split(" // ")
+        if len(msg) < 4:
+            await ctx.send("Formatting is: `Channel ID // Message ID "
+                           "// New Title // New Content`")
+            return
+        ch_id = int(sub('[^0-9]', '', msg[0]))
+        old_id = int(msg[1])
+        ch = bot.get_channel(ch_id)
+        old_msg = await ch.fetch_message(old_id)
+        title = msg[2]
+        content = msg[3]
+        em = discord.Embed(title=title, description=content, colour=botcolor)
+        em.set_footer(text="Reaction Light", icon_url=logo)
+        await old_msg.edit(embed=em)
+
 
 
 @bot.command(name="kill")
