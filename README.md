@@ -94,7 +94,7 @@ If you would like to contribute to this project, fork it and then create a pull 
 
 ### TO-DO List
 - [x] Listen only to process initiator in the channel the command was used
-- [ ] Allow editing of previous embeds
+- [x] Allow editing of previous embeds
 - [ ] Use messages created by other users to manage roles and reactions
 - [ ] Message setup abort feature
   - [ ] Delete entries to `*.csv` files when aborting
