@@ -83,6 +83,12 @@ User: Select your roles // Click on the buttons below to give yourself some role
 ```
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
 
+#### Editing
+To edit an old embed and preserve the emoji-role links, you can use the `edit` command. You will need the channel and message id where the embed is located. You can find these IDs by right clicking the respective channel and messages (with developer mode on in your Discord settings). For example:
+```
+rl!edit CHANNEL_ID // MESSAGE_ID // New Title // New Description
+```
+
 ## Troubleshooting
 **When I click one of the reactions the bot does not give me a role!**
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
