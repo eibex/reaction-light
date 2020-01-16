@@ -115,4 +115,5 @@ def end(r):
     del wizard[r]
     readcache()
 
+
 readcache()

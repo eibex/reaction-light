@@ -38,13 +38,16 @@ with open("activities.csv", "r") as f:
 activities = cycle(activities)
 
 # Colour palette - changes embeds' sideline colour
-botcolor = 0xffff00
+botcolor = 0xFFFF00
 
 
 def isadmin(ctx, msg=False):
     # Checks if command author has one of config.ini admin role IDs
-    check = ([role.id for role in ctx.author.roles] if msg
-             else [role.id for role in ctx.message.author.roles])
+    check = (
+        [role.id for role in ctx.author.roles]
+        if msg
+        else [role.id for role in ctx.message.author.roles]
+    )
     if admin_a in check or admin_b in check or admin_c in check:
         return True
     else:
@@ -74,39 +77,42 @@ async def on_message(message):
         r_id = wizard[1]
         msg = message.content.split()
         if step is not None:  # Checks if the setup process was started before.
-            if step == 1:     # If it was not, it ignores the message.
+            if step == 1:  # If it was not, it ignores the message.
                 rlightfm.step1(r_id, msg[0])
-                await message.channel.send("Attach roles and emojis separated "
-                                           "by a space (one combination per "
-                                           "message). When you are done type "
-                                           "`done`. Example:\n:smile: `@Role`")
+                await message.channel.send(
+                    "Attach roles and emojis separated "
+                    "by a space (one combination per "
+                    "message). When you are done type "
+                    "`done`. Example:\n:smile: `@Role`"
+                )
             elif step == 2:
                 if msg[0].lower() != "done":
-                    rlightfm.step2(r_id,
-                                   str(message.role_mentions[0].id),
-                                   msg[0])
+                    rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
                 else:
                     rlightfm.step2(r_id, None, msg[0], done=True)
-                    em = discord.Embed(title="Title",
-                                       description="Message_content",
-                                       colour=botcolor)
+                    em = discord.Embed(
+                        title="Title", description="Message_content", colour=botcolor
+                    )
                     em.set_footer(text="Reaction Light", icon_url=logo)
-                    await message.channel.send("What would you like the "
-                                               "message to say? Formatting "
-                                               "is: `Title // "
-                                               "Message_content`",
-                                               embed=em)
+                    await message.channel.send(
+                        "What would you like the "
+                        "message to say? Formatting "
+                        "is: `Title // "
+                        "Message_content`",
+                        embed=em,
+                    )
             elif step == 3:
                 msg = message.content.split(" // ")
                 if len(msg) != 2:
-                    await message.channel.send("Formatting is: `Title // "
-                                               "Message_content`")
+                    await message.channel.send(
+                        "Formatting is: `Title // " "Message_content`"
+                    )
                 else:
                     title = msg[0]
                     content = msg[1]
-                    em = discord.Embed(title=title,
-                                       description=content,
-                                       colour=botcolor)
+                    em = discord.Embed(
+                        title=title, description=content, colour=botcolor
+                    )
                     em.set_footer(text="Reaction Light", icon_url=logo)
                     ch = bot.get_channel(int(rlightfm.getch(r_id)))
                     emb = await ch.send(embed=em)
@@ -163,17 +169,20 @@ async def on_raw_reaction_remove(payload):
 async def new(ctx):
     if isadmin(ctx):
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
-        await ctx.send("Please paste the channel ID where to "
-                       "send the auto-role message.")
+        await ctx.send(
+            "Please paste the channel ID where to " "send the auto-role message."
+        )
 
 
 @bot.command(name="help")
 async def hlp(ctx):
     if isadmin(ctx):
-        await ctx.send("Use `rl!new` to start creating a reaction message.\n"
-                       "Visit <https://github.com/eibex/reaction-light/"
-                       "blob/master/README.md#example> for a "
-                       "setup walkthrough.")
+        await ctx.send(
+            "Use `rl!new` to start creating a reaction message.\n"
+            "Visit <https://github.com/eibex/reaction-light/"
+            "blob/master/README.md#example> for a "
+            "setup walkthrough."
+        )
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -205,10 +214,12 @@ async def edit_embed(ctx):
     if isadmin(ctx):
         msg = ctx.message.content.split(" // ")
         if len(msg) < 4:
-            await ctx.send("Formatting is: `Channel ID // Message ID "
-                           "// New Title // New Content`")
+            await ctx.send(
+                "Formatting is: `Channel ID // Message ID "
+                "// New Title // New Content`"
+            )
             return
-        ch_id = int(sub('[^0-9]', '', msg[0]))
+        ch_id = int(sub("[^0-9]", "", msg[0]))
         old_id = int(msg[1])
         ch = bot.get_channel(ch_id)
         old_msg = await ch.fetch_message(old_id)
@@ -217,7 +228,6 @@ async def edit_embed(ctx):
         em = discord.Embed(title=title, description=content, colour=botcolor)
         em.set_footer(text="Reaction Light", icon_url=logo)
         await old_msg.edit(embed=em)
-
 
 
 @bot.command(name="kill")
