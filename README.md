@@ -88,6 +88,7 @@ To edit an old embed and preserve the emoji-role links, you can use the `edit` c
 ```
 rl!edit CHANNEL_ID // MESSAGE_ID // New Title // New Description
 ```
+Any admin can edit old embeds, even if they were originally created by another admin.
 
 ## Troubleshooting
 **When I click one of the reactions the bot does not give me a role!**
@@ -101,7 +102,6 @@ If you would like to contribute to this project, fork it and then create a pull 
 ### TO-DO List
 - [x] Listen only to process initiator in the channel the command was used
 - [x] Allow editing of previous embeds
-- [ ] Use messages created by other users to manage roles and reactions
 - [ ] Message setup abort feature
   - [ ] Delete entries to `*.csv` files when aborting
 - [ ] Delete entries to `*.csv` files when deleting a reaction role message
