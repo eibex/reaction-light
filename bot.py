@@ -9,7 +9,7 @@ import rlightfm
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __license__ = "MIT"
 
 
