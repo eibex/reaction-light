@@ -63,3 +63,5 @@ config["server_role"]["admin_b"] = admin_b
 config["server_role"]["admin_c"] = admin_c
 with open("config.ini", "w") as f:
     config.write(f)
+
+input("Done. You can now delete setup.py")
