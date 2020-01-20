@@ -15,7 +15,7 @@ __license__ = "MIT"
 
 folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("{}\\config.ini".format(folder))
 
 TOKEN = str(config.get("server", "token"))
 
