@@ -13,7 +13,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Use the same instance of the bot on multiple servers
 - Easy installation and setup
 
-You can host the bot yourself by configuring the `config.ini` file or add the one hosted by myself. You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
+You can host the bot yourself by configuring the `reaction-light-files/config.ini` file or add the one hosted by myself. You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
 
 ## Contents
 - [Requirements](https://github.com/eibex/reaction-light#requirements)
@@ -34,7 +34,7 @@ python3 -m pip install -U discord.py
 ```
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file)
-- Run `setup.py` and follow the instructions or edit the `config.ini` file manually:
+- Run `setup.py` and follow the instructions or edit the `reaction-light-files/config.ini` file manually:
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
   - Name is not currently used and can be left blank
@@ -57,7 +57,7 @@ If you want to run it as a background task:
 nohup python3 bot.py &
 ```
 ## Commands
-Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
+Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `reaction-light-files/config.ini`.
 
 ### Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
