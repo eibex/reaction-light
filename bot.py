@@ -1,4 +1,5 @@
 import configparser
+from os import path
 from re import sub
 from itertools import cycle
 import csv
@@ -12,7 +13,7 @@ __author__ = "eibex"
 __version__ = "0.0.2"
 __license__ = "MIT"
 
-
+folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
 config = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -30,7 +31,8 @@ admin_b = int(config.get("server_role", "admin_b"))
 admin_c = int(config.get("server_role", "admin_c"))
 logo = str(config.get("server", "logo"))
 activities = []
-with open("activities.csv", "r") as f:
+activities_file = "{}\\activities.csv".format(folder)
+with open(activities_file, "r") as f:
     reader = csv.reader(f, delimiter=",")
     for row in reader:
         activity = row[0]
@@ -185,28 +187,6 @@ async def hlp(ctx):
         )
     else:
         await ctx.send("You do not have an admin role.")
-
-
-@bot.command(name="reload")
-async def reload_config(ctx):
-    if isadmin(ctx):
-        global activities
-        global admin_a
-        global admin_b
-        global admin_c
-        global logo
-        admin_a = int(config.get("server_role", "admin_a"))
-        admin_b = int(config.get("server_role", "admin_b"))
-        admin_c = int(config.get("server_role", "admin_c"))
-        logo = str(config.get("server", "logo"))
-        activities = []
-        with open("activities.csv", "r") as f:
-            reader = csv.reader(f, delimiter=",")
-            for row in reader:
-                activity = row[0]
-                activities.append(activity)
-        activities = cycle(activities)
-        await ctx.send("Configuration reloaded.")
 
 
 @bot.command(name="edit")

@@ -1,6 +1,13 @@
 from random import randint
+from os import path, makedirs
 import csv
 
+folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
+try:
+    makedirs(folder)
+    print("Creating file folder")
+except FileExistsError:
+    pass
 wizard = {}
 wizardcache = {}
 cache = {}
@@ -8,7 +15,7 @@ cache = {}
 
 def readcache():
     try:
-        with open("cache.csv", "r") as f:
+        with open("{}\\cache.csv".format(folder), "r") as f:
             r = csv.reader(f, delimiter=",")
             for row in r:
                 cache[row[0]] = row[1]
@@ -33,13 +40,13 @@ def getch(r):
 
 
 def getcombo(r):
-    with open(str(r) + ".csv", "r") as f:
+    with open("{}\\".format(folder) + str(r) + ".csv", "r") as f:
         r = csv.reader(f, delimiter=",")
         return [i for i in r]
 
 
 def addids(message_id, r):
-    with open("cache.csv", "a") as f:
+    with open("{}\\cache.csv".format(folder), "a") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow([message_id, r])
 
@@ -51,7 +58,7 @@ def getids(message_id):
 
 
 def getreactions(r):
-    with open(r + ".csv", "r") as f:
+    with open("{}\\".format(folder) + r + ".csv", "r") as f:
         r = csv.reader(f, delimiter=",")
         reactions = {}
         for row in r:
@@ -68,7 +75,7 @@ def listen(user, channel):
     ids = {}
 
     try:
-        with open("id.csv", "r") as f:
+        with open("{}\\id.csv".format(folder), "r") as f:
             read = csv.reader(f, delimiter=",")
             for i in read:
                 ids[i[0]] = i[1:]
@@ -78,7 +85,7 @@ def listen(user, channel):
         print("Creating id.csv")
 
     ids[r] = [str(user), str(channel)]
-    with open("id.csv", "w") as f:
+    with open("{}\\id.csv".format(folder), "w") as f:
         w = csv.writer(f, delimiter=",")
         for i in ids:
             row = [i, ids[i][0], ids[i][1]]
@@ -100,7 +107,7 @@ def step2(r, role, emoji, done=False):
     global wizardcache
     if done:
         wizard[r][3] += 1  # Set step3 (was 2)
-        with open(str(r) + ".csv", "a") as f:
+        with open("{}\\".format(folder) + str(r) + ".csv", "a") as f:
             w = csv.writer(f, delimiter=",")
             for i in wizardcache[r]:
                 w.writerow(i)
