@@ -4,7 +4,7 @@
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
-Light yet powerful reaction role bot coded in discord.py (rewrite branch). Create custom embedded messages, with any emoji you want (including the custom ones uploaded to your server). Automatically assign roles to users when they select a certain reaction, and remove them when they deselect it. You can use the same instance on the bot on multiple servers. 
+Light yet powerful reaction role bot coded in discord.py (rewrite branch). Create custom embedded messages, with any emoji you want (including the custom ones uploaded to your server). Automatically assign roles to users when they select a certain reaction, and remove them when they deselect it. You can use the same instance of the bot on multiple servers. 
 
 You can host the bot yourself by configuring the `config.ini` file or add the one hosted by myself. You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
 
