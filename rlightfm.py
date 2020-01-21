@@ -3,11 +3,6 @@ from os import path, makedirs
 import csv
 
 folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
-try:
-    makedirs(folder)
-    print("Creating file folder")
-except FileExistsError:
-    pass
 wizard = {}
 wizardcache = {}
 cache = {}
