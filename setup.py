@@ -1,4 +1,8 @@
+from os import path
 import configparser
+
+
+folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
 
 # Original Repository: https://github.com/eibex/reaction-light
 print("Author: eibex")
@@ -54,7 +58,7 @@ while True:
         break
 
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("{}\\config.ini".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
 config["server"]["logo"] = logo
