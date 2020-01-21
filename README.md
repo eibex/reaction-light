@@ -33,7 +33,7 @@ You can get discord.py via PyPI:
 python3 -m pip install -U discord.py
 ```
 ## Setup
-- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file)
+- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it)
 - Run `setup.py` and follow the instructions or edit the `reaction-light-files/config.ini` file manually:
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
