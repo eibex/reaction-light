@@ -81,7 +81,7 @@ async def updates():
     if system_channel and new_version:
         channel = bot.get_channel(system_channel)
         await channel.send(
-            "An update is available. Download Reaction Light v{} it at https://github.com/eibex/reaction-light".format(
+            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light".format(
                 new_version
             )
         )
