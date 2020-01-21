@@ -5,17 +5,19 @@ from itertools import cycle
 import csv
 import discord
 from discord.ext import commands, tasks
+from requests import get as requests_get
 import rlightfm
 
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __license__ = "MIT"
 
-folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
+directory = path.dirname(path.realpath(__file__))
+folder = "{}\\files".format(directory)
 config = configparser.ConfigParser()
-config.read("{}\\config.ini".format(folder))
+config.read("{}\\config.ini".format(directory))
 
 TOKEN = str(config.get("server", "token"))
 
@@ -29,6 +31,7 @@ bot.remove_command("help")
 admin_a = int(config.get("server_role", "admin_a"))
 admin_b = int(config.get("server_role", "admin_b"))
 admin_c = int(config.get("server_role", "admin_c"))
+system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
 activities_file = "{}\\activities.csv".format(folder)
@@ -56,11 +59,32 @@ def isadmin(ctx, msg=False):
         return False
 
 
+def check_for_updates():
+    latest = requests_get(
+        "https://raw.githubusercontent.com/eibex/reaction-light/master/version.txt"
+    ).rstrip("\n")
+    if latest > __version__:
+        return latest
+    return False
+
+
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
     activity = next(activities)
     await bot.change_presence(activity=discord.Game(name=activity))
+
+
+@tasks.loop(seconds=3600)
+async def updates():
+    new_version = check_for_updates()
+    if system_channel and new_version:
+        channel = bot.get_channel(system_channel)
+        await channel.send(
+            "An update is available. Download Reaction Light v{} it at https://github.com/eibex/reaction-light".format(
+                new_version
+            )
+        )
 
 
 @bot.event
@@ -73,8 +97,8 @@ async def on_ready():
 async def on_message(message):
     if isadmin(message, msg=True):
         user = str(message.author.id)
-        ch = str(message.channel.id)
-        wizard = rlightfm.get(user, ch)
+        channel = str(message.channel.id)
+        wizard = rlightfm.get(user, channel)
         step = wizard[0]
         r_id = wizard[1]
         msg = message.content.split()
@@ -82,10 +106,7 @@ async def on_message(message):
             if step == 1:  # If it was not, it ignores the message.
                 rlightfm.step1(r_id, msg[0])
                 await message.channel.send(
-                    "Attach roles and emojis separated "
-                    "by a space (one combination per "
-                    "message). When you are done type "
-                    "`done`. Example:\n:smile: `@Role`"
+                    "Attach roles and emojis separated by a space (one combination per message). When you are done type `done`. Example:\n:smile: `@Role`"
                 )
             elif step == 2:
                 if msg[0].lower() != "done":
@@ -97,17 +118,14 @@ async def on_message(message):
                     )
                     em.set_footer(text="Reaction Light", icon_url=logo)
                     await message.channel.send(
-                        "What would you like the "
-                        "message to say? Formatting "
-                        "is: `Title // "
-                        "Message_content`",
+                        "What would you like the message to say? Formatting is: `Title // Message_content`",
                         embed=em,
                     )
             elif step == 3:
                 msg = message.content.split(" // ")
                 if len(msg) != 2:
                     await message.channel.send(
-                        "Formatting is: `Title // " "Message_content`"
+                        "Formatting is: `Title // Message_content`"
                     )
                 else:
                     title = msg[0]
@@ -116,11 +134,13 @@ async def on_message(message):
                         title=title, description=content, colour=botcolor
                     )
                     em.set_footer(text="Reaction Light", icon_url=logo)
-                    ch = bot.get_channel(int(rlightfm.getch(r_id)))
-                    emb = await ch.send(embed=em)
+                    channel = bot.get_channel(int(rlightfm.getch(r_id)))
+                    emb = await channel.send(embed=em)
                     combo = rlightfm.getcombo(r_id)
                     for i in range(len(combo)):
-                        if i != 0:
+                        if (
+                            i != 0
+                        ):  # skip first row as it does not contain reaction/role data
                             await emb.add_reaction(combo[i][0])
                     rlightfm.addids(emb.id, r_id)
                     rlightfm.end(r_id)
@@ -182,10 +202,7 @@ async def new(ctx):
 async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
-            "Use `rl!new` to start creating a reaction message.\n"
-            "Visit <https://github.com/eibex/reaction-light/"
-            "blob/master/README.md#example> for a "
-            "setup walkthrough."
+            "Use `rl!new` to start creating a reaction message.\nVisit <https://github.com/eibex/reaction-light/blob/master/README.md#example> for a setup walkthrough."
         )
     else:
         await ctx.send("You do not have an admin role.")
@@ -197,8 +214,7 @@ async def edit_embed(ctx):
         msg = ctx.message.content.split(" // ")
         if len(msg) < 4:
             await ctx.send(
-                "Formatting is: `Channel ID // Message ID "
-                "// New Title // New Content`"
+                "Formatting is: `Channel ID // Message ID // New Title // New Content`"
             )
             return
         ch_id = int(sub("[^0-9]", "", msg[0]))

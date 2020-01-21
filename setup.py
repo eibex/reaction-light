@@ -6,7 +6,7 @@ folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__))
 
 # Original Repository: https://github.com/eibex/reaction-light
 print("Author: eibex")
-print("Version: 0.0.2")
+print("Version: 0.0.3")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
@@ -57,14 +57,28 @@ while True:
         )
         break
 
+while True:
+    system_channel = input(
+        "Paste the ID of the channel you wish to receive system notifications (e.g. new versions of the bot). [optional]\n"
+    )
+    if system_channel.lower() == "help":
+        print(
+            "Currently only new versions are going to be fetched. Less than one message per week. Leave blank if no updates want to be received."
+        )
+        continue
+    else:
+        break
+
 config = configparser.ConfigParser()
 config.read("{}\\config.ini".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
 config["server"]["logo"] = logo
+config["server"]["system_channel"] = system_channel
 config["server_role"]["admin_a"] = admin_a
 config["server_role"]["admin_b"] = admin_b
 config["server_role"]["admin_c"] = admin_c
+
 with open("config.ini", "w") as f:
     config.write(f)
 

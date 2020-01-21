@@ -2,7 +2,7 @@ from random import randint
 from os import path
 import csv
 
-folder = "{}\\reaction-light-files".format(path.dirname(path.realpath(__file__)))
+folder = "{}\\files".format(path.dirname(path.realpath(__file__)))
 wizard = {}
 wizardcache = {}
 cache = {}
