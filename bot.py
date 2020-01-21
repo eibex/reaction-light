@@ -61,7 +61,7 @@ def isadmin(ctx, msg=False):
 
 def check_for_updates():
     latest = requests_get(
-        "https://raw.githubusercontent.com/eibex/reaction-light/master/version.txt"
+        "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
     ).text.lower().rstrip("\n")
     if latest > __version__:
         return latest
