@@ -15,9 +15,9 @@ __version__ = "0.0.3"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
-folder = "{}\\files".format(directory)
+folder = "{}/files".format(directory)
 config = configparser.ConfigParser()
-config.read("{}\\config.ini".format(directory))
+config.read("{}/config.ini".format(directory))
 
 TOKEN = str(config.get("server", "token"))
 
@@ -34,7 +34,7 @@ admin_c = int(config.get("server_role", "admin_c"))
 system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
-activities_file = "{}\\activities.csv".format(folder)
+activities_file = "{}/activities.csv".format(folder)
 with open(activities_file, "r") as f:
     reader = csv.reader(f, delimiter=",")
     for row in reader:
