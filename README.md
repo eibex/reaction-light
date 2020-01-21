@@ -8,12 +8,11 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 
 ## Features
 - Create multiple custom embedded messages with custom reactions and roles
-- Automatically assign roles to users when they select a certain reaction
-- Automatically remove roles to users when they deselect a certain reaction
+- Automatically assign/remove roles to users when they select/deselect a certain reaction
 - Use the same instance of the bot on multiple servers
 - Easy installation and setup
 
-You can host the bot yourself by configuring the `reaction-light-files/config.ini` file or add the one hosted by myself. You can request to use the bot hosted by myself by sending an email to hello@eibe.dev and explaining why you need the bot (and why you cannot host it yourself) along with how many server(s) and users the bot will need to serve more or less. I will reply within a few hours.
+You can host the bot yourself by configuring the `reaction-light-files/config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
 ## Contents
 - [Requirements](https://github.com/eibex/reaction-light#requirements)
@@ -28,6 +27,7 @@ You can host the bot yourself by configuring the `reaction-light-files/config.in
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater. It is recommended to run the bot on Linux based systems.
+
 You can get discord.py via PyPI:
 ```
 python3 -m pip install -U discord.py
@@ -48,14 +48,15 @@ python3 -m pip install -U discord.py
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
 ## Running the bot
-You can run the bot by using:
+The bot can be run by using:
 ```
 python3 bot.py
 ```
-If you want to run it as a background task:
+To run it as a background task (recommended unless debugging):
 ```
 nohup python3 bot.py &
 ```
+
 ## Commands
 Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `reaction-light-files/config.ini`.
 
