@@ -12,28 +12,28 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Use the same instance of the bot on multiple servers
 - Easy installation and setup
 
-You can host the bot yourself by configuring the `reaction-light-files/config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
+You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
 ## Contents
-- [Requirements](https://github.com/eibex/reaction-light#requirements)
-- [Setup](https://github.com/eibex/reaction-light#setup)
-- [Running the Bot](https://github.com/eibex/reaction-light#running-the-bot)
-- [Commands](https://github.com/eibex/reaction-light#commands)
-  - [Example](https://github.com/eibex/reaction-light#example)
-- [Troubleshooting](https://github.com/eibex/reaction-light#troubleshooting)
-- [Contribute](https://github.com/eibex/reaction-light#contribute)
-- [License](https://github.com/eibex/reaction-light#license)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Running the Bot](#running-the-bot)
+- [Commands](#commands)
+  - [Example](#example)
+- [Troubleshooting](#troubleshooting)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Requirements
-Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater. It is recommended to run the bot on Linux based systems.
+Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. It is recommended to run the bot on Linux based systems.
 
-You can get discord.py via PyPI:
+You can get discord.py (and other dependencies) via PyPI:
 ```
-python3 -m pip install -U discord.py
+python3 -m pip install -U discord.py requests 
 ```
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it)
-- Run `setup.py` and follow the instructions or edit the `reaction-light-files/config.ini` file manually:
+- Run `setup.py` and follow the instructions or edit the `files/config.ini` file manually:
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
   - Name is not currently used and can be left blank
