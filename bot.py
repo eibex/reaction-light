@@ -91,6 +91,7 @@ async def updates():
 async def on_ready():
     print("Reaction Light ready!")
     maintain_presence.start()
+    updates.start()
 
 
 @bot.event
