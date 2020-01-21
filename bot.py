@@ -174,6 +174,8 @@ async def new(ctx):
         await ctx.send(
             "Please paste the channel ID where to " "send the auto-role message."
         )
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="help")
