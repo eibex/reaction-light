@@ -22,7 +22,6 @@ You can host the bot yourself by configuring the `reaction-light-files/config.in
   - [Example](https://github.com/eibex/reaction-light#example)
 - [Troubleshooting](https://github.com/eibex/reaction-light#troubleshooting)
 - [Contribute](https://github.com/eibex/reaction-light#contribute)
-  - [TO-DO List](https://github.com/eibex/reaction-light#to-do-list)
 - [License](https://github.com/eibex/reaction-light#license)
 
 ## Requirements
