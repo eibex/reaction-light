@@ -96,23 +96,14 @@ rl!edit CHANNEL_ID // MESSAGE_ID // New Title // New Description
 ```
 Any admin can edit old embeds, even if they were originally created by another admin.
 
-## Troubleshooting
+## FAQ
 **When I click one of the reactions the bot does not give me a role!**
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
 
 Post bugs and issues [here](https://github.com/eibex/reaction-light/issues).
 
 ## Contribute
-If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. PEP-8 styled code is not enforced but most welcome (human readability is required though).
-
-### TO-DO List
-- [x] Listen only to process initiator in the channel the command was used
-- [x] Allow editing of previous embeds
-  - [ ] Allow editing of existing reactions and roles on previous embeds
-- [ ] Message setup abort feature
-  - [ ] Delete entries to `*.csv` files when aborting
-- [ ] Delete entries to `*.csv` files when deleting a reaction role message
-- [ ] Your suggestions (open an issue [here](https://github.com/eibex/reaction-light/issues))
+If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 
 
 ## License
 [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
