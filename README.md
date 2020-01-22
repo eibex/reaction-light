@@ -26,7 +26,7 @@ You can host the bot yourself by configuring the `config.ini` file. Contact [eib
 - [License](#license)
 
 ## Requirements
-Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. It is recommended to run the bot on Linux based systems.
+Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. Currently, only Linux based systems are supported.
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
