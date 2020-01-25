@@ -34,7 +34,7 @@ python3 -m pip install -U discord.py requests
 ```
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it)
-- Run `setup.py` and follow the instructions or edit the `files/config.ini` file manually:
+- Run `setup.py` and follow the instructions or edit the `config.ini.sample` file manually (rename it to `config.ini` when done):
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
   - Name is not currently used and can be left blank
@@ -58,7 +58,7 @@ nohup python3 bot.py &
 ```
 
 ## Commands
-Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `reaction-light-files/config.ini`.
+Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
 
 ### Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
