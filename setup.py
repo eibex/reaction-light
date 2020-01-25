@@ -56,11 +56,11 @@ while True:
 
 while True:
     system_channel = input(
-        "Paste the ID of the channel you wish to receive system notifications (e.g. new versions of the bot). [optional]\n"
+        "Paste the ID of the channel you wish to receive system notifications (e.g. errors, new versions of the bot). [optional]\n"
     )
     if system_channel.lower() == "help":
         print(
-            "Currently only new versions are going to be fetched. Less than one message per week. Leave blank if no updates want to be received."
+            "Currently only new versions are going to be fetched. Less than one message per week. Leave blank if no updates or error notifications want to be received."
         )
         continue
     else:
