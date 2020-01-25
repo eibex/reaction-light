@@ -11,7 +11,7 @@ import rlightfm
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
