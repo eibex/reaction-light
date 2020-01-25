@@ -220,13 +220,17 @@ async def edit_embed(ctx):
             return
         ch_id = int(sub("[^0-9]", "", msg[0]))
         old_id = int(msg[1])
-        ch = bot.get_channel(ch_id)
-        old_msg = await ch.fetch_message(old_id)
-        title = msg[2]
-        content = msg[3]
-        em = discord.Embed(title=title, description=content, colour=botcolor)
-        em.set_footer(text="Reaction Light", icon_url=logo)
-        await old_msg.edit(embed=em)
+        try:
+            ch = bot.get_channel(ch_id)
+            old_msg = await ch.fetch_message(old_id)
+            title = msg[2]
+            content = msg[3]
+            em = discord.Embed(title=title, description=content, colour=botcolor)
+            em.set_footer(text="Reaction Light", icon_url=logo)
+            await old_msg.edit(embed=em)
+            await ctx.send("Message edited.")
+        except:
+            await ctx.send("The message could not be edited. Check that the IDs and formatting of the command are correct.")
 
 
 @bot.command(name="kill")
