@@ -40,7 +40,7 @@ python3 -m pip install -U discord.py requests
   - Name is not currently used and can be left blank
   - URL of the footer logo
   - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
-- Edit the `activities.csv` file:
+- Edit the `activities.csv.sample` file (it will be automatically copied to `activities.csv` when the bot is launched):
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
   - Do not use commas `,`.
