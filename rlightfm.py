@@ -1,4 +1,5 @@
 from random import randint
+from shutil import copy
 from os import path
 import csv
 
@@ -116,6 +117,13 @@ def step2(r, role, emoji, done=False):
 def end(r):
     del wizard[r]
     readcache()
+
+
+if not path.isfile("{}/files/activities.csv".format(folder)):
+    copy(
+        "{}/files/activities.csv.sample".format(folder),
+        "{}/files/activities.csv".format(folder),
+    )
 
 
 readcache()
