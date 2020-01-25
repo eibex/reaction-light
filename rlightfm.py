@@ -119,10 +119,10 @@ def end(r):
     readcache()
 
 
-if not path.isfile("{}/files/activities.csv".format(folder)):
+if not path.isfile("{}/activities.csv".format(folder)):
     copy(
-        "{}/files/activities.csv.sample".format(folder),
-        "{}/files/activities.csv".format(folder),
+        "{}/activities.csv.sample".format(folder),
+        "{}/activities.csv".format(folder),
     )
 
 
