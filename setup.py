@@ -1,4 +1,4 @@
-from os import path
+from os import path, rename
 import configparser
 
 # Original Repository: https://github.com/eibex/reaction-light
@@ -66,8 +66,9 @@ while True:
     else:
         break
 
+folder = path.dirname(path.realpath(__file__))
 config = configparser.ConfigParser()
-config.read("{}/config.ini".format(path.dirname(path.realpath(__file__))))
+config.read("{}/config.ini".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
 config["server"]["logo"] = logo
@@ -78,5 +79,7 @@ config["server_role"]["admin_c"] = admin_c
 
 with open("config.ini", "w") as f:
     config.write(f)
+
+rename("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
 input("Done. You can now delete setup.py")

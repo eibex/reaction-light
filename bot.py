@@ -60,9 +60,13 @@ def isadmin(ctx, msg=False):
 
 
 def check_for_updates():
-    latest = requests_get(
-        "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
-    ).text.lower().rstrip("\n")
+    latest = (
+        requests_get(
+            "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
+        )
+        .text.lower()
+        .rstrip("\n")
+    )
     if latest > __version__:
         return latest
     return False
@@ -81,7 +85,7 @@ async def updates():
     if system_channel and new_version:
         channel = bot.get_channel(system_channel)
         await channel.send(
-            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light".format(
+            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light or simply use `git pull origin master` on your server".format(
                 new_version
             )
         )
@@ -230,7 +234,9 @@ async def edit_embed(ctx):
             await old_msg.edit(embed=em)
             await ctx.send("Message edited.")
         except:
-            await ctx.send("The message could not be edited. Check that the IDs and formatting of the command are correct.")
+            await ctx.send(
+                "The message could not be edited. Check that the IDs and formatting of the command are correct."
+            )
 
 
 @bot.command(name="kill")
