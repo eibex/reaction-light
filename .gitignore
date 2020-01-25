@@ -10,3 +10,6 @@ __pycache__/
 # Configuration files and CSVs
 *.ini
 *.csv
+
+# Other
+*.out
