@@ -3,7 +3,7 @@ import configparser
 
 # Original Repository: https://github.com/eibex/reaction-light
 print("Author: eibex")
-print("Version: 0.0.3")
+print("Version: 0.0.4")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
@@ -68,7 +68,7 @@ while True:
 
 folder = path.dirname(path.realpath(__file__))
 config = configparser.ConfigParser()
-config.read("{}/config.ini".format(folder))
+config.read("{}/config.ini.sample".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
 config["server"]["logo"] = logo
@@ -77,7 +77,7 @@ config["server_role"]["admin_a"] = admin_a
 config["server_role"]["admin_b"] = admin_b
 config["server_role"]["admin_c"] = admin_c
 
-with open("config.ini", "w") as f:
+with open("config.ini.sample", "w") as f:
     config.write(f)
 
 rename("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
