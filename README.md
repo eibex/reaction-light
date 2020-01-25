@@ -12,6 +12,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Automatically assign/remove roles to users when they select/deselect a certain reaction
 - Use the same instance of the bot on multiple servers
 - Easy installation and setup
+- Optional update notifications and error reporting to your own Discord server
 
 You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
