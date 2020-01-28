@@ -11,7 +11,7 @@ import rlightfm
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
@@ -109,7 +109,7 @@ async def on_message(message):
         msg = message.content.split()
         if step is not None:  # Checks if the setup process was started before.
             if step == 1:  # If it was not, it ignores the message.
-                rlightfm.step1(r_id, msg[0])
+                rlightfm.step1(r_id, message.channel_mentions[0].id)
                 await message.channel.send(
                     "Attach roles and emojis separated by a space (one combination per message). When you are done type `done`. Example:\n:smile: `@Role`"
                 )
@@ -197,7 +197,7 @@ async def new(ctx):
     if isadmin(ctx):
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
         await ctx.send(
-            "Please paste the channel ID where to " "send the auto-role message."
+            "Please mention the #channel where to send the auto-role message."
         )
     else:
         await ctx.send("You do not have an admin role.")
@@ -219,10 +219,10 @@ async def edit_embed(ctx):
         msg = ctx.message.content.split(" // ")
         if len(msg) < 4:
             await ctx.send(
-                "Formatting is: `Channel ID // Message ID // New Title // New Content`"
+                "Formatting is: `#channelname // Message ID // New Title // New Content`"
             )
             return
-        ch_id = int(sub("[^0-9]", "", msg[0]))
+        ch_id = ctx.message.channel_mentions[0].id
         old_id = int(msg[1])
         try:
             ch = bot.get_channel(ch_id)
