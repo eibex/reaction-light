@@ -48,14 +48,17 @@ botcolor = 0xFFFF00
 
 def isadmin(ctx, msg=False):
     # Checks if command author has one of config.ini admin role IDs
-    check = (
-        [role.id for role in ctx.author.roles]
-        if msg
-        else [role.id for role in ctx.message.author.roles]
-    )
-    if admin_a in check or admin_b in check or admin_c in check:
-        return True
-    else:
+    try:
+        check = (
+            [role.id for role in ctx.author.roles]
+            if msg
+            else [role.id for role in ctx.message.author.roles]
+        )
+        if admin_a in check or admin_b in check or admin_c in check:
+            return True
+        return False
+    except AttributeError:
+        # Error raised from 'fake' users, such as webhooks
         return False
 
 
