@@ -10,6 +10,8 @@ cache = {}
 
 
 def readcache():
+    # Reads cache.csv and stores into the dictionary
+    # Run at the start of the program and updated when changes are made
     try:
         with open("{}/cache.csv".format(folder), "r") as f:
             r = csv.reader(f, delimiter=",")
@@ -20,6 +22,9 @@ def readcache():
 
 
 def get(user, channel):
+    # Checks if a setup process was initiated by "user" in "channel"
+    # If it was, it returns the setup ID along with the current setup step
+    # Otherwise a (None, None) tuple is returned
     global wizard
     for i in wizard:
         wizuser = wizard[i][0]
@@ -36,24 +41,28 @@ def getch(r):
 
 
 def getcombo(r):
+    # Returns the reaction-role combinations
     with open("{}/".format(folder) + str(r) + ".csv", "r") as f:
         r = csv.reader(f, delimiter=",")
         return [i for i in r]
 
 
 def addids(message_id, r):
+    # Adds the embed ID and CSV filename to the cache
     with open("{}/cache.csv".format(folder), "a") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow([message_id, r])
 
 
 def getids(message_id):
+    # Returns the CSV filename corresponding to an embed ID
     if message_id in cache:
         return cache[message_id]
     return None
 
 
 def getreactions(r):
+    # Returns a list of the reactions used by a certain embed
     with open("{}/".format(folder) + r + ".csv", "r") as f:
         r = csv.reader(f, delimiter=",")
         reactions = {}
@@ -66,6 +75,8 @@ def getreactions(r):
 
 
 def listen(user, channel):
+    # When the setup process is started a setup ID is assigned to a [user, channel] list
+    # The setup ID is also used as the CSV filename that stores the reaction-role combinations
     global wizard
     r = str(randint(0, 100000))
     ids = {}
@@ -92,6 +103,9 @@ def listen(user, channel):
 
 
 def step1(r, role_channel):
+    # The wizardcache is a dictionary where the key is the setup ID
+    # and the value is a list of lists (which will be written to CSV)
+    # Here, at the top of the list, the channel ID is added.
     global wizard
     global wizardcache
     wizardcache[r] = [[role_channel]]
@@ -99,6 +113,8 @@ def step1(r, role_channel):
 
 
 def step2(r, role, emoji, done=False):
+    # Adds [emoji, role] combinations to the wizardcache
+    # If "done" is passed, the wizardcache is written to CSV
     global wizard
     global wizardcache
     if done:
@@ -115,6 +131,7 @@ def step2(r, role, emoji, done=False):
 
 
 def end(r):
+    # Deletes the setup process and updates the cache
     del wizard[r]
     readcache()
 

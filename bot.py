@@ -63,6 +63,7 @@ def isadmin(ctx, msg=False):
 
 
 def check_for_updates():
+    # Get latest version from GitHub repo and checks it against the current one
     latest = (
         requests_get(
             "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
@@ -84,6 +85,7 @@ async def maintain_presence():
 
 @tasks.loop(seconds=86400)
 async def updates():
+    # Sends a reminder once a day if there are updates available
     new_version = check_for_updates()
     if system_channel and new_version:
         channel = bot.get_channel(system_channel)
@@ -111,6 +113,8 @@ async def on_message(message):
         msg = message.content.split()
         if step is not None:  # Checks if the setup process was started before.
             if step == 1:  # If it was not, it ignores the message.
+                # The channel the message needs to be sent to is stored
+                # Advances to step two
                 rlightfm.step1(r_id, message.channel_mentions[0].id)
                 await message.channel.send(
                     "Attach roles and emojis separated by a space (one combination per message). "
@@ -118,8 +122,11 @@ async def on_message(message):
                 )
             elif step == 2:
                 if msg[0].lower() != "done":
+                    # Stores reaction-role combinations until "done" is received
                     rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
                 else:
+                    # If "done" is received the combinations are written to CSV
+                    # Advances to step three
                     rlightfm.step2(r_id, None, msg[0], done=True)
                     em = discord.Embed(
                         title="Title", description="Message_content", colour=botcolor
@@ -130,6 +137,8 @@ async def on_message(message):
                         embed=em,
                     )
             elif step == 3:
+                # Receives the title and description of the embed
+                # If the formatting is not correct it reminds the user of it
                 msg = message.content.split(" // ")
                 if len(msg) != 2:
                     await message.channel.send(
@@ -146,10 +155,10 @@ async def on_message(message):
                     emb = await channel.send(embed=em)
                     combo = rlightfm.getcombo(r_id)
                     for i in range(len(combo)):
-                        if (
-                            i != 0
-                        ):  # skip first row as it does not contain reaction/role data
+                        if i != 0:
+                            # Skips first row as it does not contain reaction/role data
                             await emb.add_reaction(combo[i][0])
+                    # Writes CSV name and embed ID to cache.csv and ends process
                     rlightfm.addids(emb.id, r_id)
                     rlightfm.end(r_id)
 
@@ -165,13 +174,16 @@ async def on_raw_reaction_add(payload):
     guild_id = payload.guild_id
     r = rlightfm.getids(str(msg_id))
     if r is not None:
+        # Checks that the message that was reacted to is an embed managed by the bot
         reactions = rlightfm.getreactions(r)
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
         if str(reaction) not in reactions:
+            # Removes reactions added to the embed that are not connected to any role
             await msg.remove_reaction(reaction, user)
         else:
+            # Gives role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
@@ -196,8 +208,10 @@ async def on_raw_reaction_remove(payload):
     guild_id = payload.guild_id
     r = rlightfm.getids(str(msg_id))
     if r is not None:
+        # Checks that the message that was unreacted to is an embed managed by the bot
         reactions = rlightfm.getreactions(r)
         if str(reaction) in reactions:
+            # Removes role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
@@ -216,6 +230,8 @@ async def on_raw_reaction_remove(payload):
 @bot.command(name="new")
 async def new(ctx):
     if isadmin(ctx):
+        # Starts setup process and the bot starts to listen to the user in that channel
+        # For future prompts (see: "async def on_message(message)")
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
         await ctx.send(
             "Please mention the #channel where to send the auto-role message."
@@ -238,6 +254,7 @@ async def hlp(ctx):
 @bot.command(name="edit")
 async def edit_embed(ctx):
     if isadmin(ctx):
+        # Reminds user of formatting if it is wrong
         msg = ctx.message.content.split(" // ")
         if len(msg) < 4:
             await ctx.send(
@@ -247,6 +264,8 @@ async def edit_embed(ctx):
         ch_id = ctx.message.channel_mentions[0].id
         old_id = int(msg[1])
         try:
+            # Tries to edit the embed
+            # Raises errors if the channel sent was invalid or if the bot cannot edit the message
             ch = bot.get_channel(ch_id)
             old_msg = await ch.fetch_message(old_id)
             title = msg[2]
@@ -267,7 +286,7 @@ async def edit_embed(ctx):
 async def kill(ctx):
     if isadmin(ctx):
         await ctx.send("Shutting down...")
-        shutdown()
+        shutdown()  # sys.exit()
     else:
         await ctx.send("You do not have an admin role.")
 
