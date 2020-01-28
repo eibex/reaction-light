@@ -237,6 +237,8 @@ async def edit_embed(ctx):
             await ctx.send(
                 "The message could not be edited. Check that the IDs and formatting of the command are correct."
             )
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="kill")
@@ -244,6 +246,7 @@ async def kill(ctx):
     if isadmin(ctx):
         await ctx.send("Shutting down...")
         exit()
-
+    else:
+        await ctx.send("You do not have an admin role.")
 
 bot.run(TOKEN)

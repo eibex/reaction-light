@@ -17,14 +17,18 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
 ## Contents
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Running the Bot](#running-the-bot)
-- [Commands](#commands)
-  - [Example](#example)
-- [Troubleshooting](#troubleshooting)
-- [Contribute](#contribute)
-- [License](#license)
+- [Reaction Light - Discord Role Bot](#reaction-light---discord-role-bot)
+  - [Features](#features)
+  - [Contents](#contents)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Running the bot](#running-the-bot)
+  - [Commands](#commands)
+    - [Example](#example)
+      - [Editing](#editing)
+  - [FAQ](#faq)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. Currently, only Linux based systems are supported.
@@ -33,6 +37,7 @@ You can get discord.py (and other dependencies) via PyPI:
 ```
 python3 -m pip install -U discord.py requests 
 ```
+
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it)
 - Run `setup.py` and follow the instructions or edit the `config.ini.sample` file manually (rename it to `config.ini` when done):
@@ -53,13 +58,19 @@ The bot can be run by using:
 ```
 python3 bot.py
 ```
+
 To run it as a background task (recommended unless debugging):
 ```
 nohup python3 bot.py &
 ```
 
 ## Commands
-Use `rl!help` to get started and follow the instructions. If the bot replies with an admin error, make sure you set the role id correctly in `config.ini`.
+All commands require an admin role set in `config.ini`. The bot will reply with missing permissions otherwise. In the following list the default prefix `rl!` is used, but it can be freely changed in the `config.ini` file.
+
+- `rl!help` shows a set of commands to get started and provides a link to this README's setup walkthrough.
+- `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
+- `rl!edit` edits an existing reaction role message. Check [below](#editing) for an example.
+- `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 
 ### Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
@@ -68,11 +79,13 @@ Initiate the message creation process with `rl!new`.
 ```
 User: rl!new
 ```
+
 Next, you will be asked to provide the ID of the channel you want to send the message in. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
 ```
 Bot: Please paste the channel ID where to send the auto-role message.
 User: 595907369242722304
 ```
+
 Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on your server (i.e. the Bot is not a Nitro user and cannot use emojis from other servers). Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
 ```
 Bot: Attach roles and emojis separated by a space (one combination per message).
@@ -84,11 +97,13 @@ User: :cry: @EvenSadderRole
 User: :joy: @HappyRole
 User: done
 ```
+
 Next, you will be asked to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
 ```
 Bot: What would you like the message to say? Formatting is: `Title // Message_content`
 User: Select your roles // Click on the buttons below to give yourself some roles!
 ```
+
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
 
 #### Editing
@@ -96,10 +111,12 @@ To edit an old embed and preserve the emoji-role links, you can use the `edit` c
 ```
 rl!edit CHANNEL_ID // MESSAGE_ID // New Title // New Description
 ```
+
 Any admin can edit old embeds, even if they were originally created by another admin.
 
 ## FAQ
 **When I click one of the reactions the bot does not give me a role!**
+
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
 
 Post bugs and issues [here](https://github.com/eibex/reaction-light/issues).
