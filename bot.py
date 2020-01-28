@@ -1,6 +1,6 @@
 import configparser
+from sys import exit as shutdown
 from os import path
-from re import sub
 from itertools import cycle
 import csv
 import discord
@@ -79,15 +79,14 @@ async def maintain_presence():
     await bot.change_presence(activity=discord.Game(name=activity))
 
 
-@tasks.loop(seconds=3600)
+@tasks.loop(seconds=86400)
 async def updates():
     new_version = check_for_updates()
     if system_channel and new_version:
         channel = bot.get_channel(system_channel)
         await channel.send(
-            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light or simply use `git pull origin master` on your server".format(
-                new_version
-            )
+            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light "
+            "or simply use `git pull origin master` on your server".format(new_version)
         )
 
 
@@ -111,7 +110,8 @@ async def on_message(message):
             if step == 1:  # If it was not, it ignores the message.
                 rlightfm.step1(r_id, message.channel_mentions[0].id)
                 await message.channel.send(
-                    "Attach roles and emojis separated by a space (one combination per message). When you are done type `done`. Example:\n:smile: `@Role`"
+                    "Attach roles and emojis separated by a space (one combination per message). "
+                    "When you are done type `done`. Example:\n:smile: `@Role`"
                 )
             elif step == 2:
                 if msg[0].lower() != "done":
@@ -173,7 +173,16 @@ async def on_raw_reaction_add(payload):
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
             if user_id != bot.user.id:
-                await member.add_roles(role)
+                try:
+                    await member.add_roles(role)
+                except discord.Forbidden:
+                    if system_channel:
+                        channel = bot.get_channel(system_channel)
+                        await channel.send(
+                            "Someone tried to add a role to themselves but I do not have permissions to add it. "
+                            "Ensure that I have a role that is hierarchically higher than the role I have to assign, "
+                            "and that I have the `Manage Roles` permission."
+                        )
 
 
 @bot.event
@@ -189,7 +198,16 @@ async def on_raw_reaction_remove(payload):
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=reactions[str(reaction)])
-            await member.remove_roles(role)
+            try:
+                await member.remove_roles(role)
+            except discord.Forbidden:
+                if system_channel:
+                    channel = bot.get_channel(system_channel)
+                    await channel.send(
+                        "Someone tried to remove a role from themselves but I do not have permissions to remove it. "
+                        "Ensure that I have a role that is hierarchically higher than the role I have to remove, "
+                        "and that I have the `Manage Roles` permission."
+                    )
 
 
 @bot.command(name="new")
@@ -207,7 +225,8 @@ async def new(ctx):
 async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
-            "Use `rl!new` to start creating a reaction message.\nVisit <https://github.com/eibex/reaction-light/blob/master/README.md#example> for a setup walkthrough."
+            "Use `rl!new` to start creating a reaction message.\n"
+            "Visit <https://github.com/eibex/reaction-light/blob/master/README.md#example> for a setup walkthrough."
         )
     else:
         await ctx.send("You do not have an admin role.")
@@ -233,10 +252,10 @@ async def edit_embed(ctx):
             em.set_footer(text="Reaction Light", icon_url=logo)
             await old_msg.edit(embed=em)
             await ctx.send("Message edited.")
-        except:
-            await ctx.send(
-                "The message could not be edited. Check that the IDs and formatting of the command are correct."
-            )
+        except IndexError:
+            await ctx.send("The channel you linked is invalid.")
+        except discord.Forbidden:
+            await ctx.send("I do not have permissions to edit the message.")
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -245,8 +264,9 @@ async def edit_embed(ctx):
 async def kill(ctx):
     if isadmin(ctx):
         await ctx.send("Shutting down...")
-        exit()
+        shutdown()
     else:
         await ctx.send("You do not have an admin role.")
+
 
 bot.run(TOKEN)

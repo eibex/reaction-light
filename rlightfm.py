@@ -121,8 +121,7 @@ def end(r):
 
 if not path.isfile("{}/activities.csv".format(folder)):
     copy(
-        "{}/activities.csv.sample".format(folder),
-        "{}/activities.csv".format(folder),
+        "{}/activities.csv.sample".format(folder), "{}/activities.csv".format(folder),
     )
 
 
