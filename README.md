@@ -109,9 +109,14 @@ Finally, the bot will send the message to the channel specified in the first ste
 #### Editing
 To edit an old embed and preserve the emoji-role links, you can use the `edit` command. You will need the message id where the embed is located. You can find these IDs by right clicking the respective channel and messages. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
 
-For example:
+The formatting is:
 ```
 rl!edit #channelname // MESSAGE_ID // New Title // New Description
+```
+
+For example:
+```
+rl!edit #get-roles // 672701308151278629 // A new title! // ...and a new description!
 ```
 
 Any admin can edit old embeds, even if they were originally created by another admin.
