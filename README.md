@@ -80,10 +80,10 @@ Initiate the message creation process with `rl!new`.
 User: rl!new
 ```
 
-Next, you will be asked to provide the ID of the channel you want to send the message in. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
+Next, you will be asked to mention the channel you want to send the message in.
 ```
-Bot: Please paste the channel ID where to send the auto-role message.
-User: 595907369242722304
+Bot: Please mention the #channel where to send the auto-role message.
+User: #get-roles
 ```
 
 Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on your server (i.e. the Bot is not a Nitro user and cannot use emojis from other servers). Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
@@ -107,9 +107,11 @@ User: Select your roles // Click on the buttons below to give yourself some role
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
 
 #### Editing
-To edit an old embed and preserve the emoji-role links, you can use the `edit` command. You will need the channel and message id where the embed is located. You can find these IDs by right clicking the respective channel and messages (with developer mode on in your Discord settings). For example:
+To edit an old embed and preserve the emoji-role links, you can use the `edit` command. You will need the message id where the embed is located. You can find these IDs by right clicking the respective channel and messages. You can find the ID by right clicking the channel and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
+
+For example:
 ```
-rl!edit CHANNEL_ID // MESSAGE_ID // New Title // New Description
+rl!edit #channelname // MESSAGE_ID // New Title // New Description
 ```
 
 Any admin can edit old embeds, even if they were originally created by another admin.
