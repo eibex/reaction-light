@@ -24,8 +24,8 @@ You can host the bot yourself by configuring the `config.ini` file. Contact [eib
   - [Setup](#setup)
   - [Running the bot](#running-the-bot)
   - [Commands](#commands)
-    - [Example](#example)
-      - [Editing](#editing)
+    - [Setup Example](#setup%20example)
+    - [Editing](#editing)
   - [FAQ](#faq)
   - [Contribute](#contribute)
   - [License](#license)
@@ -72,7 +72,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 - `rl!edit` edits an existing reaction role message. Check [below](#editing) for an example.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 
-### Example
+### Setup Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
 
 Initiate the message creation process with `rl!new`.
@@ -106,18 +106,8 @@ User: Select your roles // Click on the buttons below to give yourself some role
 
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
 
-#### Editing
-To edit an old embed and preserve the emoji-role links, you can use the `edit` command. You will need the message id, which can be found by right clicking on the reaction-role message and clicking on `Copy ID`. If you do not see a `Copy ID` option, go to `Discord Settings > Appearance` and, at the bottom of the page, turn `Developer Mode` ON.
-
-The formatting is:
-```
-rl!edit #channelname // MESSAGE_ID // New Title // New Description
-```
-
-For example:
-```
-rl!edit #get-roles // 672701308151278629 // A new title! // ...and a new description!
-```
+### Editing
+To edit an old embed and preserve the emoji-role links, you can use the `edit` command. Using `rl!edit` will provide you with a set of instructions to edit your embeds.
 
 Any admin can edit old embeds, even if they were originally created by another admin.
 
