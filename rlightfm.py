@@ -14,8 +14,8 @@ def readcache():
     # Run at the start of the program and updated when changes are made
     try:
         with open("{}/cache.csv".format(folder), "r") as f:
-            r = csv.reader(f, delimiter=",")
-            for row in r:
+            read = csv.reader(f, delimiter=",")
+            for row in read:
                 cache[row[0]] = row[1]
     except FileNotFoundError:
         print("No cache.csv file found. It will be created on the next wizard run.")
@@ -42,9 +42,9 @@ def getch(r):
 
 def getcombo(r):
     # Returns the reaction-role combinations
-    with open("{}/".format(folder) + str(r) + ".csv", "r") as f:
-        r = csv.reader(f, delimiter=",")
-        return [i for i in r]
+    with open("{}/{}.csv".format(folder, str(r)), "r") as f:
+        read = csv.reader(f, delimiter=",")
+        return [i for i in read]
 
 
 def addids(message_id, r):
@@ -63,10 +63,10 @@ def getids(message_id):
 
 def getreactions(r):
     # Returns a list of the reactions used by a certain embed
-    with open("{}/".format(folder) + r + ".csv", "r") as f:
-        r = csv.reader(f, delimiter=",")
+    with open("{}/{}.csv".format(folder, str(r)), "r") as f:
+        read = csv.reader(f, delimiter=",")
         reactions = {}
-        for row in r:
+        for row in read:
             try:
                 reactions[row[0]] = int(row[1])
             except IndexError:
@@ -119,7 +119,7 @@ def step2(r, role, emoji, done=False):
     global wizardcache
     if done:
         wizard[r][3] += 1  # Set step3 (was 2)
-        with open("{}/".format(folder) + str(r) + ".csv", "a") as f:
+        with open("{}/{}.csv".format(folder, str(r)), "a") as f:
             w = csv.writer(f, delimiter=",")
             for i in wizardcache[r]:
                 w.writerow(i)
@@ -129,6 +129,20 @@ def step2(r, role, emoji, done=False):
     print("Added " + emoji + " : " + role + " combo.")
     wizardcache[r].append(combo)
 
+
+def edit(role_channel):
+    # Loops through all CSVs to check for embeds that are present in role_channel
+    r_ids = {}
+    for msg_id in cache:
+        r = cache[msg_id]
+        with open("{}/{}.csv".format(folder, str(r)), "r") as f:
+            read = csv.reader(f, delimiter=",")
+            for row in read:
+                channel = int(row[0])
+                break # The channel is stored only at the first row
+            if role_channel == channel:
+                r_ids[str(msg_id)] = str(r)
+    return r_ids
 
 def end(r):
     # Deletes the setup process and updates the cache
