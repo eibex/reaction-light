@@ -13,6 +13,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Use the same instance of the bot on multiple servers
 - Easy installation and setup
 - Optional update notifications and error reporting to your own Discord server
+- No need to rely on developer mode and IDs
 
 You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
