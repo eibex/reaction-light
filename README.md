@@ -24,7 +24,7 @@ You can host the bot yourself by configuring the `config.ini` file. Contact [eib
   - [Setup](#setup)
   - [Running the bot](#running-the-bot)
   - [Commands](#commands)
-    - [Setup Example](#setup%20example)
+    - [Setup Example](#setup-example)
     - [Editing](#editing)
   - [FAQ](#faq)
   - [Contribute](#contribute)
