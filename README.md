@@ -18,18 +18,15 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
 
 ## Contents
-- [Reaction Light - Discord Role Bot](#reaction-light---discord-role-bot)
-  - [Features](#features)
-  - [Contents](#contents)
-  - [Requirements](#requirements)
-  - [Setup](#setup)
-  - [Running the bot](#running-the-bot)
-  - [Commands](#commands)
-    - [Setup Example](#setup-example)
-    - [Editing](#editing)
-  - [FAQ](#faq)
-  - [Contribute](#contribute)
-  - [License](#license)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Running the bot](#running-the-bot)
+- [Commands](#commands)
+  - [Setup Example](#setup-example)
+  - [Editing](#editing)
+- [FAQ](#faq)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. Currently, only Linux based systems are supported.
