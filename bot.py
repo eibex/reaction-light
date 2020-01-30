@@ -11,7 +11,7 @@ import rlightfm
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
@@ -115,7 +115,20 @@ async def on_message(message):
             if step == 1:  # If it was not, it ignores the message.
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
-                rlightfm.step1(r_id, message.channel_mentions[0].id)
+                try:
+                    server = bot.get_guild(message.guild.id)
+                    bot_user = server.get_member(bot.user.id)
+                    ch_id = message.channel_mentions[0].id
+                    bot_permissions = bot.get_channel(ch_id).permissions_for(bot_user)
+                    writable = bot_permissions.read_messages
+                    readable = bot_permissions.view_channel
+                    if not writable or not readable:
+                        await message.channel.send("I cannot read or send messages to that channel.")
+                        return
+                except IndexError:
+                    await message.channel.send("The channel you mentioned is invalid.")
+                    return
+                rlightfm.step1(r_id, ch_id)
                 await message.channel.send(
                     "Attach roles and emojis separated by a space (one combination per message). "
                     "When you are done type `done`. Example:\n:smile: `@Role`"
@@ -240,44 +253,103 @@ async def new(ctx):
         await ctx.send("You do not have an admin role.")
 
 
-@bot.command(name="help")
-async def hlp(ctx):
-    if isadmin(ctx):
-        await ctx.send(
-            "Use `rl!new` to start creating a reaction message.\n"
-            "Visit <https://github.com/eibex/reaction-light/blob/master/README.md#example> for a setup walkthrough."
-        )
-    else:
-        await ctx.send("You do not have an admin role.")
-
-
 @bot.command(name="edit")
 async def edit_embed(ctx):
     if isadmin(ctx):
         # Reminds user of formatting if it is wrong
-        msg = ctx.message.content.split(" // ")
-        if len(msg) < 4:
+        msg = ctx.message.content.split()
+        if len(msg) < 2:
             await ctx.send(
-                "Formatting is: `#channelname // Message ID // New Title // New Content`"
+                "Type `{}edit #channelname` to get started. Replace `#channelname` "
+                "with the channel where the reaction-role message "
+                "you wish to edit is located.".format(prefix)
             )
             return
-        ch_id = ctx.message.channel_mentions[0].id
-        old_id = int(msg[1])
-        try:
-            # Tries to edit the embed
-            # Raises errors if the channel sent was invalid or if the bot cannot edit the message
+        elif len(msg) == 2:
+            try:
+                ch_id = ctx.message.channel_mentions[0].id
+            except IndexError:
+                await ctx.send("The channel you mentioned is invalid.")
+                return
             ch = bot.get_channel(ch_id)
-            old_msg = await ch.fetch_message(old_id)
-            title = msg[2]
-            content = msg[3]
-            em = discord.Embed(title=title, description=content, colour=botcolor)
-            em.set_footer(text="Reaction Light", icon_url=logo)
-            await old_msg.edit(embed=em)
-            await ctx.send("Message edited.")
-        except IndexError:
-            await ctx.send("The channel you linked is invalid.")
-        except discord.Forbidden:
-            await ctx.send("I do not have permissions to edit the message.")
+            r_ids = rlightfm.edit(ch_id)
+            if len(r_ids) == 1:
+                await ctx.send(
+                    "There is only one embed in this channel. Type "
+                    "`{}edit #channelname // 1 // New Title // New Description` "
+                    "to edit the reaction-role message.".format(prefix)
+                )
+            elif len(r_ids) > 1:
+                embeds = []
+                counter = 1
+                for msg_id in r_ids:
+                    try:
+                        old_msg = await ch.fetch_message(int(msg_id))
+                    except discord.NotFound:
+                        # Skipping embeds that might have been deleted without updating CSVs
+                        continue
+                    except discord.Forbidden:
+                        ctx.send("I do not have permissions to edit a reaction-role message that I previously created.")
+                        continue
+                    entry = "{}. {}".format(counter, old_msg.embeds[0].title)
+                    embeds.append(entry)
+                    counter += 1
+                await ctx.send(
+                    "There are {} embeds in this channel. Type "
+                    "`{}edit #channelname // EMBED_NUMBER // New Title // New Description` "
+                    "to edit the desired reaction-role message. The list of embeds is:\n".format(len(r_ids), prefix)
+                    + "\n".join(embeds)
+                )
+            else:
+                await ctx.send("There are no reaction-role messages in that channel.")
+        elif len(msg) > 2:
+            try:
+                # Tries to edit the embed
+                # Raises errors if the channel sent was invalid or if the bot cannot edit the message
+                ch_id = ctx.message.channel_mentions[0].id
+                ch = bot.get_channel(ch_id)
+                msg = ctx.message.content.split(" // ")
+                embed_number = msg[1]
+                r_ids = rlightfm.edit(ch_id)
+                counter = 1
+                # Loop through all msg_ids and stops when the counter matches the user input
+                if r_ids:
+                    to_edit_id = None
+                    for msg_id in r_ids:
+                        if str(counter) == embed_number:
+                            to_edit_id = msg_id
+                            break
+                        counter += 1
+                else:
+                    await ctx.send("You selected an embed that does not exist.")
+                    return
+                if to_edit_id:
+                    old_msg = await ch.fetch_message(int(to_edit_id))
+                else:
+                    await ctx.send("Select a valid embed number (i.e. the number to the left of the embed title in the list above).")
+                    return
+                title = msg[2]
+                content = msg[3]
+                em = discord.Embed(title=title, description=content, colour=botcolor)
+                em.set_footer(text="Reaction Light", icon_url=logo)
+                await old_msg.edit(embed=em)
+                await ctx.send("Message edited.")
+            except IndexError:
+                await ctx.send("The channel you mentioned is invalid.")
+            except discord.Forbidden:
+                await ctx.send("I do not have permissions to edit the message.")
+        else:
+            await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="help")
+async def hlp(ctx):
+    if isadmin(ctx):
+        await ctx.send(
+            "Use `{}new` to start creating a reaction message.\n"
+            "Visit <https://github.com/eibex/reaction-light/blob/master/README.md#example> "
+            "for a setup walkthrough.".format(prefix)
+        )
     else:
         await ctx.send("You do not have an admin role.")
 
