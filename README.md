@@ -22,8 +22,9 @@ You can host the bot yourself by configuring the `config.ini` file. Contact [eib
 - [Setup](#setup)
 - [Running the bot](#running-the-bot)
 - [Commands](#commands)
-  - [Setup Example](#setup-example)
+  - [Usage Example](#usage-example)
   - [Editing](#editing)
+- [Updating](#updating)
 - [FAQ](#faq)
 - [Contribute](#contribute)
 - [License](#license)
@@ -37,7 +38,7 @@ python3 -m pip install -U discord.py requests
 ```
 
 ## Setup
-- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it)
+- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
 - Run `setup.py` and follow the instructions or edit the `config.ini.sample` file manually (rename it to `config.ini` when done):
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
@@ -70,7 +71,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 - `rl!edit` edits an existing reaction role message. Check [below](#editing) for an example.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 
-### Setup Example
+### Usage Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
 
 Initiate the message creation process with `rl!new`.
@@ -108,6 +109,28 @@ Finally, the bot will send the message to the channel specified in the first ste
 To edit an old embed and preserve the emoji-role links, you can use the `edit` command. Using `rl!edit` will provide you with a set of instructions to edit your embeds.
 
 Any admin can edit old embeds, even if they were originally created by another admin.
+
+## Updating
+If you set a system channel in `config.ini`, your bot will check for new versions from this repository. If updates are available a message is sent briefly outlining the update process. This process varies depending on how you installed the bot.
+
+### Updating a git install
+If you downloaded the bot with git, updating is trivial:
+
+- Navigate to the reaction-light directory
+- Run `git pull origin master`
+- Shutdown the bot by using the `rl!kill` command
+- Start the bot again
+
+### Updating a zip install
+This is not the recommended way to manage the bot files, consider moving to git. You can copy your `files` folder and the `config.ini` file to maintain the bot functionality with older reaction-role messages. 
+
+If you downloaded the bot as a zip archive:
+
+- Download the new zip
+- Extract it into the current reaction-light folder and replace old files with new ones if prompted to
+- Shutdown the bot by using the `rl!kill` command
+- Start the bot again
+
 
 ## FAQ
 **When I click one of the reactions the bot does not give me a role!**
