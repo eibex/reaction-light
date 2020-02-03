@@ -291,7 +291,7 @@ async def edit_embed(ctx):
                     except discord.Forbidden:
                         ctx.send("I do not have permissions to edit a reaction-role message that I previously created.")
                         continue
-                    entry = "{}. {}".format(counter, old_msg.embeds[0].title)
+                    entry = "`{}` {}".format(counter, old_msg.embeds[0].title)
                     embeds.append(entry)
                     counter += 1
                 await ctx.send(
