@@ -11,7 +11,7 @@ import rlightfm
 
 # Original Repository: https://github.com/eibex/reaction-light
 __author__ = "eibex"
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
@@ -111,6 +111,7 @@ async def on_message(message):
         step = wizard[0]
         r_id = wizard[1]
         msg = message.content.split()
+
         if step is not None:  # Checks if the setup process was started before.
             if step == 1:  # If it was not, it ignores the message.
                 # The channel the message needs to be sent to is stored
@@ -128,6 +129,7 @@ async def on_message(message):
                 except IndexError:
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
+
                 rlightfm.step1(r_id, ch_id)
                 await message.channel.send(
                     "Attach roles and emojis separated by a space (one combination per message). "
@@ -141,6 +143,7 @@ async def on_message(message):
                     # If "done" is received the combinations are written to CSV
                     # Advances to step three
                     rlightfm.step2(r_id, None, msg[0], done=True)
+
                     em = discord.Embed(
                         title="Title", description="Message_content", colour=botcolor
                     )
@@ -166,6 +169,7 @@ async def on_message(message):
                     em.set_footer(text="Reaction Light", icon_url=logo)
                     channel = bot.get_channel(int(rlightfm.getch(r_id)))
                     emb = await channel.send(embed=em)
+
                     combo = rlightfm.getcombo(r_id)
                     for i in range(len(combo)):
                         if i != 0:
@@ -271,6 +275,7 @@ async def edit_embed(ctx):
             except IndexError:
                 await ctx.send("The channel you mentioned is invalid.")
                 return
+
             ch = bot.get_channel(ch_id)
             r_ids = rlightfm.edit(ch_id)
             if len(r_ids) == 1:
@@ -294,6 +299,7 @@ async def edit_embed(ctx):
                     entry = "`{}` {}".format(counter, old_msg.embeds[0].title)
                     embeds.append(entry)
                     counter += 1
+
                 await ctx.send(
                     "There are {} embeds in this channel. Type "
                     "`{}edit #channelname // EMBED_NUMBER // New Title // New Description` "
@@ -312,6 +318,7 @@ async def edit_embed(ctx):
                 embed_number = msg[1]
                 r_ids = rlightfm.edit(ch_id)
                 counter = 1
+
                 # Loop through all msg_ids and stops when the counter matches the user input
                 if r_ids:
                     to_edit_id = None
@@ -323,23 +330,55 @@ async def edit_embed(ctx):
                 else:
                     await ctx.send("You selected an embed that does not exist.")
                     return
+
                 if to_edit_id:
                     old_msg = await ch.fetch_message(int(to_edit_id))
                 else:
                     await ctx.send("Select a valid embed number (i.e. the number to the left of the embed title in the list above).")
                     return
+
                 title = msg[2]
                 content = msg[3]
                 em = discord.Embed(title=title, description=content, colour=botcolor)
                 em.set_footer(text="Reaction Light", icon_url=logo)
                 await old_msg.edit(embed=em)
                 await ctx.send("Message edited.")
+
             except IndexError:
                 await ctx.send("The channel you mentioned is invalid.")
+
             except discord.Forbidden:
                 await ctx.send("I do not have permissions to edit the message.")
+
         else:
             await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="systemchannel")
+async def set_systemchannel(ctx):
+    if isadmin(ctx):
+        global system_channel
+        try:
+            system_channel = ctx.message.channel_mentions[0].id
+
+            server = bot.get_guild(ctx.message.guild.id)
+            bot_user = server.get_member(bot.user.id)
+            bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
+            writable = bot_permissions.read_messages
+            readable = bot_permissions.view_channel
+            if not writable or not readable:
+                await ctx.send("I cannot read or send messages to that channel.")
+                return
+
+            config["server"]["system_channel"] = str(system_channel)
+
+            with open("config.ini", "w") as f:
+                config.write(f)
+
+            await ctx.send("System channel updated.")
+
+        except IndexError:
+            await ctx.send("Mention the channel you would like to receive notifications in.")
 
 
 @bot.command(name="help")
@@ -347,8 +386,9 @@ async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
             "Use `{}new` to start creating a reaction message.\n"
-            "Visit <https://github.com/eibex/reaction-light/blob/master/README.md#example> "
-            "for a setup walkthrough.".format(prefix)
+            "Visit <https://github.com/eibex/reaction-light#usage-example> "
+            "for a setup walkthrough.\n\nYou can find a list of commands here: "
+            "<https://github.com/eibex/reaction-light#commands>".format(prefix)
         )
     else:
         await ctx.send("You do not have an admin role.")

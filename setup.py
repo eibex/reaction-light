@@ -3,7 +3,7 @@ import configparser
 
 # Original Repository: https://github.com/eibex/reaction-light
 print("Author: eibex")
-print("Version: 0.0.6")
+print("Version: 0.0.7")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
@@ -56,7 +56,7 @@ while True:
 
 while True:
     system_channel = input(
-        "Paste the ID of the channel you wish to receive system notifications (e.g. errors, new versions of the bot). [optional]\n"
+        "Paste the ID of the channel you wish to receive system notifications (e.g. errors, new versions of the bot). This is optional and you can set it up later by using the systemchannel command.\n"
     )
     if system_channel.lower() == "help":
         print(

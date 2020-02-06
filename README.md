@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 0.0.6](https://img.shields.io/badge/Reaction%20Light-0.0.6-yellow.svg)
+![Reaction Light 0.0.7](https://img.shields.io/badge/Reaction%20Light-0.0.7-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -18,17 +18,22 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 You can host the bot yourself by configuring the `config.ini` file.
 
 ## Contents
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Running the bot](#running-the-bot)
-- [Commands](#commands)
-  - [Usage Example](#usage-example)
-  - [Editing](#editing)
-- [Updating](#updating)
-- [FAQ](#faq)
-- [Help](#help)
-- [Contribute](#contribute)
-- [License](#license)
+- [Reaction Light - Discord Role Bot](#reaction-light---discord-role-bot)
+  - [Features](#features)
+  - [Contents](#contents)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Running the bot](#running-the-bot)
+  - [Commands](#commands)
+    - [Usage Example](#usage-example)
+    - [Editing](#editing)
+  - [Updating](#updating)
+    - [Updating a git install](#updating-a-git-install)
+    - [Updating a zip install](#updating-a-zip-install)
+  - [FAQ](#faq)
+  - [Help](#help)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Requirements
 Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. Currently, only Linux based systems are supported.
@@ -71,6 +76,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
 - `rl!edit` edits an existing reaction role message. Check [below](#editing) for an example.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
+- `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
 
 ### Usage Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
