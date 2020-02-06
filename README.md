@@ -15,7 +15,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Optional update notifications and error reporting to your own Discord server
 - No need to rely on developer mode and IDs
 
-You can host the bot yourself by configuring the `config.ini` file. Contact [eibex](https://github.com/eibex) if you want to add the bot hosted by him.
+You can host the bot yourself by configuring the `config.ini` file.
 
 ## Contents
 - [Requirements](#requirements)
@@ -26,6 +26,7 @@ You can host the bot yourself by configuring the `config.ini` file. Contact [eib
   - [Editing](#editing)
 - [Updating](#updating)
 - [FAQ](#faq)
+- [Help](#help)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -137,7 +138,8 @@ If you downloaded the bot as a zip archive:
 
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
 
-Post bugs and issues [here](https://github.com/eibex/reaction-light/issues).
+## Help
+If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
 
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 
