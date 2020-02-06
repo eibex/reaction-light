@@ -91,7 +91,8 @@ async def updates():
         channel = bot.get_channel(system_channel)
         await channel.send(
             "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light "
-            "or simply use `git pull origin master` on your server".format(new_version)
+            "or simply use `git pull origin master` on your server.\n"
+            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>".format(new_version)
         )
 
 
