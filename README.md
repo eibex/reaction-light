@@ -118,6 +118,8 @@ To edit an old embed and preserve the emoji-role links, you can use the `edit` c
 Any admin can edit old embeds, even if they were originally created by another admin.
 
 ## Updating
+You can view new features in the [changelog](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md).
+
 If you set a system channel in `config.ini`, your bot will check for new versions from this repository. If updates are available a message is sent briefly outlining the update process. This process varies depending on how you installed the bot.
 
 ### Updating a git install
