@@ -83,4 +83,4 @@ with open("config.ini.sample", "w") as f:
 
 copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
-input("Done. You can now delete setup.py")
+input("Done. You can now start the bot.")
