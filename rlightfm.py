@@ -139,10 +139,11 @@ def edit(role_channel):
             read = csv.reader(f, delimiter=",")
             for row in read:
                 channel = int(row[0])
-                break # The channel is stored only at the first row
+                break  # The channel is stored only at the first row
             if role_channel == channel:
                 r_ids[str(msg_id)] = str(r)
     return r_ids
+
 
 def end(r):
     # Deletes the setup process and updates the cache

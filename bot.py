@@ -92,7 +92,9 @@ async def updates():
         await channel.send(
             "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light "
             "or simply use `git pull origin master` on your server.\n\n"
-            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>".format(new_version)
+            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>".format(
+                new_version
+            )
         )
 
 
@@ -125,7 +127,9 @@ async def on_message(message):
                     writable = bot_permissions.read_messages
                     readable = bot_permissions.view_channel
                     if not writable or not readable:
-                        await message.channel.send("I cannot read or send messages to that channel.")
+                        await message.channel.send(
+                            "I cannot read or send messages to that channel."
+                        )
                         return
                 except IndexError:
                     await message.channel.send("The channel you mentioned is invalid.")
@@ -295,7 +299,9 @@ async def edit_embed(ctx):
                         # Skipping embeds that might have been deleted without updating CSVs
                         continue
                     except discord.Forbidden:
-                        ctx.send("I do not have permissions to edit a reaction-role message that I previously created.")
+                        ctx.send(
+                            "I do not have permissions to edit a reaction-role message that I previously created."
+                        )
                         continue
                     entry = "`{}` {}".format(counter, old_msg.embeds[0].title)
                     embeds.append(entry)
@@ -304,7 +310,9 @@ async def edit_embed(ctx):
                 await ctx.send(
                     "There are {} embeds in this channel. Type "
                     "`{}edit #channelname // EMBED_NUMBER // New Title // New Description` "
-                    "to edit the desired reaction-role message. The list of embeds is:\n".format(len(r_ids), prefix)
+                    "to edit the desired reaction-role message. The list of embeds is:\n".format(
+                        len(r_ids), prefix
+                    )
                     + "\n".join(embeds)
                 )
             else:
@@ -335,7 +343,9 @@ async def edit_embed(ctx):
                 if to_edit_id:
                     old_msg = await ch.fetch_message(int(to_edit_id))
                 else:
-                    await ctx.send("Select a valid embed number (i.e. the number to the left of the embed title in the list above).")
+                    await ctx.send(
+                        "Select a valid embed number (i.e. the number to the left of the embed title in the list above)."
+                    )
                     return
 
                 title = msg[2]
@@ -379,7 +389,9 @@ async def set_systemchannel(ctx):
             await ctx.send("System channel updated.")
 
         except IndexError:
-            await ctx.send("Mention the channel you would like to receive notifications in.")
+            await ctx.send(
+                "Mention the channel you would like to receive notifications in."
+            )
 
 
 @bot.command(name="help")

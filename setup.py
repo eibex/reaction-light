@@ -1,4 +1,5 @@
-from os import path, rename
+from os import path
+from shutil import copy
 import configparser
 
 # Original Repository: https://github.com/eibex/reaction-light
@@ -80,6 +81,6 @@ config["server_role"]["admin_c"] = admin_c
 with open("config.ini.sample", "w") as f:
     config.write(f)
 
-rename("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
+copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
 input("Done. You can now delete setup.py")
