@@ -15,9 +15,9 @@ __version__ = "0.0.7"
 __license__ = "MIT"
 
 directory = path.dirname(path.realpath(__file__))
-folder = "{}/files".format(directory)
+folder = f"{directory}/files"
 config = configparser.ConfigParser()
-config.read("{}/config.ini".format(directory))
+config.read(f"{directory}/config.ini")
 
 TOKEN = str(config.get("server", "token"))
 
@@ -34,7 +34,7 @@ admin_c = int(config.get("server_role", "admin_c"))
 system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
-activities_file = "{}/activities.csv".format(folder)
+activities_file = f"{folder}/activities.csv"
 with open(activities_file, "r") as f:
     reader = csv.reader(f, delimiter=",")
     for row in reader:
@@ -90,11 +90,9 @@ async def updates():
     if system_channel and new_version:
         channel = bot.get_channel(system_channel)
         await channel.send(
-            "An update is available. Download Reaction Light v{} at https://github.com/eibex/reaction-light "
+            f"An update is available. Download Reaction Light v{new_version} at https://github.com/eibex/reaction-light "
             "or simply use `git pull origin master` on your server.\n\n"
-            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>".format(
-                new_version
-            )
+            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>"
         )
 
 
@@ -269,9 +267,9 @@ async def edit_embed(ctx):
         msg = ctx.message.content.split()
         if len(msg) < 2:
             await ctx.send(
-                "Type `{}edit #channelname` to get started. Replace `#channelname` "
+                f"Type `{prefix}edit #channelname` to get started. Replace `#channelname` "
                 "with the channel where the reaction-role message "
-                "you wish to edit is located.".format(prefix)
+                "you wish to edit is located."
             )
             return
         elif len(msg) == 2:
@@ -286,8 +284,8 @@ async def edit_embed(ctx):
             if len(r_ids) == 1:
                 await ctx.send(
                     "There is only one embed in this channel. Type "
-                    "`{}edit #channelname // 1 // New Title // New Description` "
-                    "to edit the reaction-role message.".format(prefix)
+                    f"`{prefix}edit #channelname // 1 // New Title // New Description` "
+                    "to edit the reaction-role message."
                 )
             elif len(r_ids) > 1:
                 embeds = []
@@ -303,16 +301,14 @@ async def edit_embed(ctx):
                             "I do not have permissions to edit a reaction-role message that I previously created."
                         )
                         continue
-                    entry = "`{}` {}".format(counter, old_msg.embeds[0].title)
+                    entry = f"`{counter}` {old_msg.embeds[0].title}"
                     embeds.append(entry)
                     counter += 1
 
                 await ctx.send(
-                    "There are {} embeds in this channel. Type "
-                    "`{}edit #channelname // EMBED_NUMBER // New Title // New Description` "
-                    "to edit the desired reaction-role message. The list of embeds is:\n".format(
-                        len(r_ids), prefix
-                    )
+                    f"There are {len(r_ids)} embeds in this channel. Type "
+                    f"`{prefix}edit #channelname // EMBED_NUMBER // New Title // New Description` "
+                    "to edit the desired reaction-role message. The list of embeds is:\n"
                     + "\n".join(embeds)
                 )
             else:
@@ -390,7 +386,8 @@ async def set_systemchannel(ctx):
 
         except IndexError:
             await ctx.send(
-                "Mention the channel you would like to receive notifications in."
+                "Mention the channel you would like to receive notifications in.\n"
+                f"{prefix}systemchannel #channelname"
             )
 
 
@@ -398,10 +395,10 @@ async def set_systemchannel(ctx):
 async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
-            "Use `{}new` to start creating a reaction message.\n"
+            f"Use `{prefix}new` to start creating a reaction message.\n"
             "Visit <https://github.com/eibex/reaction-light#usage-example> "
             "for a setup walkthrough.\n\nYou can find a list of commands here: "
-            "<https://github.com/eibex/reaction-light#commands>".format(prefix)
+            "<https://github.com/eibex/reaction-light#commands>"
         )
     else:
         await ctx.send("You do not have an admin role.")
