@@ -26,7 +26,6 @@ You can host the bot yourself by configuring the `config.ini` file.
   - [Running the bot](#running-the-bot)
   - [Commands](#commands)
     - [Usage Example](#usage-example)
-    - [Editing](#editing)
   - [Updating](#updating)
     - [Updating a git install](#updating-a-git-install)
     - [Updating a zip install](#updating-a-zip-install)
@@ -74,7 +73,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 
 - `rl!help` shows a set of commands to get started and provides a link to this README's setup walkthrough.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
-- `rl!edit` edits an existing reaction role message. Check [below](#editing) for an example.
+- `rl!edit #` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 - `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
 
@@ -111,11 +110,6 @@ User: Select your roles // Click on the buttons below to give yourself some role
 ```
 
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
-
-### Editing
-To edit an old embed and preserve the emoji-role links, you can use the `edit` command. Using `rl!edit` will provide you with a set of instructions to edit your embeds.
-
-Any admin can edit old embeds, even if they were originally created by another admin.
 
 ## Updating
 You can view new features in the [changelog](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md).
