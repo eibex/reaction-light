@@ -73,7 +73,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 
 - `rl!help` shows a set of commands to get started and provides a link to this README's setup walkthrough.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
-- `rl!edit #` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
+- `rl!edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 - `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
 
