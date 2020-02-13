@@ -387,7 +387,7 @@ async def set_systemchannel(ctx):
         except IndexError:
             await ctx.send(
                 "Mention the channel you would like to receive notifications in.\n"
-                f"{prefix}systemchannel #channelname"
+                f"`{prefix}systemchannel #channelname`"
             )
 
 
