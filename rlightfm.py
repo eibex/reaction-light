@@ -13,7 +13,7 @@ def readcache():
     # Reads cache.csv and stores into the dictionary
     # Run at the start of the program and updated when changes are made
     try:
-        with open(f"{folder}/cache.csv", "r") as f:
+        with open(f"{folder}/cache.csv", "r", encoding="utf-8") as f:
             read = csv.reader(f, delimiter=",")
             for row in read:
                 cache[row[0]] = row[1]
@@ -42,15 +42,15 @@ def getch(r):
 
 def getcombo(r):
     # Returns the reaction-role combinations
-    with open(f"{folder}/{r}.csv", "r") as f:
+    with open(f"{folder}/{r}.csv", "r", encoding="utf-8") as f:
         read = csv.reader(f, delimiter=",")
         return [i for i in read]
 
 
 def addids(message_id, r):
     # Adds the embed ID and CSV filename to the cache
-    with open(f"{folder}/cache.csv", "a") as f:
-        w = csv.writer(f, delimiter=",")
+    with open(f"{folder}/cache.csv", "a", encoding="utf-8") as f:
+        w = csv.writer(f, delimiter=",", lineterminator="\n")
         w.writerow([message_id, r])
 
 
@@ -63,7 +63,7 @@ def getids(message_id):
 
 def getreactions(r):
     # Returns a list of the reactions used by a certain embed
-    with open(f"{folder}/{r}.csv", "r") as f:
+    with open(f"{folder}/{r}.csv", "r", encoding="utf-8") as f:
         read = csv.reader(f, delimiter=",")
         reactions = {}
         for row in read:
@@ -82,7 +82,7 @@ def listen(user, channel):
     ids = {}
 
     try:
-        with open(f"{folder}/id.csv", "r") as f:
+        with open(f"{folder}/id.csv", "r", encoding="utf-8") as f:
             read = csv.reader(f, delimiter=",")
             for i in read:
                 ids[i[0]] = i[1:]
@@ -92,8 +92,8 @@ def listen(user, channel):
         print("Creating id.csv")
 
     ids[r] = [str(user), str(channel)]
-    with open(f"{folder}/id.csv", "w") as f:
-        w = csv.writer(f, delimiter=",")
+    with open(f"{folder}/id.csv", "w", encoding="utf-8") as f:
+        w = csv.writer(f, delimiter=",", lineterminator="\n")
         for i in ids:
             row = [i, ids[i][0], ids[i][1]]
             w.writerow(row)
@@ -119,8 +119,8 @@ def step2(r, role, emoji, done=False):
     global wizardcache
     if done:
         wizard[r][3] += 1  # Set step3 (was 2)
-        with open(f"{folder}/{r}.csv", "a") as f:
-            w = csv.writer(f, delimiter=",")
+        with open(f"{folder}/{r}.csv", "a", encoding="utf-8") as f:
+            w = csv.writer(f, delimiter=",", lineterminator="\n")
             for i in wizardcache[r]:
                 w.writerow(i)
         print("Done adding combos and saved.")
@@ -135,7 +135,7 @@ def edit(role_channel):
     r_ids = {}
     for msg_id in cache:
         r = cache[msg_id]
-        with open(f"{folder}/{r}.csv", "r") as f:
+        with open(f"{folder}/{r}.csv", "r", encoding="utf-8") as f:
             read = csv.reader(f, delimiter=",")
             for row in read:
                 channel = int(row[0])
