@@ -3,6 +3,9 @@ from shutil import copy
 from os import path
 import csv
 
+# Original Repository: https://github.com/eibex/reaction-light
+# License: MIT - Copyright 2019-2020 eibex
+
 folder = f"{path.dirname(path.realpath(__file__))}/files"
 wizard = {}
 wizardcache = {}

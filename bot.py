@@ -10,9 +10,9 @@ import rlightfm
 
 
 # Original Repository: https://github.com/eibex/reaction-light
-__author__ = "eibex"
-__version__ = "0.0.7"
-__license__ = "MIT"
+# License: MIT - Copyright 2019-2020 eibex
+
+__version__ = "0.1.0"
 
 directory = path.dirname(path.realpath(__file__))
 folder = f"{directory}/files"
