@@ -1,4 +1,7 @@
 # Reaction Light - Changelog
+### 0.1.0
+- Add Windows compatibility
+
 ### 0.0.7
 - Add system channel updating via Discord (using the `rl!systemchannel` command)
 
