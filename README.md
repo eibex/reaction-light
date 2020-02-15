@@ -63,6 +63,8 @@ pip install -U discord.py requests
   - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
+If you need help to setup the bot you can join [this Discord server](https://discord.gg/ZGTPh5b) to ask questions. Do not report bugs there, file an issue on GitHub instead.
+
 ## Running the bot
 The bot can be run by using:
 ```
