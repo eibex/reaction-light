@@ -59,6 +59,8 @@ pip install -U discord.py requests
   - If you want a static activity just add one line.
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visibile under the general information tab): 
+  - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
 ## Running the bot
