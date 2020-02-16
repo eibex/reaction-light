@@ -1,7 +1,7 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
 ### 0.1.0
-- Add Windows compatibility
+- Add Windows compatibility ([#4](https://github.com/eibex/reaction-light/issues/4) closed by [#8](https://github.com/eibex/reaction-light/pull/8))
 
 ### 0.0.7
 - Add system channel updating via Discord (using the `rl!systemchannel` command)
