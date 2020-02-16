@@ -35,11 +35,15 @@ You can host the bot yourself by configuring the `config.ini` file.
   - [License](#license)
 
 ## Requirements
-Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies. Currently, only Linux based systems are supported.
+Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 or greater as well as other dependencies.
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
 python3 -m pip install -U discord.py requests 
+```
+or
+```
+pip install -U discord.py requests 
 ```
 
 ## Setup
@@ -55,7 +59,11 @@ python3 -m pip install -U discord.py requests
   - If you want a static activity just add one line.
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visibile under the general information tab): 
+  - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+
+If you need help to setup the bot you can join [this Discord server](https://discord.gg/ZGTPh5b) to ask questions. Do not report bugs there, file an issue on GitHub instead.
 
 ## Running the bot
 The bot can be run by using:
