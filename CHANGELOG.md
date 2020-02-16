@@ -1,4 +1,5 @@
 # Reaction Light - Changelog
+Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
 ### 0.1.0
 - Add Windows compatibility
 
