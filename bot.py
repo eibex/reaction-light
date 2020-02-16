@@ -142,9 +142,12 @@ async def on_message(message):
                 if msg[0].lower() != "done":
                     # Stores reaction-role combinations until "done" is received
                     try:
+                        await message.add_reaction(msg[0])
                         rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
                     except IndexError:
-                        await message.channel.send("Please mention a role after the reaction. Example:\n:smile: `@Role`")   
+                        await message.channel.send("Mention a role after the reaction. Example:\n:smile: `@Role`")
+                    except discord.HTTPException:
+                        await message.channel.send("You can only use reactions uploaded to this server or standard emojis.")
                 else:
                     # If "done" is received the combinations are written to CSV
                     # Advances to step three
@@ -257,7 +260,7 @@ async def new(ctx):
         # For future prompts (see: "async def on_message(message)")
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
         await ctx.send(
-            "Please mention the #channel where to send the auto-role message."
+            "Mention the #channel where to send the auto-role message."
         )
     else:
         await ctx.send("You do not have an admin role.")
