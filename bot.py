@@ -135,13 +135,16 @@ async def on_message(message):
 
                 rlightfm.step1(r_id, ch_id)
                 await message.channel.send(
-                    "Attach roles and emojis separated by a space (one combination per message). "
+                    "Attach roles and emojis separated by one space (one combination per message). "
                     "When you are done type `done`. Example:\n:smile: `@Role`"
                 )
             elif step == 2:
                 if msg[0].lower() != "done":
                     # Stores reaction-role combinations until "done" is received
-                    rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
+                    try:
+                        rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
+                    except IndexError:
+                        await message.channel.send("Please mention a role after the reaction. Example:\n:smile: `@Role`")   
                 else:
                     # If "done" is received the combinations are written to CSV
                     # Advances to step three
