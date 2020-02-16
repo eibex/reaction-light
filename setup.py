@@ -5,7 +5,7 @@ import configparser
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
 print("Author: eibex")
-print("Version: 0.1.0")
+print("Version: 0.1.1")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
