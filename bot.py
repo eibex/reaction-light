@@ -1,6 +1,6 @@
 import configparser
-from sys import exit as shutdown
-from os import path
+from sys import platform, exit as shutdown
+import os
 from itertools import cycle
 import csv
 import discord
@@ -14,7 +14,7 @@ import rlightfm
 
 __version__ = "0.1.1"
 
-directory = path.dirname(path.realpath(__file__))
+directory = os.path.dirname(os.path.realpath(__file__))
 folder = f"{directory}/files"
 config = configparser.ConfigParser()
 config.read(f"{directory}/config.ini")
@@ -74,6 +74,13 @@ def check_for_updates():
     if latest > __version__:
         return latest
     return False
+
+
+def restart():
+    os.chdir(directory)
+    python = "python" if platform == "win32" else "python3"
+    cmd = os.popen(f"nohup {python} bot.py &")
+    cmd.close()
 
 
 @tasks.loop(seconds=30)
@@ -145,9 +152,13 @@ async def on_message(message):
                         await message.add_reaction(msg[0])
                         rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
                     except IndexError:
-                        await message.channel.send("Mention a role after the reaction. Example:\n:smile: `@Role`")
+                        await message.channel.send(
+                            "Mention a role after the reaction. Example:\n:smile: `@Role`"
+                        )
                     except discord.HTTPException:
-                        await message.channel.send("You can only use reactions uploaded to this server or standard emojis.")
+                        await message.channel.send(
+                            "You can only use reactions uploaded to this server or standard emojis."
+                        )
                 else:
                     # If "done" is received the combinations are written to CSV
                     # Advances to step three
@@ -259,9 +270,7 @@ async def new(ctx):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
         rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
-        await ctx.send(
-            "Mention the #channel where to send the auto-role message."
-        )
+        await ctx.send("Mention the #channel where to send the auto-role message.")
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -414,6 +423,16 @@ async def hlp(ctx):
 async def kill(ctx):
     if isadmin(ctx):
         await ctx.send("Shutting down...")
+        shutdown()  # sys.exit()
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="restart")
+async def restart_cmd(ctx):
+    if isadmin(ctx):
+        restart()
+        await ctx.send("Restarting...")
         shutdown()  # sys.exit()
     else:
         await ctx.send("You do not have an admin role.")
