@@ -444,7 +444,7 @@ async def update(ctx):
         os.chdir(directory)
         cmd = os.popen("git fetch")
         cmd.close()
-        cmd = os.popen("git pull origin master")
+        cmd = os.popen("git pull")
         out = cmd.read()
         cmd.close()
         restart()
