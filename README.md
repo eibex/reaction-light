@@ -156,6 +156,8 @@ Ensure that you moved the `Reaction Light` role to a position that is hierarchic
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
 
+We also have [a Discord server](https://discord.gg/ZGTPh5b) in which you can ask questions. Do not report bugs there, file an issue on GitHub instead.
+
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 
 
