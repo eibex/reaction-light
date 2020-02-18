@@ -146,6 +146,8 @@ If you downloaded the bot as a zip archive:
 ## Roadmap
 Upcoming features can be found in the open issues tagged with **new feature**. They can be found [here](https://github.com/eibex/reaction-light/issues?q=is%3Aopen+is%3Aissue+label%3A%22new+feature%22).
 
+Open a new issue if you would like to see a feature implemented, and/or open a pull request implementing it.
+
 ## FAQ
 **When I click one of the reactions the bot does not give me a role!**
 
