@@ -11,7 +11,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Create multiple custom embedded messages with custom reactions and roles
 - Automatically assign/remove roles to users when they select/deselect a certain reaction
 - Use the same instance of the bot on multiple servers
-- Easy installation and setup
+- Easy installation, setup, and updating
 - Optional update notifications and error reporting to your own Discord server
 - No need to rely on developer mode and IDs
 
