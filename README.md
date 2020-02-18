@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 0.1.1](https://img.shields.io/badge/Reaction%20Light-0.1.1-yellow.svg)
+![Reaction Light 0.2.0](https://img.shields.io/badge/Reaction%20Light-0.2.0-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -129,7 +129,9 @@ If you set a system channel in `config.ini`, your bot will check for new version
 
 ### Updating a git install
 If you downloaded the bot with git, updating is trivial:
+- Run `rl!update`. This will `git fetch` and `git pull` for you and restart the bot too. If you made changes you made to the `*.py` files you have to update manually to handle stashing or resets.
 
+...or if you prefer to do it manually:
 - Navigate to the reaction-light directory
 - Run `git pull origin master`
 - Shutdown the bot by using the `rl!kill` command
