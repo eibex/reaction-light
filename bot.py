@@ -445,10 +445,8 @@ async def update(ctx):
         cmd = os.popen("git fetch")
         cmd.close()
         cmd = os.popen("git pull")
-        out = cmd.read()
         cmd.close()
         restart()
-        await ctx.send(out)
         await ctx.send("Restarting...")
         shutdown()  # sys.exit()
     else:
