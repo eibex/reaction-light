@@ -438,4 +438,21 @@ async def restart_cmd(ctx):
         await ctx.send("You do not have an admin role.")
 
 
+@bot.command(name="update")
+async def update(ctx):
+    if isadmin(ctx):
+        os.chdir(directory)
+        cmd = os.popen("git fetch")
+        cmd.close()
+        cmd = os.popen("git pull origin master")
+        out = cmd.read()
+        cmd.close()
+        restart()
+        await ctx.send(out)
+        await ctx.send("Restarting...")
+        shutdown()  # sys.exit()
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
 bot.run(TOKEN)
