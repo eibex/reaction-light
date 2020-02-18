@@ -29,7 +29,7 @@ You can host the bot yourself by configuring the `config.ini` file.
   - [Updating](#updating)
     - [Updating a git install](#updating-a-git-install)
     - [Updating a zip install](#updating-a-zip-install)
-  - [Roadmap and upcoming features](#roadmap)
+  - [Roadmap](#roadmap)
   - [FAQ](#faq)
   - [Help](#help)
   - [Contribute](#contribute)
@@ -85,6 +85,8 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 - `rl!edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
 - `rl!kill` shuts down the bot. You will need to start it again manually (for now).
 - `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
+- `rl!restart` restarts the bot.
+- `rl!update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.
 
 ### Usage Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
