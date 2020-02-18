@@ -29,6 +29,7 @@ You can host the bot yourself by configuring the `config.ini` file.
   - [Updating](#updating)
     - [Updating a git install](#updating-a-git-install)
     - [Updating a zip install](#updating-a-zip-install)
+  - [Roadmap and upcoming features](#roadmap)
   - [FAQ](#faq)
   - [Help](#help)
   - [Contribute](#contribute)
@@ -142,6 +143,8 @@ If you downloaded the bot as a zip archive:
 - Shutdown the bot by using the `rl!kill` command
 - Start the bot again
 
+## Roadmap
+Upcoming features can be found in the open issues tagged with **new feature**. They can be found [here](https://github.com/eibex/reaction-light/issues?q=is%3Aopen+is%3Aissue+label%3A%22new+feature%22).
 
 ## FAQ
 **When I click one of the reactions the bot does not give me a role!**
