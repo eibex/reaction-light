@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 0.1.0](https://img.shields.io/badge/Reaction%20Light-0.1.0-yellow.svg)
+![Reaction Light 0.1.1](https://img.shields.io/badge/Reaction%20Light-0.1.1-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -11,7 +11,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Create multiple custom embedded messages with custom reactions and roles
 - Automatically assign/remove roles to users when they select/deselect a certain reaction
 - Use the same instance of the bot on multiple servers
-- Easy installation and setup
+- Easy installation, setup, and updating
 - Optional update notifications and error reporting to your own Discord server
 - No need to rely on developer mode and IDs
 
@@ -29,6 +29,7 @@ You can host the bot yourself by configuring the `config.ini` file.
   - [Updating](#updating)
     - [Updating a git install](#updating-a-git-install)
     - [Updating a zip install](#updating-a-zip-install)
+  - [Roadmap and upcoming features](#roadmap)
   - [FAQ](#faq)
   - [Help](#help)
   - [Contribute](#contribute)
@@ -59,7 +60,7 @@ pip install -U discord.py requests
   - If you want a static activity just add one line.
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
-  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visibile under the general information tab): 
+  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
   - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
@@ -142,6 +143,10 @@ If you downloaded the bot as a zip archive:
 - Shutdown the bot by using the `rl!kill` command
 - Start the bot again
 
+## Roadmap
+Upcoming features can be found in the open issues tagged with **new feature**. They can be found [here](https://github.com/eibex/reaction-light/issues?q=is%3Aopen+is%3Aissue+label%3A%22new+feature%22).
+
+Open a new issue if you would like to see a feature implemented, and/or open a pull request implementing it.
 
 ## FAQ
 **When I click one of the reactions the bot does not give me a role!**
@@ -150,6 +155,8 @@ Ensure that you moved the `Reaction Light` role to a position that is hierarchic
 
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
+
+We also have [a Discord server](https://discord.gg/ZGTPh5b) in which you can ask questions. Do not report bugs there, file an issue on GitHub instead.
 
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 
