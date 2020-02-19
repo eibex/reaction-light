@@ -1,8 +1,8 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
 ### 0.2.0
-- Add `rl!restart` to restart the bot from within Discord
-- Add `rl!update` to update the bot and restart it from within Discord (only works on `git` installations)
+- Add `rl!restart` to restart the bot from within Discord ([#10](https://github.com/eibex/reaction-light/issues/10) closed by [#12](https://github.com/eibex/reaction-light/pull/12))
+- Add `rl!update` to update the bot and restart it from within Discord (only works on `git` installations) ([#11](https://github.com/eibex/reaction-light/issues/11) closed by [#12](https://github.com/eibex/reaction-light/pull/12))
 ### 0.1.1
 - Warns the user if no role mention is provided when creating combinations of reactions and roles
 - Fix allowing users to create combinations with reactions from other servers that the bot cannot use ([#7](https://github.com/eibex/reaction-light/issues/7) closed by [#9](https://github.com/eibex/reaction-light/pull/9))
