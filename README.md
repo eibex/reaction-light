@@ -64,8 +64,6 @@ pip install -U discord.py requests
   - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 
-If you need help to setup the bot you can join [this Discord server](https://discord.gg/ZGTPh5b) to ask questions. Do not report bugs there, file an issue on GitHub instead.
-
 ## Running the bot
 The bot can be run by using:
 ```
@@ -159,8 +157,6 @@ Ensure that you moved the `Reaction Light` role to a position that is hierarchic
 
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
-
-We also have [a Discord server](https://discord.gg/ZGTPh5b) in which you can ask questions. Do not report bugs there, file an issue on GitHub instead.
 
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 
