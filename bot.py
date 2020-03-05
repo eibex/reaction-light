@@ -442,6 +442,7 @@ async def restart_cmd(ctx):
 @bot.command(name="update")
 async def update(ctx):
     if isadmin(ctx):
+        await ctx.send("Attempting update...")
         os.chdir(directory)
         cmd = os.popen("git fetch")
         cmd.close()
