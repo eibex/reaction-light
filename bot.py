@@ -134,7 +134,7 @@ async def on_message(message):
                     readable = bot_permissions.view_channel
                     if not writable or not readable:
                         await message.channel.send(
-                            "I cannot read or send messages to that channel."
+                            "I cannot read or send messages in that channel."
                         )
                         return
                 except IndexError:
@@ -390,7 +390,7 @@ async def set_systemchannel(ctx):
             writable = bot_permissions.read_messages
             readable = bot_permissions.view_channel
             if not writable or not readable:
-                await ctx.send("I cannot read or send messages to that channel.")
+                await ctx.send("I cannot read or send messages in that channel.")
                 return
 
             config["server"]["system_channel"] = str(system_channel)
