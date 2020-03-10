@@ -12,7 +12,7 @@ import rlightfm
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 directory = os.path.dirname(os.path.realpath(__file__))
 folder = f"{directory}/files"
@@ -63,8 +63,7 @@ def isadmin(ctx, msg=False):
         return False
 
 
-def check_for_updates():
-    # Get latest version from GitHub repo and checks it against the current one
+def get_latest():
     latest = (
         requests_get(
             "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
@@ -72,6 +71,12 @@ def check_for_updates():
         .text.lower()
         .rstrip("\n")
     )
+    return latest
+
+
+def check_for_updates():
+    # Get latest version from GitHub repo and checks it against the current one
+    latest = get_latest()
     if latest > __version__:
         return latest
     return False
@@ -419,11 +424,13 @@ async def hlp(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
+
 @bot.command(name="version")
 async def print_version(ctx):
     if isadmin(ctx):
-        latest = check_for_updates()
+        latest = get_latest()
         await ctx.send(f"I am currently running v{__version__}. The latest available version is v{latest}.")
+
 
 @bot.command(name="kill")
 async def kill(ctx):
