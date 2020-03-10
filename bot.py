@@ -419,6 +419,11 @@ async def hlp(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
+@bot.command(name="version")
+async def print_version(ctx):
+    if isadmin(ctx):
+        latest = check_for_updates()
+        await ctx.send(f"I am currently running v{__version__}. The latest available version is v{latest}.")
 
 @bot.command(name="kill")
 async def kill(ctx):
