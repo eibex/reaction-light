@@ -378,8 +378,8 @@ async def edit_embed(ctx):
             except discord.Forbidden:
                 await ctx.send("I do not have permissions to edit the message.")
 
-        else:
-            await ctx.send("You do not have an admin role.")
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="systemchannel")
