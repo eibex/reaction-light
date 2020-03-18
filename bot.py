@@ -12,9 +12,11 @@ import rlightfm
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
 
-__version__ = "0.3.0"
-
 directory = os.path.dirname(os.path.realpath(__file__))
+
+with open(f"{directory}/.version") as f:
+    __version__ = f.read().rstrip("\n").rstrip("\r")
+
 folder = f"{directory}/files"
 config = configparser.ConfigParser()
 config.read(f"{directory}/config.ini")
