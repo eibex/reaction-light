@@ -8,7 +8,7 @@ folder = path.dirname(path.realpath(__file__))
 with open(f"{folder}/.version") as f:
     __version__ = f.read().rstrip("\n").rstrip("\r")
 
-print("Author: eibex")
+print("Original Repository: https://github.com/eibex/reaction-light")
 print(f"Version: {__version__}")
 print("License: MIT\n")
 

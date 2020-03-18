@@ -1,26 +1,31 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 0.3.1
+- Fix "not admin" warning on embed edit ([#14](https://github.com/eibex/reaction-light/pull/14) by [arbaes](https://github.com/arbaes))
+- Improve permission error handling ([#15](https://github.com/eibex/reaction-light/pull/15) by [arbaes](https://github.com/arbaes))
+- Improve local version reading (read from file instead of hardcoded string) ([#16](https://github.com/eibex/reaction-light/pull/16) by [eibex](https://github.com/eibex))
+
 ### 0.3.0
 - Add `rl!version` to show what version the bot is currently running
 
 ### 0.2.0
-- Add `rl!restart` to restart the bot from within Discord ([#10](https://github.com/eibex/reaction-light/issues/10) closed by [#12](https://github.com/eibex/reaction-light/pull/12))
-- Add `rl!update` to update the bot and restart it from within Discord (only works on `git` installations) ([#11](https://github.com/eibex/reaction-light/issues/11) closed by [#12](https://github.com/eibex/reaction-light/pull/12))
+- Add `rl!restart` to restart the bot from within Discord ([#10](https://github.com/eibex/reaction-light/issues/10) closed by [#12](https://github.com/eibex/reaction-light/pull/12) by [eibex](https://github.com/eibex))
+- Add `rl!update` to update the bot and restart it from within Discord (only works on `git` installations) ([#11](https://github.com/eibex/reaction-light/issues/11) closed by [#12](https://github.com/eibex/reaction-light/pull/12) by [eibex](https://github.com/eibex))
 
 ### 0.1.1
 - Warns the user if no role mention is provided when creating combinations of reactions and roles
-- Fix allowing users to create combinations with reactions from other servers that the bot cannot use ([#7](https://github.com/eibex/reaction-light/issues/7) closed by [#9](https://github.com/eibex/reaction-light/pull/9))
+- Fix allowing users to create combinations with reactions from other servers that the bot cannot use ([#7](https://github.com/eibex/reaction-light/issues/7) closed by [#9](https://github.com/eibex/reaction-light/pull/9) by [eibex](https://github.com/eibex))
 ### 0.1.0
-- Add Windows compatibility ([#4](https://github.com/eibex/reaction-light/issues/4) closed by [#8](https://github.com/eibex/reaction-light/pull/8))
+- Add Windows compatibility ([#4](https://github.com/eibex/reaction-light/issues/4) closed by [#8](https://github.com/eibex/reaction-light/pull/8) by [eibex](https://github.com/eibex))
 
 ### 0.0.7
 - Add system channel updating via Discord (using the `rl!systemchannel` command)
 
 ### 0.0.6
-- Allow editing embeds without relying on channel and message IDs ([#5](https://github.com/eibex/reaction-light/issues/5) closed by [#6](https://github.com/eibex/reaction-light/pull/6))
+- Allow editing embeds without relying on channel and message IDs ([#5](https://github.com/eibex/reaction-light/issues/5) closed by [#6](https://github.com/eibex/reaction-light/pull/6) by [eibex](https://github.com/eibex))
 
 ### 0.0.5
-- Allow creating embeds without relying on channel IDs (partly fixes [#5](https://github.com/eibex/reaction-light/issues/5))
+- Allow creating embeds without relying on channel IDs (partly fixes [#5](https://github.com/eibex/reaction-light/issues/5) by [eibex](https://github.com/eibex))
 - Better handling of errors
 
 ### 0.0.4
