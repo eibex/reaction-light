@@ -4,8 +4,12 @@ import configparser
 
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
+folder = path.dirname(path.realpath(__file__))
+with open(f"{folder}/.version") as f:
+    __version__ = f.read().rstrip("\n").rstrip("\r")
+
 print("Author: eibex")
-print("Version: 0.3.0")
+print(f"Version: {__version__}")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
@@ -68,7 +72,6 @@ while True:
     else:
         break
 
-folder = path.dirname(path.realpath(__file__))
 config = configparser.ConfigParser()
 config.read("{}/config.ini.sample".format(folder))
 config["server"]["token"] = token
