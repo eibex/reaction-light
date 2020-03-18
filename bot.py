@@ -196,16 +196,26 @@ async def on_message(message):
                     )
                     em.set_footer(text=f"{botname} - github.com/eibex/reaction-light", icon_url=logo)
                     channel = bot.get_channel(int(rlightfm.getch(r_id)))
-                    emb = await channel.send(embed=em)
 
-                    combo = rlightfm.getcombo(r_id)
-                    for i in range(len(combo)):
-                        if i != 0:
-                            # Skips first row as it does not contain reaction/role data
-                            await emb.add_reaction(combo[i][0])
-                    # Writes CSV name and embed ID to cache.csv and ends process
-                    rlightfm.addids(emb.id, r_id)
-                    rlightfm.end(r_id)
+                    emb = None
+                    try:
+                        emb = await channel.send(embed=em)
+                    except discord.Forbidden as ef:
+                        await message.channel.send("I don't have permission to send embed messages to the channel {0.mention}.".format(channel))
+
+                    if isinstance(emb, discord.Message):
+                        combo = rlightfm.getcombo(r_id)
+                        for i in range(len(combo)):
+                            if i != 0:
+                                # Skips first row as it does not contain reaction/role data
+                                try:
+                                    await emb.add_reaction(combo[i][0])
+                                except discord.Forbidden:
+                                    await message.channel.send("I don't have permission to react to messages from the channel {0.mention}.".format(channel))
+
+                        # Writes CSV name and embed ID to cache.csv and ends process
+                        rlightfm.addids(emb.id, r_id)
+                        rlightfm.end(r_id)
 
     await bot.process_commands(message)
 
