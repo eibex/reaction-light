@@ -82,6 +82,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 - `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
 - `rl!restart` restarts the bot.
 - `rl!update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.
+- `rl!version` reports the bot's current version and the latest available one from GitHub.
 
 ### Usage Example
 In this example the prefix used is `rl!`. Once you initiate the process, be sure only to answer to the bots questions or the bot might record unwanted messages as instructions. You can still send messages to other channels, and others can send messages to the channel you initiated the process in.
