@@ -447,8 +447,11 @@ async def print_version(ctx):
 @bot.command(name="kill")
 async def kill(ctx):
     if isadmin(ctx):
-        await ctx.send("Shutting down...")
-        shutdown()  # sys.exit()
+        if platform != "win32":
+            await ctx.send("Shutting down...")
+            shutdown()  # sys.exit()
+        else:
+            await ctx.send("I cannot do this on Windows.")
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -456,9 +459,12 @@ async def kill(ctx):
 @bot.command(name="restart")
 async def restart_cmd(ctx):
     if isadmin(ctx):
-        restart()
-        await ctx.send("Restarting...")
-        shutdown()  # sys.exit()
+        if platform != "win32":
+            restart()
+            await ctx.send("Restarting...")
+            shutdown()  # sys.exit()
+        else:
+            await ctx.send("I cannot do this on Windows.")
     else:
         await ctx.send("You do not have an admin role.")
 
