@@ -175,7 +175,7 @@ async def on_message(message):
                     em = discord.Embed(
                         title="Title", description="Message_content", colour=botcolor
                     )
-                    em.set_footer(text="Reaction Light", icon_url=logo)
+                    em.set_footer(text=f"{botname}", icon_url=logo)
                     await message.channel.send(
                         "What would you like the message to say? Formatting is: `Title // Message_content`",
                         embed=em,
@@ -194,7 +194,7 @@ async def on_message(message):
                     em = discord.Embed(
                         title=title, description=content, colour=botcolor
                     )
-                    em.set_footer(text=f"{botname} - github.com/eibex/reaction-light", icon_url=logo)
+                    em.set_footer(text=f"{botname}", icon_url=logo)
                     channel = bot.get_channel(int(rlightfm.getch(r_id)))
 
                     emb = None
@@ -380,7 +380,7 @@ async def edit_embed(ctx):
                 title = msg[2]
                 content = msg[3]
                 em = discord.Embed(title=title, description=content, colour=botcolor)
-                em.set_footer(text="Reaction Light", icon_url=logo)
+                em.set_footer(text=f"{botname}", icon_url=logo)
                 await old_msg.edit(embed=em)
                 await ctx.send("Message edited.")
 
