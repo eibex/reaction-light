@@ -447,11 +447,8 @@ async def print_version(ctx):
 @bot.command(name="kill")
 async def kill(ctx):
     if isadmin(ctx):
-        if platform != "win32":
-            await ctx.send("Shutting down...")
-            shutdown()  # sys.exit()
-        else:
-            await ctx.send("I cannot do this on Windows.")
+        await ctx.send("Shutting down...")
+        shutdown()  # sys.exit()
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -472,15 +469,18 @@ async def restart_cmd(ctx):
 @bot.command(name="update")
 async def update(ctx):
     if isadmin(ctx):
-        await ctx.send("Attempting update...")
-        os.chdir(directory)
-        cmd = os.popen("git fetch")
-        cmd.close()
-        cmd = os.popen("git pull")
-        cmd.close()
-        restart()
-        await ctx.send("Restarting...")
-        shutdown()  # sys.exit()
+        if platform != "win32":
+            await ctx.send("Attempting update...")
+            os.chdir(directory)
+            cmd = os.popen("git fetch")
+            cmd.close()
+            cmd = os.popen("git pull")
+            cmd.close()
+            restart()
+            await ctx.send("Restarting...")
+            shutdown()  # sys.exit()
+        else:
+            await ctx.send("I cannot do this on Windows.")
     else:
         await ctx.send("You do not have an admin role.")
 
