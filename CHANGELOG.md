@@ -1,5 +1,10 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 0.3.2
+- Prevent update and restart commands when the bot is hosted on Windows to avoid errors
+- Set all embed footers to show the configured bot name
+- Improve the help command to inclue all commands instead of just a few links to the README
+
 ### 0.3.1
 - Fix "not admin" warning on embed edit ([#14](https://github.com/eibex/reaction-light/pull/14) by [arbaes](https://github.com/arbaes))
 - Improve permission error handling ([#15](https://github.com/eibex/reaction-light/pull/15) by [arbaes](https://github.com/arbaes))
