@@ -435,7 +435,6 @@ async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
             "Commands are:\n"
-            f"- `{prefix}help` shows a set of commands to get started and provides a link to this README.\n"
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
             f"- `{prefix}edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
