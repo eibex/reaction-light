@@ -435,13 +435,13 @@ async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
             "Commands are:\n"
-            f"- `{prefix}help` shows a set of commands to get started and provides a link to this README's setup walkthrough.\n"
-            f"- `{prefix}new` starts the creation process for a new reaction role message. Check [below](#example) for an example.\n"
+            f"- `{prefix}help` shows a set of commands to get started and provides a link to this README.\n"
+            f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
             f"- `{prefix}edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
-            f"- `{prefix}restart` restarts the bot.\n"
-            f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.\n"
+            f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
+            f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations running on GNU/Linux.\n"
             f"- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n"
             f"{botname} is running version {__version__} of Reaction Light. Find more resources at: <https://github.com/eibex/reaction-light>"
         )
