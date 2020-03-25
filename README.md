@@ -75,7 +75,7 @@ nohup python3 bot.py &
 ## Commands
 All commands require an admin role set in `config.ini`. The bot will reply with missing permissions otherwise. In the following list the default prefix `rl!` is used, but it can be freely changed in the `config.ini` file.
 
-- `rl!help` shows a set of commands to get started and provides a link to this README's setup walkthrough.
+- `rl!help` shows this set of commands along with a link to the repository.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
 - `rl!edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
 - `rl!kill` shuts down the bot.

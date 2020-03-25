@@ -201,7 +201,9 @@ async def on_message(message):
                     try:
                         emb = await channel.send(embed=em)
                     except discord.Forbidden as ef:
-                        await message.channel.send("I don't have permission to send embed messages to the channel {0.mention}.".format(channel))
+                        await message.channel.send(
+                            "I don't have permission to send embed messages to the channel {0.mention}.".format(channel)
+                        )
 
                     if isinstance(emb, discord.Message):
                         combo = rlightfm.getcombo(r_id)
@@ -211,7 +213,11 @@ async def on_message(message):
                                 try:
                                     await emb.add_reaction(combo[i][0])
                                 except discord.Forbidden:
-                                    await message.channel.send("I don't have permission to react to messages from the channel {0.mention}.".format(channel))
+                                    await message.channel.send(
+                                        "I don't have permission to react to messages from the channel {0.mention}.".format(
+                                            channel
+                                        )
+                                    )
 
                         # Writes CSV name and embed ID to cache.csv and ends process
                         rlightfm.addids(emb.id, r_id)
@@ -428,10 +434,16 @@ async def set_systemchannel(ctx):
 async def hlp(ctx):
     if isadmin(ctx):
         await ctx.send(
-            f"Use `{prefix}new` to start creating a reaction message.\n"
-            "Visit <https://github.com/eibex/reaction-light#usage-example> "
-            "for a setup walkthrough.\n\nYou can find a list of commands here: "
-            "<https://github.com/eibex/reaction-light#commands>"
+            "Commands are:\n"
+            f"- `{prefix}help` shows a set of commands to get started and provides a link to this README's setup walkthrough.\n"
+            f"- `{prefix}new` starts the creation process for a new reaction role message. Check [below](#example) for an example.\n"
+            f"- `{prefix}edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}kill` shuts down the bot.\n"
+            f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
+            f"- `{prefix}restart` restarts the bot.\n"
+            f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.\n"
+            f"- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n"
+            f"{botname} is running {__version__} of Reaction Light. Find more resources at: <https://github.com/eibex/reaction-light>"
         )
     else:
         await ctx.send("You do not have an admin role.")
@@ -441,7 +453,9 @@ async def hlp(ctx):
 async def print_version(ctx):
     if isadmin(ctx):
         latest = get_latest()
-        await ctx.send(f"I am currently running v{__version__}. The latest available version is v{latest}.")
+        await ctx.send(
+            f"I am currently running v{__version__}. The latest available version is v{latest}."
+        )
 
 
 @bot.command(name="kill")
