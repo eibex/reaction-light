@@ -443,7 +443,7 @@ async def hlp(ctx):
             f"- `{prefix}restart` restarts the bot.\n"
             f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.\n"
             f"- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n"
-            f"{botname} is running {__version__} of Reaction Light. Find more resources at: <https://github.com/eibex/reaction-light>"
+            f"{botname} is running version {__version__} of Reaction Light. Find more resources at: <https://github.com/eibex/reaction-light>"
         )
     else:
         await ctx.send("You do not have an admin role.")
