@@ -7,12 +7,15 @@ import discord
 from discord.ext import commands, tasks
 from requests import get as requests_get
 import rldb
+import migration
 
 
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
 
 directory = os.path.dirname(os.path.realpath(__file__))
+
+migrated = migration.migrate()
 
 with open(f"{directory}/.version") as f:
     __version__ = f.read().rstrip("\n").rstrip("\r")
@@ -114,6 +117,9 @@ async def updates():
 @bot.event
 async def on_ready():
     print("Reaction Light ready!")
+    if migrated and system_channel:
+        channel = bot.get_channel(system_channel)
+        await channel.send("Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file.")
     maintain_presence.start()
     updates.start()
 
