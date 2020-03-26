@@ -313,25 +313,25 @@ async def edit_embed(ctx):
             return
         elif len(msg) == 2:
             try:
-                ch_id = ctx.message.channel_mentions[0].id
+                channel_id = ctx.message.channel_mentions[0].id
             except IndexError:
-                await ctx.send("The channel you mentioned is invalid.")
+                await ctx.send("You need to mention a channel.")
                 return
 
-            ch = bot.get_channel(ch_id)
-            r_ids = rlightfm.edit(ch_id)
-            if len(r_ids) == 1:
+            all_messages = rldb.fetch_messages(channel_id)
+            channel = bot.get_channel(channel_id)
+            if len(all_messages) == 1:
                 await ctx.send(
-                    "There is only one embed in this channel. Type "
-                    f"`{prefix}edit #channelname // 1 // New Title // New Description` "
+                    "There is only one embed in this channel. Type\n"
+                    f"```\n{prefix}edit #{channel.name} // 1 // New Title // New Description\n```\n"
                     "to edit the reaction-role message."
                 )
-            elif len(r_ids) > 1:
+            elif len(all_messages) > 1:
                 embeds = []
                 counter = 1
-                for msg_id in r_ids:
+                for msg_id in all_messages:
                     try:
-                        old_msg = await ch.fetch_message(int(msg_id))
+                        old_msg = await channel.fetch_message(int(msg_id))
                     except discord.NotFound:
                         # Skipping embeds that might have been deleted without updating CSVs
                         continue
@@ -345,8 +345,8 @@ async def edit_embed(ctx):
                     counter += 1
 
                 await ctx.send(
-                    f"There are {len(r_ids)} embeds in this channel. Type "
-                    f"`{prefix}edit #channelname // EMBED_NUMBER // New Title // New Description` "
+                    f"There are {len(all_messages)} embeds in this channel. Type\n"
+                    f"```\n{prefix}edit #{channel.name} // EMBED_NUMBER // New Title // New Description\n```\n"
                     "to edit the desired reaction-role message. The list of embeds is:\n"
                     + "\n".join(embeds)
                 )
@@ -356,27 +356,23 @@ async def edit_embed(ctx):
             try:
                 # Tries to edit the embed
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
-                ch_id = ctx.message.channel_mentions[0].id
-                ch = bot.get_channel(ch_id)
+                channel_id = ctx.message.channel_mentions[0].id
+                channel = bot.get_channel(channel_id)
                 msg = ctx.message.content.split(" // ")
-                embed_number = msg[1]
-                r_ids = rlightfm.edit(ch_id)
-                counter = 1
-
-                # Loop through all msg_ids and stops when the counter matches the user input
-                if r_ids:
-                    to_edit_id = None
-                    for msg_id in r_ids:
-                        if str(counter) == embed_number:
-                            to_edit_id = msg_id
-                            break
-                        counter += 1
-                else:
+                try:
+                    embed_number = int(msg[1])
+                except ValueError:
+                    await ctx.send("You need to select an embed by typing its number in the list.")
+                    return
+                all_messages = rldb.fetch_messages(channel_id)
+                try:
+                    message_to_edit_id = all_messages[embed_number - 1]
+                except IndexError:
                     await ctx.send("You selected an embed that does not exist.")
                     return
 
-                if to_edit_id:
-                    old_msg = await ch.fetch_message(int(to_edit_id))
+                if message_to_edit_id:
+                    old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
                     await ctx.send(
                         "Select a valid embed number (i.e. the number to the left of the embed title in the list above)."
