@@ -7,6 +7,6 @@ system_channel =
 logo =
 
 [server_role]
-admin_a = 0
-admin_b = 0
-admin_c = 0
+admin_a =
+admin_b =
+admin_c =

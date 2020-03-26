@@ -6,7 +6,7 @@ import csv
 import discord
 from discord.ext import commands, tasks
 from requests import get as requests_get
-import rlightfm
+import rldb
 
 
 # Original Repository: https://github.com/eibex/reaction-light
@@ -123,20 +123,20 @@ async def on_message(message):
     if isadmin(message, msg=True):
         user = str(message.author.id)
         channel = str(message.channel.id)
-        wizard = rlightfm.get(user, channel)
-        step = wizard[0]
-        r_id = wizard[1]
+        step = rldb.step(user, channel)
         msg = message.content.split()
 
-        if step is not None:  # Checks if the setup process was started before.
-            if step == 1:  # If it was not, it ignores the message.
+        if step is not None:
+            # Checks if the setup process was started before.
+            # If it was not, it ignores the message.
+            if step == 1:
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
                 try:
                     server = bot.get_guild(message.guild.id)
                     bot_user = server.get_member(bot.user.id)
-                    ch_id = message.channel_mentions[0].id
-                    bot_permissions = bot.get_channel(ch_id).permissions_for(bot_user)
+                    target_channel = message.channel_mentions[0].id
+                    bot_permissions = bot.get_channel(target_channel).permissions_for(bot_user)
                     writable = bot_permissions.read_messages
                     readable = bot_permissions.view_channel
                     if not writable or not readable:
@@ -148,7 +148,7 @@ async def on_message(message):
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
 
-                rlightfm.step1(r_id, ch_id)
+                rldb.step1(user, channel, target_channel)
                 await message.channel.send(
                     "Attach roles and emojis separated by one space (one combination per message). "
                     "When you are done type `done`. Example:\n:smile: `@Role`"
@@ -157,8 +157,10 @@ async def on_message(message):
                 if msg[0].lower() != "done":
                     # Stores reaction-role combinations until "done" is received
                     try:
-                        await message.add_reaction(msg[0])
-                        rlightfm.step2(r_id, str(message.role_mentions[0].id), msg[0])
+                        reaction = msg[0]
+                        role = message.role_mentions[0].id
+                        await message.add_reaction(reaction)
+                        rldb.step2(user, channel, role, reaction)
                     except IndexError:
                         await message.channel.send(
                             "Mention a role after the reaction. Example:\n:smile: `@Role`"
@@ -170,7 +172,7 @@ async def on_message(message):
                 else:
                     # If "done" is received the combinations are written to CSV
                     # Advances to step three
-                    rlightfm.step2(r_id, None, msg[0], done=True)
+                    rldb.step2(user, channel, done=True)
 
                     em = discord.Embed(
                         title="Title", description="Message_content", colour=botcolor
@@ -195,59 +197,55 @@ async def on_message(message):
                         title=title, description=content, colour=botcolor
                     )
                     em.set_footer(text=f"{botname}", icon_url=logo)
-                    channel = bot.get_channel(int(rlightfm.getch(r_id)))
+                    target_channel = bot.get_channel(rldb.get_targetchannel(user, channel))
 
                     emb = None
                     try:
-                        emb = await channel.send(embed=em)
+                        emb = await target_channel.send(embed=em)
                     except discord.Forbidden as ef:
-                        await message.channel.send(
-                            "I don't have permission to send embed messages to the channel {0.mention}.".format(channel)
+                        await message.target_channel.send(
+                            "I don't have permission to send embed messages to the channel {0.mention}.".format(target_channel)
                         )
 
                     if isinstance(emb, discord.Message):
-                        combo = rlightfm.getcombo(r_id)
-                        for i in range(len(combo)):
-                            if i != 0:
-                                # Skips first row as it does not contain reaction/role data
-                                try:
-                                    await emb.add_reaction(combo[i][0])
-                                except discord.Forbidden:
-                                    await message.channel.send(
-                                        "I don't have permission to react to messages from the channel {0.mention}.".format(
-                                            channel
-                                        )
+                        combos = rldb.get_combos(user, channel)
+                        rldb.end_creation(user, channel, emb.id)
+                        for reaction in combos:
+                            try:
+                                await emb.add_reaction(reaction)
+                            except discord.Forbidden:
+                                await message.target_channel.send(
+                                    "I don't have permission to react to messages in the channel {0.mention}.".format(
+                                        target_channel
                                     )
-
-                        # Writes CSV name and embed ID to cache.csv and ends process
-                        rlightfm.addids(emb.id, r_id)
-                        rlightfm.end(r_id)
+                                )
 
     await bot.process_commands(message)
 
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    reaction = payload.emoji
+    reaction = str(payload.emoji)
     msg_id = payload.message_id
     ch_id = payload.channel_id
     user_id = payload.user_id
     guild_id = payload.guild_id
-    r = rlightfm.getids(str(msg_id))
-    if r is not None:
+    exists = rldb.exists(msg_id)
+    if exists:
         # Checks that the message that was reacted to is an embed managed by the bot
-        reactions = rlightfm.getreactions(r)
+        reactions = rldb.get_reactions(msg_id)
+        role_id = reactions[reaction]
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
-        if str(reaction) not in reactions:
+        if reaction not in reactions:
             # Removes reactions added to the embed that are not connected to any role
             await msg.remove_reaction(reaction, user)
         else:
             # Gives role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
-            role = discord.utils.get(server.roles, id=reactions[str(reaction)])
+            role = discord.utils.get(server.roles, id=role_id)
             if user_id != bot.user.id:
                 try:
                     await member.add_roles(role)
@@ -263,19 +261,20 @@ async def on_raw_reaction_add(payload):
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-    reaction = payload.emoji
+    reaction = str(payload.emoji)
     msg_id = payload.message_id
     user_id = payload.user_id
     guild_id = payload.guild_id
-    r = rlightfm.getids(str(msg_id))
-    if r is not None:
+    exists = rldb.exists(msg_id)
+    if exists:
         # Checks that the message that was unreacted to is an embed managed by the bot
-        reactions = rlightfm.getreactions(r)
-        if str(reaction) in reactions:
+        reactions = rldb.get_reactions(msg_id)
+        role_id = reactions[reaction]
+        if reaction in reactions:
             # Removes role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
-            role = discord.utils.get(server.roles, id=reactions[str(reaction)])
+            role = discord.utils.get(server.roles, id=role_id)
             try:
                 await member.remove_roles(role)
             except discord.Forbidden:
@@ -293,12 +292,13 @@ async def new(ctx):
     if isadmin(ctx):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
-        rlightfm.listen(ctx.message.author.id, ctx.message.channel.id)
+        rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
         await ctx.send("Mention the #channel where to send the auto-role message.")
     else:
         await ctx.send("You do not have an admin role.")
 
-
+### EDIT NOT CURRENTLY WORKING
+### NEED TO IMPLEMENT SQL QUERIES FOR IT
 @bot.command(name="edit")
 async def edit_embed(ctx):
     if isadmin(ctx):
