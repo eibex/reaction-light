@@ -234,7 +234,6 @@ async def on_raw_reaction_add(payload):
     if exists:
         # Checks that the message that was reacted to is an embed managed by the bot
         reactions = rldb.get_reactions(msg_id)
-        role_id = reactions[reaction]
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
@@ -243,6 +242,7 @@ async def on_raw_reaction_add(payload):
             await msg.remove_reaction(reaction, user)
         else:
             # Gives role if it has permissions, else 403 error is raised
+            role_id = reactions[reaction]
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=role_id)
@@ -269,8 +269,8 @@ async def on_raw_reaction_remove(payload):
     if exists:
         # Checks that the message that was unreacted to is an embed managed by the bot
         reactions = rldb.get_reactions(msg_id)
-        role_id = reactions[reaction]
         if reaction in reactions:
+            role_id = reactions[reaction]
             # Removes role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
             member = server.get_member(user_id)
