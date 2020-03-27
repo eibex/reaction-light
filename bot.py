@@ -362,7 +362,7 @@ async def edit_selector(ctx):
                 await ctx.send(
                     f"There are **{len(all_messages)}** reaction-role messages in this channel. **Type**:"
                     f"\n```\n{prefix}edit #{channel.name} // MESSAGE_NUMBER // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
-                    "\nto edit the desired one. You can type `none` in any of the argument fields above (e.g. `New Message`) to make the bot ignore it."
+                    "\nto edit the desired one. You can type `none` in any of the argument fields above (e.g. `New Message`) to make the bot ignore it. "
                     "The list of the current reaction-role messages is:\n\n"
                     + "\n".join(selector_msgs)
                 )
