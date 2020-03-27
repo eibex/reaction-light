@@ -373,7 +373,7 @@ async def edit_selector(ctx):
                             break
                         counter += 1
                 else:
-                    await ctx.send("You selected an reaction-role message that does not exist.")
+                    await ctx.send("You selected a reaction-role message that does not exist.")
                     return
 
                 if message_to_edit_id:
@@ -390,7 +390,9 @@ async def edit_selector(ctx):
                 if len(msg_values) == 4:
                     selector_embed.title = msg_values[3]
                 elif len(msg_values) > 4:
+                    selector_embed.title = msg_values[3]
                     selector_embed.description = msg_values[4]
+                    selector_embed.colour = botcolor
                 await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
                 await ctx.send("Message edited.")
 
@@ -438,7 +440,7 @@ async def remove_selector_embed(ctx):
                     try:
                         old_msg = await channel.fetch_message(int(msg_id))
                     except discord.NotFound:
-                        # Skipping reaction-role messages that might have been deleted without updating CSVs
+                        # Skipping reaction-role messages that might have been deleted without updating the DB
                         continue
                     except discord.Forbidden:
                         ctx.send(
@@ -477,7 +479,7 @@ async def remove_selector_embed(ctx):
                             break
                         counter += 1
                 else:
-                    await ctx.send("You selected an reaction-role message that does not exist.")
+                    await ctx.send("You selected a reaction-role message that does not exist.")
                     return
 
                 if message_to_edit_id:
