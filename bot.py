@@ -176,7 +176,6 @@ async def on_message(message):
                             "You can only use reactions uploaded to this server or standard emojis."
                         )
                 else:
-                    # If "done" is received the combinations are written to CSV
                     # Advances to step three
                     rldb.step2(user, channel, done=True)
 
@@ -338,7 +337,7 @@ async def edit_embed(ctx):
                     try:
                         old_msg = await channel.fetch_message(int(msg_id))
                     except discord.NotFound:
-                        # Skipping embeds that might have been deleted without updating CSVs
+                        # Skipping embeds that might have been deleted without updating the DB
                         continue
                     except discord.Forbidden:
                         ctx.send(
