@@ -48,7 +48,7 @@ with open(activities_file, "r") as f:
         activities.append(activity)
 activities = cycle(activities)
 
-# Colour palette - changes embeds' sideline colour
+# Colour palette - changes 'embeds' sideline colour
 botcolor = 0xFFFF00
 
 
@@ -179,51 +179,47 @@ async def on_message(message):
                     # Advances to step three
                     rldb.step2(user, channel, done=True)
 
-                    em = discord.Embed(
-                        title="Title", description="Message_content", colour=botcolor
+                    selector_embed = discord.Embed(
+                        title="Embed_title", description="Embed_content", colour=botcolor
                     )
-                    em.set_footer(text=f"{botname}", icon_url=logo)
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                     await message.channel.send(
-                        "What would you like the message to say? Formatting is: `Title // Message_content`",
-                        embed=em,
+                        "What would you like the message to say?"
+                        "\nFormatting is: `Message // Embed_title // Embed_content`."
+                        "\n\n`Embed_title` and `Embed_content` are optional."
+                        "\n\n\nMessage",
+                        embed=selector_embed,
                     )
             elif step == 3:
-                # Receives the title and description of the embed
+                # Receives the title and description of the reaction-role message
                 # If the formatting is not correct it reminds the user of it
-                msg = message.content.split(" // ")
-                if len(msg) != 2:
-                    await message.channel.send(
-                        "Formatting is: `Title // Message_content`"
+                msg_values = message.content.split(" // ")
+                selector_msg_body = msg_values[0] if msg_values[0].lower() != 'none' else None
+                selector_embed = None
+                if len(msg_values) > 1:
+                    selector_embed_title = msg_values[1]
+                    selector_embed_content = msg_values[2] if len(msg_values) > 2 else None
+                    selector_embed = discord.Embed(
+                        title=selector_embed_title, description=selector_embed_content, colour=botcolor
                     )
-                else:
-                    title = msg[0]
-                    content = msg[1]
-                    em = discord.Embed(
-                        title=title, description=content, colour=botcolor
-                    )
-                    em.set_footer(text=f"{botname}", icon_url=logo)
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+                if selector_msg_body or selector_embed:
                     target_channel = bot.get_channel(rldb.get_targetchannel(user, channel))
-
-                    emb = None
+                    selector_msg = None
                     try:
-                        emb = await target_channel.send(embed=em)
+                        selector_msg = await target_channel.send(content=selector_msg_body, embed=selector_embed)
                     except discord.Forbidden as ef:
-                        await message.target_channel.send(
-                            "I don't have permission to send embed messages to the channel {0.mention}.".format(target_channel)
-                        )
-
-                    if isinstance(emb, discord.Message):
+                        await message.channel.send("I don't have permission to send selector_msg messages to the channel {0.mention}.".format(target_channel))
+                    if isinstance(selector_msg, discord.Message):
                         combos = rldb.get_combos(user, channel)
-                        rldb.end_creation(user, channel, emb.id)
+                        rldb.end_creation(user, channel, selector_msg.id)
                         for reaction in combos:
                             try:
-                                await emb.add_reaction(reaction)
+                                await selector_msg.add_reaction(reaction)
                             except discord.Forbidden:
-                                await message.target_channel.send(
-                                    "I don't have permission to react to messages in the channel {0.mention}.".format(
-                                        target_channel
-                                    )
-                                )
+                                await message.channel.send("I don't have permission to react to messages from the channel {0.mention}.".format(target_channel))
+                else:
+                    await message.channel.send("You can't use an empty message as a role-reaction message.")
 
     await bot.process_commands(message)
 
@@ -237,13 +233,13 @@ async def on_raw_reaction_add(payload):
     guild_id = payload.guild_id
     exists = rldb.exists(msg_id)
     if exists:
-        # Checks that the message that was reacted to is an embed managed by the bot
+        # Checks that the message that was reacted to is a reaction-role message managed by the bot
         reactions = rldb.get_reactions(msg_id)
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
         if reaction not in reactions:
-            # Removes reactions added to the embed that are not connected to any role
+            # Removes reactions added to the reaction-role message that are not connected to any role
             await msg.remove_reaction(reaction, user)
         else:
             # Gives role if it has permissions, else 403 error is raised
@@ -272,7 +268,7 @@ async def on_raw_reaction_remove(payload):
     guild_id = payload.guild_id
     exists = rldb.exists(msg_id)
     if exists:
-        # Checks that the message that was unreacted to is an embed managed by the bot
+        # Checks that the message that was unreacted to is a reaction-role message managed by the bot
         reactions = rldb.get_reactions(msg_id)
         if reaction in reactions:
             role_id = reactions[reaction]
@@ -292,6 +288,7 @@ async def on_raw_reaction_remove(payload):
                     )
 
 
+
 @bot.command(name="new")
 async def new(ctx):
     if isadmin(ctx):
@@ -304,18 +301,18 @@ async def new(ctx):
 
 
 @bot.command(name="edit")
-async def edit_embed(ctx):
+async def edit_selector(ctx):
     if isadmin(ctx):
         # Reminds user of formatting if it is wrong
-        msg = ctx.message.content.split()
-        if len(msg) < 2:
+        msg_values = ctx.message.content.split()
+        if len(msg_values) < 2:
             await ctx.send(
-                f"Type `{prefix}edit #channelname` to get started. Replace `#channelname` "
+                f"**Type** `{prefix}edit #channelname` to get started. Replace `#channelname` "
                 "with the channel where the reaction-role message "
                 "you wish to edit is located."
             )
             return
-        elif len(msg) == 2:
+        elif len(msg_values) == 2:
             try:
                 channel_id = ctx.message.channel_mentions[0].id
             except IndexError:
@@ -326,68 +323,75 @@ async def edit_embed(ctx):
             channel = bot.get_channel(channel_id)
             if len(all_messages) == 1:
                 await ctx.send(
-                    "There is only one embed in this channel. Type\n"
-                    f"```\n{prefix}edit #{channel.name} // 1 // New Title // New Description\n```\n"
-                    "to edit the reaction-role message."
+                    "There is only one reaction-role message in this channel. **Type**:"
+                    f"\n```\n{prefix}edit #{channel.name} // 1 // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
+                    "\nto edit the reaction-role message."
                 )
             elif len(all_messages) > 1:
-                embeds = []
+                selector_msgs = []
                 counter = 1
                 for msg_id in all_messages:
                     try:
                         old_msg = await channel.fetch_message(int(msg_id))
                     except discord.NotFound:
-                        # Skipping embeds that might have been deleted without updating the DB
+                        # Skipping reaction-role messages that might have been deleted without updating CSVs
                         continue
                     except discord.Forbidden:
                         ctx.send(
                             "I do not have permissions to edit a reaction-role message that I previously created."
                         )
                         continue
-                    entry = f"`{counter}` {old_msg.embeds[0].title}"
-                    embeds.append(entry)
+                    entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    selector_msgs.append(entry)
                     counter += 1
 
                 await ctx.send(
-                    f"There are {len(all_messages)} embeds in this channel. Type\n"
-                    f"```\n{prefix}edit #{channel.name} // EMBED_NUMBER // New Title // New Description\n```\n"
-                    "to edit the desired reaction-role message. The list of embeds is:\n"
-                    + "\n".join(embeds)
+                    f"There are **{len(all_messages)}** reaction-role messages in this channel. **Type**:"
+                    f"\n```\n{prefix}edit #{channel.name} // MESSAGE_NUMBER // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
+                    "\nto edit the desired one. The list of the current reaction-role messages is:\n\n"
+                    + "\n".join(selector_msgs)
                 )
             else:
                 await ctx.send("There are no reaction-role messages in that channel.")
-        elif len(msg) > 2:
+        elif len(msg_values) > 2:
             try:
-                # Tries to edit the embed
+                # Tries to edit the reaction-role message
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
                 channel_id = ctx.message.channel_mentions[0].id
                 channel = bot.get_channel(channel_id)
-                msg = ctx.message.content.split(" // ")
-                try:
-                    embed_number = int(msg[1])
-                except ValueError:
-                    await ctx.send("You need to select an embed by typing its number in the list.")
-                    return
+                msg_values = ctx.message.content.split(" // ")
+                selector_msg_number = msg_values[1]
                 all_messages = rldb.fetch_messages(channel_id)
-                try:
-                    message_to_edit_id = all_messages[embed_number - 1]
-                except IndexError:
-                    await ctx.send("You selected an embed that does not exist.")
+                counter = 1
+
+                # Loop through all msg_ids and stops when the counter matches the user input
+                if all_messages:
+                    message_to_edit_id = None
+                    for msg_id in all_messages:
+                        if str(counter) == selector_msg_number:
+                            message_to_edit_id = msg_id
+                            break
+                        counter += 1
+                else:
+                    await ctx.send("You selected an reaction-role message that does not exist.")
                     return
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
                     await ctx.send(
-                        "Select a valid embed number (i.e. the number to the left of the embed title in the list above)."
+                        "Select a valid reaction-role message number (i.e. the number to the left of the reaction-role message content in the list above)."
                     )
                     return
 
-                title = msg[2]
-                content = msg[3]
-                em = discord.Embed(title=title, description=content, colour=botcolor)
-                em.set_footer(text=f"{botname}", icon_url=logo)
-                await old_msg.edit(embed=em)
+                await old_msg.edit(suppress=False)
+                selector_msg_new_body = msg_values[2]
+                selector_embed = old_msg.embeds[0] if old_msg.embeds else discord.Embed()
+                if len(msg_values) == 4:
+                    selector_embed.title = msg_values[3]
+                elif len(msg_values) > 4:
+                    selector_embed.description = msg_values[4]
+                await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
                 await ctx.send("Message edited.")
 
             except IndexError:
@@ -399,6 +403,111 @@ async def edit_embed(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
+
+@bot.command(name="rm-embed")
+async def remove_selector_embed(ctx):
+    if isadmin(ctx):
+        # Reminds user of formatting if it is wrong
+        msg_values = ctx.message.content.split()
+        if len(msg_values) < 2:
+            await ctx.send(
+                f"**Type** `{prefix}rm-embed #channelname` to get started. Replace `#channelname` "
+                "with the channel where the reaction-role message "
+                "you wish to remove its embed is located."
+            )
+            return
+        elif len(msg_values) == 2:
+            try:
+                channel_id = ctx.message.channel_mentions[0].id
+            except IndexError:
+                await ctx.send("The channel you mentioned is invalid.")
+                return
+
+            channel = bot.get_channel(channel_id)
+            all_messages = rldb.fetch_messages(channel_id)
+            if len(all_messages) == 1:
+                await ctx.send(
+                    "There is only one reaction-role message in this channel. **Type**:"
+                    f"\n```\n{prefix}rm-embed #{channel.name} // 1\n```"
+                    "\nto remove the reaction-role message's embed."
+                )
+            elif len(all_messages) > 1:
+                selector_msgs = []
+                counter = 1
+                for msg_id in all_messages:
+                    try:
+                        old_msg = await channel.fetch_message(int(msg_id))
+                    except discord.NotFound:
+                        # Skipping reaction-role messages that might have been deleted without updating CSVs
+                        continue
+                    except discord.Forbidden:
+                        ctx.send(
+                            "I do not have permissions to edit a reaction-role message that I previously created."
+                        )
+                        continue
+                    entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    selector_msgs.append(entry)
+                    counter += 1
+
+                await ctx.send(
+                    f"There are **{len(all_messages)}** reaction-role messages in this channel. **Type**:"
+                    f"\n```\n{prefix}rm-embed #{channel.name} // MESSAGE_NUMBER\n```"
+                    "\nto remove its embed. The list of the current reaction-role messages is:\n\n"
+                    + "\n".join(selector_msgs)
+                )
+            else:
+                await ctx.send("There are no reaction-role messages in that channel.")
+        elif len(msg_values) > 2:
+            try:
+                # Tries to edit the reaction-role message
+                # Raises errors if the channel sent was invalid or if the bot cannot edit the message
+                channel_id = ctx.message.channel_mentions[0].id
+                channel = bot.get_channel(channel_id)
+                msg_values = ctx.message.content.split(" // ")
+                selector_msg_number = msg_values[1]
+                all_messages = rldb.fetch_messages(channel_id)
+                counter = 1
+
+                # Loop through all msg_ids and stops when the counter matches the user input
+                if all_messages:
+                    message_to_edit_id = None
+                    for msg_id in all_messages:
+                        if str(counter) == selector_msg_number:
+                            message_to_edit_id = msg_id
+                            break
+                        counter += 1
+                else:
+                    await ctx.send("You selected an reaction-role message that does not exist.")
+                    return
+
+                if message_to_edit_id:
+                    old_msg = await channel.fetch_message(int(message_to_edit_id))
+                else:
+                    await ctx.send(
+                        "Select a valid reaction-role message number (i.e. the number to the left of the reaction-role message content in the list above)."
+                    )
+                    return
+
+                try:
+                    await old_msg.edit(embed=None)
+                    await ctx.send("Embed Removed.")
+                except discord.HTTPException as e:
+                    if e.code == 50006:
+                        await ctx.send(
+                            "You can't remove an embed if its message is empty. Please edit the message first with: "
+                            f"\n`{prefix}edit #{ctx.message.channel_mentions[0]} // {selector_msg_number} // New Message`"
+                            )
+                    else:
+                        await ctx.send(str(e))
+
+            except IndexError:
+                await ctx.send("The channel you mentioned is invalid.")
+
+            except discord.Forbidden:
+                await ctx.send("I do not have permissions to edit the message.")
+
+    else:
+        await ctx.send("You do not have an admin role.")
 
 @bot.command(name="systemchannel")
 async def set_systemchannel(ctx):
@@ -436,7 +545,8 @@ async def hlp(ctx):
         await ctx.send(
             "Commands are:\n"
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
-            f"- `{prefix}edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}rm-embed` Suppress the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
