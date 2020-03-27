@@ -1,6 +1,7 @@
 import configparser
 from sys import platform, exit as shutdown
 import os
+from shutil import copy
 from itertools import cycle
 import csv
 import discord
@@ -40,6 +41,12 @@ admin_c = int(config.get("server_role", "admin_c"))
 system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
+
+if not os.path.isfile(f"{folder}/activities.csv"):
+    copy(
+        f"{folder}/activities.csv.sample", f"{folder}/activities.csv",
+    )
+
 activities_file = f"{folder}/activities.csv"
 with open(activities_file, "r") as f:
     reader = csv.reader(f, delimiter=",")
