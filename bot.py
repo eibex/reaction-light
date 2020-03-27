@@ -303,8 +303,7 @@ async def new(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
-### EDIT NOT CURRENTLY WORKING
-### NEED TO IMPLEMENT SQL QUERIES FOR IT
+
 @bot.command(name="edit")
 async def edit_embed(ctx):
     if isadmin(ctx):

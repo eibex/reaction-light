@@ -56,5 +56,5 @@ def migrate():
         os.remove(f"{folder}/cache.csv")
         os.remove(f"{folder}/id.csv")
 
-        print("Migration completed.")
+        print("\nMigration completed.")
         return True
