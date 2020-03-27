@@ -194,6 +194,8 @@ async def on_message(message):
                         "What would you like the message to say?"
                         "\nFormatting is: `Message // Embed_title // Embed_content`."
                         "\n\n`Embed_title` and `Embed_content` are optional."
+                        "\n\nYou can type `none` in any of the argument fields above (e.g. `New Message`) to "
+                        "make the bot ignore it."
                         "\n\n\nMessage",
                         embed=selector_embed,
                     )
@@ -336,7 +338,8 @@ async def edit_selector(ctx):
                 await ctx.send(
                     "There is only one reaction-role message in this channel. **Type**:"
                     f"\n```\n{prefix}edit #{channel.name} // 1 // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
-                    "\nto edit the reaction-role message."
+                    "\nto edit the reaction-role message.\n\nYou can type `none` in any of the argument fields above (e.g. `New Message`) to "
+                    "make the bot ignore it."
                 )
             elif len(all_messages) > 1:
                 selector_msgs = []
@@ -361,6 +364,8 @@ async def edit_selector(ctx):
                     f"\n```\n{prefix}edit #{channel.name} // MESSAGE_NUMBER // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
                     "\nto edit the desired one. The list of the current reaction-role messages is:\n\n"
                     + "\n".join(selector_msgs)
+                    + "\n\nYou can type `none` in any of the argument fields above (e.g. `New Message`) to "
+                    "make the bot ignore it."
                 )
             else:
                 await ctx.send("There are no reaction-role messages in that channel.")
@@ -407,6 +412,7 @@ async def edit_selector(ctx):
                         selector_embed.description = old_msg.embeds[0].description
                 if len(msg_values) > 4 and msg_values[4].lower() != 'none':
                     selector_embed.description = msg_values[4]
+                    selector_embed.colour = botcolor
 
                 # Prevent sending an empty embed instead of removing it
                 selector_embed = selector_embed if selector_embed.title or selector_embed.description else None
