@@ -188,14 +188,18 @@ async def on_message(message):
                 # If the formatting is not correct it reminds the user of it
                 msg_values = message.content.split(" // ")
                 selector_msg_body = msg_values[0] if msg_values[0].lower() != 'none' else None
-                selector_embed = None
+                selector_embed = discord.Embed(colour=botcolor)
+                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                 if len(msg_values) > 1:
-                    selector_embed_title = msg_values[1]
-                    selector_embed_content = msg_values[2] if len(msg_values) > 2 else None
-                    selector_embed = discord.Embed(
-                        title=selector_embed_title, description=selector_embed_content, colour=botcolor
-                    )
-                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+                    if msg_values[1].lower() != 'none':
+                        selector_embed.title = msg_values[1]
+                    if len(msg_values) > 2 and msg_values[2].lower() != 'none':
+                        selector_embed.description = msg_values[2]
+
+                # Prevent sending an empty embed instead of removing it
+                selector_embed = selector_embed if selector_embed.title or selector_embed.description else None
+
                 if selector_msg_body or selector_embed:
                     channel = bot.get_channel(int(rlightfm.getch(r_id)))
                     selector_msg = None
@@ -379,14 +383,25 @@ async def edit_selector(ctx):
                     return
 
                 await old_msg.edit(suppress=False)
-                selector_msg_new_body = msg_values[2]
-                selector_embed = old_msg.embeds[0] if old_msg.embeds else discord.Embed()
-                if len(msg_values) == 4:
+                selector_msg_new_body = msg_values[2] if msg_values[2].lower() != 'none' else None
+                selector_embed = discord.Embed()
+                if len(msg_values) == 3 and old_msg.embeds:
+                    selector_embed = old_msg.embeds[0]
+                if len(msg_values) > 3 and msg_values[3].lower() != 'none':
                     selector_embed.title = msg_values[3]
-                elif len(msg_values) > 4:
+                    if old_msg.embeds and len(msg_values) == 4:
+                        selector_embed.description = old_msg.embeds[0].description
+                if len(msg_values) > 4 and msg_values[4].lower() != 'none':
                     selector_embed.description = msg_values[4]
-                await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
-                await ctx.send("Message edited.")
+
+                # Prevent sending an empty embed instead of removing it
+                selector_embed = selector_embed if selector_embed.title or selector_embed.description else None
+
+                if selector_msg_new_body or selector_embed:
+                    await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
+                    await ctx.send("Message edited.")
+                else:
+                    await ctx.send("You can't use an empty message as role-reaction message.")
 
             except IndexError:
                 await ctx.send("The channel you mentioned is invalid.")
