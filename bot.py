@@ -555,7 +555,7 @@ async def hlp(ctx):
             "Commands are:\n"
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
             f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
-            f"- `{prefix}rm-embed` Suppress the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
