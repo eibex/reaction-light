@@ -15,7 +15,7 @@ Light yet powerful reaction role bot coded in discord.py (rewrite branch).
 - Optional update notifications and error reporting to your own Discord server
 - No need to rely on developer mode and IDs
 
-You can host the bot yourself by configuring the `config.ini` file.
+You can host the bot yourself by configuring the `config.ini` and `files/activities.csv` file.
 
 ## Contents
 - [Requirements](#requirements)
