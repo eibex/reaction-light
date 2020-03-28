@@ -49,7 +49,7 @@ pip install -U discord.py requests
 - Run `setup.py` and follow the instructions or edit the `config.ini.sample` file manually (rename it to `config.ini` when done):
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default is `rl!`)
-  - Name is not currently used and can be left blank
+  - Set a name to appear in embed footers
   - URL of the footer logo
   - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
 - Edit the `activities.csv.sample` file (it will be automatically copied to `activities.csv` when the bot is launched):
