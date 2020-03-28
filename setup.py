@@ -19,28 +19,49 @@ print(
 print(
     "If you would like to abort the configuration close the program. No input will be written to file until the setup is complete."
 )
+print(
+    "Default values are shown inside square brackets [] where applicable. Pressing enter and leaving the field empty will accept the default value."
+)
 
 while True:
     token = input(
-        "\nPaste the token of your bot user (you can create one at: https://discordapp.com/developers/applications/)\n"
+        "\nPaste the token of your bot user (you can create one at: https://discordapp.com/developers/applications/)  "
     )
     if token.lower() == "help":
         print(
             "\nThe bot token looks like this: NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
         )
         continue
+    elif token == "":
+        continue
     else:
         break
 
-prefix = input("\nInsert the prefix of the bot (help not available for this)\n")
+
+prefix = input("\nInsert the prefix of the bot (help not available for this) [rl!]  ")
+if prefix == "":
+    prefix = "rl!"
+
+while True:
+    name = input("\nInsert the name you wish to give the bot [Reaction Light]  ")
+    if name.lower() == "help":
+        print("\nThe name will be shown in the embed footers created by the bot.")
+    elif name == "":
+        name = "Reaction Light"
+        break
+    else:
+        break
 
 while True:
     logo = input(
-        "\nPaste the URL to your preferred logo file (should end in *.png, *.jpg, *.webp, ...)\n"
+        "\nPaste the URL to your preferred logo file (should end in *.png, *.jpg, *.webp, ...)  [readme.md logo]  "
     )
     if logo.lower() == "help":
         print("\nThe logo is the picture shown in the footer of the embeds.\n")
         continue
+    elif logo == "":
+        logo = "https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg"
+        break
     else:
         break
 
@@ -76,6 +97,7 @@ config = configparser.ConfigParser()
 config.read("{}/config.ini.sample".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
+config["server"]["name"] = name
 config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
 config["server_role"]["admin_a"] = admin_a
