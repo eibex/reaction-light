@@ -6,6 +6,7 @@ Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org
 - Improve `rl!new` and `rl!edit` by allowing to ignore text or embed fields ([#22](https://github.com/eibex/reaction-light/pull/22) by [arbaes](https://github.com/arbaes))
 - Add SQLite database ([#20](https://github.com/eibex/reaction-light/pull/20) by [eibex](https://github.com/eibex))
 - Add automatic migration to delete CSV files and transfer them to an SQLite database ([#20](https://github.com/eibex/reaction-light/pull/20) by [eibex](https://github.com/eibex))
+- Remove `requests` dependency (rely on built-in `urllib` library instead)
 - Minor improvements to `rl!help`
 
 ### 0.3.2

@@ -13,7 +13,12 @@ def migrate():
         return False
     else:
         for file in os.listdir(folder):
-            if file.endswith(".csv") and file != "activities.csv" and file != "cache.csv" and file != "id.csv":
+            if (
+                file.endswith(".csv")
+                and file != "activities.csv"
+                and file != "cache.csv"
+                and file != "id.csv"
+            ):
                 print(f"Migrating {file}")
                 filepath = os.path.join(folder, file)
                 with open(filepath, "r") as f:

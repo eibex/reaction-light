@@ -37,11 +37,11 @@ Discord.py requires Python 3.5.3 or higher. This bot requires discord.py 1.2.5 o
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
-python3 -m pip install -U discord.py requests 
+python3 -m pip install -U discord.py
 ```
 or
 ```
-pip install -U discord.py requests 
+pip install -U discord.py
 ```
 
 ## Setup

@@ -6,7 +6,7 @@ from itertools import cycle
 import csv
 import discord
 from discord.ext import commands, tasks
-from requests import get as requests_get
+from urllib.request import urlopen
 import rldb
 import migration
 
@@ -76,13 +76,12 @@ def isadmin(ctx, msg=False):
 
 
 def get_latest():
-    latest = (
-        requests_get(
-            "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
-        )
-        .text.lower()
-        .rstrip("\n")
+    data = urlopen(
+        "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
     )
+    for line in data:
+        latest = line.decode()
+        break
     return latest
 
 
@@ -126,7 +125,9 @@ async def on_ready():
     print("Reaction Light ready!")
     if migrated and system_channel:
         channel = bot.get_channel(system_channel)
-        await channel.send("Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file.")
+        await channel.send(
+            "Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file."
+        )
     maintain_presence.start()
     updates.start()
 
@@ -149,7 +150,9 @@ async def on_message(message):
                     server = bot.get_guild(message.guild.id)
                     bot_user = server.get_member(bot.user.id)
                     target_channel = message.channel_mentions[0].id
-                    bot_permissions = bot.get_channel(target_channel).permissions_for(bot_user)
+                    bot_permissions = bot.get_channel(target_channel).permissions_for(
+                        bot_user
+                    )
                     writable = bot_permissions.read_messages
                     readable = bot_permissions.view_channel
                     if not writable or not readable:
@@ -187,7 +190,9 @@ async def on_message(message):
                     rldb.step2(user, channel, done=True)
 
                     selector_embed = discord.Embed(
-                        title="Embed_title", description="Embed_content", colour=botcolor
+                        title="Embed_title",
+                        description="Embed_content",
+                        colour=botcolor,
                     )
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                     await message.channel.send(
@@ -203,26 +208,40 @@ async def on_message(message):
                 # Receives the title and description of the reaction-role message
                 # If the formatting is not correct it reminds the user of it
                 msg_values = message.content.split(" // ")
-                selector_msg_body = msg_values[0] if msg_values[0].lower() != 'none' else None
+                selector_msg_body = (
+                    msg_values[0] if msg_values[0].lower() != "none" else None
+                )
                 selector_embed = discord.Embed(colour=botcolor)
                 selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                 if len(msg_values) > 1:
 
-                    if msg_values[1].lower() != 'none':
+                    if msg_values[1].lower() != "none":
                         selector_embed.title = msg_values[1]
-                    if len(msg_values) > 2 and msg_values[2].lower() != 'none':
+                    if len(msg_values) > 2 and msg_values[2].lower() != "none":
                         selector_embed.description = msg_values[2]
 
                 # Prevent sending an empty embed instead of removing it
-                selector_embed = selector_embed if selector_embed.title or selector_embed.description else None
+                selector_embed = (
+                    selector_embed
+                    if selector_embed.title or selector_embed.description
+                    else None
+                )
 
                 if selector_msg_body or selector_embed:
-                    target_channel = bot.get_channel(rldb.get_targetchannel(user, channel))
+                    target_channel = bot.get_channel(
+                        rldb.get_targetchannel(user, channel)
+                    )
                     selector_msg = None
                     try:
-                        selector_msg = await target_channel.send(content=selector_msg_body, embed=selector_embed)
+                        selector_msg = await target_channel.send(
+                            content=selector_msg_body, embed=selector_embed
+                        )
                     except discord.Forbidden as ef:
-                        await message.channel.send("I don't have permission to send selector_msg messages to the channel {0.mention}.".format(target_channel))
+                        await message.channel.send(
+                            "I don't have permission to send selector_msg messages to the channel {0.mention}.".format(
+                                target_channel
+                            )
+                        )
                     if isinstance(selector_msg, discord.Message):
                         combos = rldb.get_combos(user, channel)
                         rldb.end_creation(user, channel, selector_msg.id)
@@ -230,9 +249,15 @@ async def on_message(message):
                             try:
                                 await selector_msg.add_reaction(reaction)
                             except discord.Forbidden:
-                                await message.channel.send("I don't have permission to react to messages from the channel {0.mention}.".format(target_channel))
+                                await message.channel.send(
+                                    "I don't have permission to react to messages from the channel {0.mention}.".format(
+                                        target_channel
+                                    )
+                                )
                 else:
-                    await message.channel.send("You can't use an empty message as a role-reaction message.")
+                    await message.channel.send(
+                        "You can't use an empty message as a role-reaction message."
+                    )
 
     await bot.process_commands(message)
 
@@ -299,7 +324,6 @@ async def on_raw_reaction_remove(payload):
                         "Ensure that I have a role that is hierarchically higher than the role I have to remove, "
                         "and that I have the `Manage Roles` permission."
                     )
-
 
 
 @bot.command(name="new")
@@ -388,7 +412,9 @@ async def edit_selector(ctx):
                             break
                         counter += 1
                 else:
-                    await ctx.send("You selected a reaction-role message that does not exist.")
+                    await ctx.send(
+                        "You selected a reaction-role message that does not exist."
+                    )
                     return
 
                 if message_to_edit_id:
@@ -400,27 +426,37 @@ async def edit_selector(ctx):
                     return
 
                 await old_msg.edit(suppress=False)
-                selector_msg_new_body = msg_values[2] if msg_values[2].lower() != 'none' else None
+                selector_msg_new_body = (
+                    msg_values[2] if msg_values[2].lower() != "none" else None
+                )
                 selector_embed = discord.Embed()
                 if len(msg_values) == 3 and old_msg.embeds:
                     selector_embed = old_msg.embeds[0]
-                if len(msg_values) > 3 and msg_values[3].lower() != 'none':
+                if len(msg_values) > 3 and msg_values[3].lower() != "none":
                     selector_embed.title = msg_values[3]
                     selector_embed.colour = botcolor
                     if old_msg.embeds and len(msg_values) == 4:
                         selector_embed.description = old_msg.embeds[0].description
-                if len(msg_values) > 4 and msg_values[4].lower() != 'none':
+                if len(msg_values) > 4 and msg_values[4].lower() != "none":
                     selector_embed.description = msg_values[4]
                     selector_embed.colour = botcolor
 
                 # Prevent sending an empty embed instead of removing it
-                selector_embed = selector_embed if selector_embed.title or selector_embed.description else None
+                selector_embed = (
+                    selector_embed
+                    if selector_embed.title or selector_embed.description
+                    else None
+                )
 
                 if selector_msg_new_body or selector_embed:
-                    await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
+                    await old_msg.edit(
+                        content=selector_msg_new_body, embed=selector_embed
+                    )
                     await ctx.send("Message edited.")
                 else:
-                    await ctx.send("You can't use an empty message as role-reaction message.")
+                    await ctx.send(
+                        "You can't use an empty message as role-reaction message."
+                    )
 
             except IndexError:
                 await ctx.send("The channel you mentioned is invalid.")
@@ -505,7 +541,9 @@ async def remove_selector_embed(ctx):
                             break
                         counter += 1
                 else:
-                    await ctx.send("You selected a reaction-role message that does not exist.")
+                    await ctx.send(
+                        "You selected a reaction-role message that does not exist."
+                    )
                     return
 
                 if message_to_edit_id:
@@ -524,7 +562,7 @@ async def remove_selector_embed(ctx):
                         await ctx.send(
                             "You can't remove an embed if its message is empty. Please edit the message first with: "
                             f"\n`{prefix}edit #{ctx.message.channel_mentions[0]} // {selector_msg_number} // New Message`"
-                            )
+                        )
                     else:
                         await ctx.send(str(e))
 
@@ -536,6 +574,7 @@ async def remove_selector_embed(ctx):
 
     else:
         await ctx.send("You do not have an admin role.")
+
 
 @bot.command(name="systemchannel")
 async def set_systemchannel(ctx):

@@ -9,10 +9,15 @@ directory = path.dirname(path.realpath(__file__))
 database = sqlite3.connect(f"{directory}/files/reactionlight.db")
 db = database.cursor()
 
-db.execute("CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'reactionrole_id' INT);")
-db.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
+db.execute(
+    "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'reactionrole_id' INT);"
+)
+db.execute(
+    "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);"
+)
 
 reactionrole_creation = {}
+
 
 class ReactionRoleCreationTracker:
     def __init__(self, user, channel):
@@ -27,17 +32,23 @@ class ReactionRoleCreationTracker:
     def _generate_reactionrole_id(self):
         while True:
             self.reactionrole_id = randint(0, 100000)
-            db.execute(f"SELECT * FROM messages WHERE reactionrole_id = '{self.reactionrole_id}'")
+            db.execute(
+                f"SELECT * FROM messages WHERE reactionrole_id = '{self.reactionrole_id}'"
+            )
             result = db.fetchall()
             if result:
                 continue
             break
 
     def commit(self):
-        db.execute(f"INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values('{self.message_id}', '{self.target_channel}', '{self.reactionrole_id}');")
+        db.execute(
+            f"INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values('{self.message_id}', '{self.target_channel}', '{self.reactionrole_id}');"
+        )
         for reaction in self.combos:
             role_id = self.combos[reaction]
-            db.execute(f"INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values('{self.reactionrole_id}', '{reaction}', '{role_id}');")
+            db.execute(
+                f"INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values('{self.reactionrole_id}', '{reaction}', '{role_id}');"
+            )
         database.commit()
 
 
@@ -91,9 +102,13 @@ def exists(message_id):
 
 
 def get_reactions(message_id):
-    db.execute(f"SELECT reactionrole_id FROM messages WHERE message_id = '{message_id}';")
+    db.execute(
+        f"SELECT reactionrole_id FROM messages WHERE message_id = '{message_id}';"
+    )
     reactionrole_id = db.fetchall()[0][0]
-    db.execute(f"SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = '{reactionrole_id}';")
+    db.execute(
+        f"SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = '{reactionrole_id}';"
+    )
     combos = {}
     for row in db:
         reaction = row[0]
