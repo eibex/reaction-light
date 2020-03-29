@@ -5,8 +5,3 @@ prefix = rl!
 name = Reaction Light
 system_channel =
 logo =
-
-[server_role]
-admin_a =
-admin_b =
-admin_c =
