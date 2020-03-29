@@ -640,8 +640,10 @@ async def add_admin(ctx):
             role = int(ctx.message.content.split()[1])
         except ValueError:
             ctx.send("Please mention a valid @Role or role ID.")
+            return
         except IndexError:
             ctx.send("Please mention a @Role or role ID.")
+            return
     rldb.add_admin(role)
 
 
@@ -655,8 +657,10 @@ async def remove_admin(ctx):
             role = int(ctx.message.content.split()[1])
         except ValueError:
             ctx.send("Please mention a valid @Role or role ID.")
+            return
         except IndexError:
             ctx.send("Please mention a @Role or role ID.")
+            return
     rldb.remove_admin(role)
 
 
