@@ -142,6 +142,7 @@ def remove_admin(role):
 def get_admins():
     db.execute(f"SELECT * FROM admins;")
     admins = []
-    for role_id in db:
+    for row in db:
+        role_id = row[0]
         admins.append(role_id)
     return admins
