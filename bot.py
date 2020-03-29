@@ -3,10 +3,10 @@ from sys import platform, exit as shutdown
 import os
 from shutil import copy
 from itertools import cycle
+from urllib.request import urlopen
 import csv
 import discord
 from discord.ext import commands, tasks
-from urllib.request import urlopen
 import rldb
 import migration
 
@@ -17,6 +17,7 @@ import migration
 directory = os.path.dirname(os.path.realpath(__file__))
 
 migrated = migration.migrate()
+config_migrated = migration.migrateconfig()
 
 with open(f"{directory}/.version") as f:
     __version__ = f.read().rstrip("\n").rstrip("\r")
@@ -24,9 +25,7 @@ with open(f"{directory}/.version") as f:
 folder = f"{directory}/files"
 config = configparser.ConfigParser()
 config.read(f"{directory}/config.ini")
-
 TOKEN = str(config.get("server", "token"))
-
 prefix = str(config.get("server", "prefix"))
 botname = str(config.get("server", "name"))
 
@@ -35,9 +34,6 @@ bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
 # IDs
-admin_a = int(config.get("server_role", "admin_a"))
-admin_b = int(config.get("server_role", "admin_b"))
-admin_c = int(config.get("server_role", "admin_c"))
 system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
@@ -61,13 +57,14 @@ botcolor = 0xFFFF00
 
 def isadmin(ctx, msg=False):
     # Checks if command author has one of config.ini admin role IDs
+    admins = rldb.get_admins()
     try:
         check = (
             [role.id for role in ctx.author.roles]
             if msg
             else [role.id for role in ctx.message.author.roles]
         )
-        if admin_a in check or admin_b in check or admin_c in check:
+        if [role for role in admins if role in check]:
             return True
         return False
     except AttributeError:
@@ -127,6 +124,12 @@ async def on_ready():
         channel = bot.get_channel(system_channel)
         await channel.send(
             "Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file."
+        )
+    if config_migrated and system_channel:
+        channel = bot.get_channel(system_channel)
+        await channel.send(
+            "Your `config.ini` has been edited and your admin IDs are now stored in the database.\n"
+            f"You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
         )
     maintain_presence.start()
     updates.start()
@@ -334,7 +337,7 @@ async def new(ctx):
         rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
         await ctx.send("Mention the #channel where to send the auto-role message.")
     else:
-        await ctx.send("You do not have an admin role.")
+        await ctx.send(f"You do not have an admin role. You might want to use `{prefix}admin` first.")
 
 
 @bot.command(name="edit")
@@ -614,6 +617,8 @@ async def hlp(ctx):
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
             f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}admin` adds the mentioned role to the list of {botname} admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n"
+            f"- `{prefix}rm-admin` removes the mentioned role from the list of {botname} admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
@@ -623,6 +628,42 @@ async def hlp(ctx):
         )
     else:
         await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="admin")
+@commands.has_permissions(administrator=True)
+async def add_admin(ctx):
+    try:
+        role = ctx.message.role_mentions[0].id
+    except IndexError:
+        try:
+            role = int(ctx.message.content.split()[1])
+        except ValueError:
+            await ctx.send("Please mention a valid @Role or role ID.")
+            return
+        except IndexError:
+            await ctx.send("Please mention a @Role or role ID.")
+            return
+    rldb.add_admin(role)
+    await ctx.send("Added the role to my admin list.")
+
+
+@bot.command(name="rm-admin")
+@commands.has_permissions(administrator=True)
+async def remove_admin(ctx):
+    try:
+        role = ctx.message.role_mentions[0].id
+    except IndexError:
+        try:
+            role = int(ctx.message.content.split()[1])
+        except ValueError:
+            await ctx.send("Please mention a valid @Role or role ID.")
+            return
+        except IndexError:
+            await ctx.send("Please mention a @Role or role ID.")
+            return
+    rldb.remove_admin(role)
+    await ctx.send("Removed the role from my admin list.")
 
 
 @bot.command(name="version")

@@ -15,6 +15,9 @@ db.execute(
 db.execute(
     "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);"
 )
+db.execute(
+    "CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);"
+)
 
 reactionrole_creation = {}
 
@@ -35,8 +38,8 @@ class ReactionRoleCreationTracker:
             db.execute(
                 f"SELECT * FROM messages WHERE reactionrole_id = '{self.reactionrole_id}'"
             )
-            result = db.fetchall()
-            if result:
+            already_exists = db.fetchall()
+            if already_exists:
                 continue
             break
 
@@ -124,3 +127,22 @@ def fetch_messages(channel):
         message_id = int(row[0])
         all_messages.append(message_id)
     return all_messages
+
+
+def add_admin(role):
+    db.execute(f"INSERT INTO 'admins' ('role_id') values('{role}');")
+    database.commit()
+
+
+def remove_admin(role):
+    db.execute(f"DELETE FROM admins WHERE role_id = '{role}';")
+    database.commit()
+
+
+def get_admins():
+    db.execute(f"SELECT * FROM admins;")
+    admins = []
+    for row in db:
+        role_id = row[0]
+        admins.append(role_id)
+    return admins
