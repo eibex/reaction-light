@@ -131,10 +131,12 @@ def fetch_messages(channel):
 
 def add_admin(role):
     db.execute(f"INSERT INTO 'admins' ('role_id') values('{role}');")
+    database.commit()
 
 
 def remove_admin(role):
     db.execute(f"DELETE FROM admins WHERE role_id = '{role}';")
+    database.commit()
 
 
 def get_admins():

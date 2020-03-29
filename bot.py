@@ -129,7 +129,7 @@ async def on_ready():
         channel = bot.get_channel(system_channel)
         await channel.send(
             "Your `config.ini` has been edited and your admin IDs are now stored in the database.\n"
-            "You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
+            f"You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
         )
     maintain_presence.start()
     updates.start()
