@@ -645,6 +645,7 @@ async def add_admin(ctx):
             await ctx.send("Please mention a @Role or role ID.")
             return
     rldb.add_admin(role)
+    await ctx.send("Added the role to my admin list.")
 
 
 @bot.command(name="rm-admin")
@@ -662,6 +663,7 @@ async def remove_admin(ctx):
             await ctx.send("Please mention a @Role or role ID.")
             return
     rldb.remove_admin(role)
+    await ctx.send("Removed the role from my admin list.")
 
 
 @bot.command(name="version")
