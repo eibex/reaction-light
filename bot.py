@@ -34,7 +34,6 @@ bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
 # IDs
-admins = rldb.get_admins()
 system_channel = int(config.get("server", "system_channel"))
 logo = str(config.get("server", "logo"))
 activities = []
@@ -58,6 +57,7 @@ botcolor = 0xFFFF00
 
 def isadmin(ctx, msg=False):
     # Checks if command author has one of config.ini admin role IDs
+    admins = rldb.get_admins()
     try:
         check = (
             [role.id for role in ctx.author.roles]
