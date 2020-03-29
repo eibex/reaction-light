@@ -1,5 +1,10 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.1.0
+- Add `rl!admin` to allow members with a certain role to use the bot commands. Requires administrator permissions on the server ([#23](https://github.com/eibex/reaction-light/pull/23) by [eibex](https://github.com/eibex))
+- Add `rl!rm-admin` to prevent members with a certain role from using the bot commands. Requires administrator permissions on the server ([#23](https://github.com/eibex/reaction-light/pull/23) by [eibex](https://github.com/eibex))
+- Add migration script to transfer current admin roles from the config to the db ([#23](https://github.com/eibex/reaction-light/pull/23) by [eibex](https://github.com/eibex))
+
 ### 1.0.0
 - Add `rl!rm-embed` to remove embeds from reaction-role messages, keeping the text-message body ([#21](https://github.com/eibex/reaction-light/pull/21) by [arbaes](https://github.com/arbaes))
 - Improve `rl!edit` to add or edit a text-message body and/or embeds to reaction-role messages ([#21](https://github.com/eibex/reaction-light/pull/21) by [arbaes](https://github.com/arbaes))
