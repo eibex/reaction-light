@@ -1,9 +1,18 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.0.0
+- Add `rl!rm-embed` to remove embeds from reaction-role messages, keeping the text-message body ([#21](https://github.com/eibex/reaction-light/pull/21) by [arbaes](https://github.com/arbaes))
+- Improve `rl!edit` to add or edit a text-message body and/or embeds to reaction-role messages ([#21](https://github.com/eibex/reaction-light/pull/21) by [arbaes](https://github.com/arbaes))
+- Improve `rl!new` and `rl!edit` by allowing to ignore text or embed fields ([#22](https://github.com/eibex/reaction-light/pull/22) by [arbaes](https://github.com/arbaes))
+- Add SQLite database ([#20](https://github.com/eibex/reaction-light/pull/20) by [eibex](https://github.com/eibex))
+- Add automatic migration to delete CSV files and transfer them to an SQLite database ([#20](https://github.com/eibex/reaction-light/pull/20) by [eibex](https://github.com/eibex))
+- Remove `requests` dependency (rely on built-in `urllib` library instead)
+- Minor improvements to `rl!help`
+
 ### 0.3.2
 - Prevent update and restart commands when the bot is hosted on Windows to avoid errors
 - Set all embed footers to show the configured bot name
-- Improve the help command to inclue all commands instead of just a few links to the README
+- Improve `rl!help` to include all commands instead of just a few links to the README
 
 ### 0.3.1
 - Fix "not admin" warning on embed edit ([#14](https://github.com/eibex/reaction-light/pull/14) by [arbaes](https://github.com/arbaes))

@@ -7,9 +7,10 @@ __pycache__/
 # Visual Studio Code
 .vscode/
 
-# Configuration files and CSVs
+# Configuration files, database and CSVs
 *.ini
 *.csv
+*.db
 
 # Other
 *.out
