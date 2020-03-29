@@ -1,5 +1,6 @@
 import os
 import csv
+import configparser
 import rldb
 
 
@@ -63,3 +64,24 @@ def migrate():
 
         print("\nMigration completed.")
         return True
+
+def migrateconfig():
+    directory = os.path.dirname(os.path.realpath(__file__))
+    configfile = f"{directory}/config.ini"
+    config = configparser.ConfigParser()
+    config.read(configfile)
+    try:
+        admins = [int(config.get("server_roles", "admin_a")), int(config.get("server_roles", "admin_b")), int(config.get("server_roles", "admin_c"))]
+        for admin in admins:
+            rldb.add_admin(admin)
+        print("\nAdmin migration completed.")
+        config.remove_option("server_role", "admin_a")
+        config.remove_option("server_role", "admin_b")
+        config.remove_option("server_role", "admin_c")
+        config.remove_section("server_role")
+        with open(configfile, "w") as f:
+            config.write(f)
+        return True
+    except configparser.NoOptionError:
+        print("\nNothing to migrate in config.ini.")
+        return False
