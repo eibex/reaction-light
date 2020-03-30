@@ -15,9 +15,7 @@ db.execute(
 db.execute(
     "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);"
 )
-db.execute(
-    "CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);"
-)
+db.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);")
 
 reactionrole_creation = {}
 
@@ -57,7 +55,17 @@ class ReactionRoleCreationTracker:
 
 def start_creation(user, channel):
     tracker = ReactionRoleCreationTracker(user, channel)
-    reactionrole_creation[f"{user}_{channel}"] = tracker
+    if not f"{user}_{channel}" in reactionrole_creation:
+        reactionrole_creation[f"{user}_{channel}"] = tracker
+        return True
+    return False
+
+
+def abort(user, channel):
+    if f"{user}_{channel}" in reactionrole_creation:
+        del reactionrole_creation[f"{user}_{channel}"]
+        return True
+    return False
 
 
 def step(user, channel):

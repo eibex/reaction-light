@@ -1,15 +1,16 @@
-import configparser
-from sys import platform, exit as shutdown
 import os
+import csv
+import configparser
 from shutil import copy
 from itertools import cycle
 from urllib.request import urlopen
-import csv
+from sys import platform, exit as shutdown
+
 import discord
 from discord.ext import commands, tasks
+
 import rldb
 import migration
-
 
 # Original Repository: https://github.com/eibex/reaction-light
 # License: MIT - Copyright 2019-2020 eibex
@@ -100,8 +101,8 @@ def restart():
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
-    activity = next(activities)
-    await bot.change_presence(activity=discord.Game(name=activity))
+    current_activity = next(activities)
+    await bot.change_presence(activity=discord.Game(name=current_activity))
 
 
 @tasks.loop(seconds=86400)
@@ -239,7 +240,7 @@ async def on_message(message):
                         selector_msg = await target_channel.send(
                             content=selector_msg_body, embed=selector_embed
                         )
-                    except discord.Forbidden as ef:
+                    except discord.Forbidden:
                         await message.channel.send(
                             "I don't have permission to send selector_msg messages to the channel {0.mention}.".format(
                                 target_channel
@@ -334,10 +335,33 @@ async def new(ctx):
     if isadmin(ctx):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
-        rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
-        await ctx.send("Mention the #channel where to send the auto-role message.")
+        started = rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
+        if started:
+            await ctx.send("Mention the #channel where to send the auto-role message.")
+        else:
+            await ctx.send(
+                "You are already creating a reaction-role message in this channel. "
+                f"Use another channel or run `{prefix}abort` first."
+            )
     else:
-        await ctx.send(f"You do not have an admin role. You might want to use `{prefix}admin` first.")
+        await ctx.send(
+            f"You do not have an admin role. You might want to use `{prefix}admin` first."
+        )
+
+
+@bot.command(name="abort")
+async def abort(ctx):
+    if isadmin(ctx):
+        # Aborts setup process
+        aborted = rldb.abort(ctx.message.author.id, ctx.message.channel.id)
+        if aborted:
+            await ctx.send("Reaction-role message creation aborted.")
+        else:
+            await ctx.send(
+                "There are no reaction-role message creation processes started by you in this channel."
+            )
+    else:
+        await ctx.send(f"You do not have an admin role.")
 
 
 @bot.command(name="edit")
@@ -597,8 +621,8 @@ async def set_systemchannel(ctx):
 
             config["server"]["system_channel"] = str(system_channel)
 
-            with open("config.ini", "w") as f:
-                config.write(f)
+            with open("config.ini", "w") as configfile:
+                config.write(configfile)
 
             await ctx.send("System channel updated.")
 
@@ -615,12 +639,13 @@ async def hlp(ctx):
         await ctx.send(
             "Commands are:\n"
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
+            f"- `{prefix}abort` aborts the creation process for a new reaction role message started by the command user in that channel.\n"
             f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}admin` adds the mentioned role to the list of {botname} admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n"
             f"- `{prefix}rm-admin` removes the mentioned role from the list of {botname} admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n"
-            f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
+            f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
             f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations running on GNU/Linux.\n"
             f"- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n"
