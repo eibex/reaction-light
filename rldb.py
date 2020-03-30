@@ -24,7 +24,7 @@ class ReactionRoleCreationTracker:
     def __init__(self, user, channel):
         self.user = user
         self.channel = channel
-        self.step = 1
+        self.step = 0
         self.target_channel = None
         self.combos = {}
         self.message_id = None
@@ -83,6 +83,11 @@ def get_targetchannel(user, channel):
 def get_combos(user, channel):
     tracker = reactionrole_creation[f"{user}_{channel}"]
     return tracker.combos
+
+
+def step0(user, channel):
+    tracker = reactionrole_creation[f"{user}_{channel}"]
+    tracker.step += 1
 
 
 def step1(user, channel, target_channel):

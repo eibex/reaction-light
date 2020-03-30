@@ -89,5 +89,5 @@ def migrateconfig():
             config.write(f)
         return True
     except configparser.NoSectionError:
-        print("\nNothing to migrate in config.ini.")
+        print("Nothing to migrate in config.ini.")
         return False

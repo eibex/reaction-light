@@ -138,6 +138,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    await bot.process_commands(message)
+
     if isadmin(message, msg=True):
         user = str(message.author.id)
         channel = str(message.channel.id)
@@ -147,7 +149,9 @@ async def on_message(message):
         if step is not None:
             # Checks if the setup process was started before.
             # If it was not, it ignores the message.
-            if step == 1:
+            if step == 0:
+                rldb.step0(user, channel)
+            elif step == 1:
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
                 try:
@@ -262,8 +266,6 @@ async def on_message(message):
                     await message.channel.send(
                         "You can't use an empty message as a role-reaction message."
                     )
-
-    await bot.process_commands(message)
 
 
 @bot.event
@@ -631,6 +633,8 @@ async def set_systemchannel(ctx):
                 "Mention the channel you would like to receive notifications in.\n"
                 f"`{prefix}systemchannel #channelname`"
             )
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="help")
@@ -698,6 +702,8 @@ async def print_version(ctx):
         await ctx.send(
             f"I am currently running v{__version__}. The latest available version is v{latest}."
         )
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="kill")
