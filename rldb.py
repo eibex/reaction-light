@@ -135,11 +135,31 @@ def get_reactions(message_id):
 
 def fetch_messages(channel):
     db.execute(f"SELECT message_id FROM messages WHERE channel = '{channel}';")
-    all_messages = []
+    all_messages_in_channel = []
     for row in db:
         message_id = int(row[0])
-        all_messages.append(message_id)
+        all_messages_in_channel.append(message_id)
+    return all_messages_in_channel
+
+
+def fetch_all_messages():
+    db.execute(f"SELECT message_id, channel FROM messages;")
+    all_messages = {}
+    for row in db:
+        message_id = int(row[0])
+        channel_id = int(row[1])
+        all_messages[message_id] = channel_id
     return all_messages
+
+
+def delete(message_id):
+    db.execute(
+        f"SELECT reactionrole_id FROM messages WHERE message_id = '{message_id}';"
+    )
+    reactionrole_id = db.fetchall()[0][0]
+    db.execute(f"DELETE FROM messages WHERE reactionrole_id = '{reactionrole_id}'")
+    db.execute(f"DELETE FROM reactionroles WHERE reactionrole_id = '{reactionrole_id}'")
+    database.commit()
 
 
 def add_admin(role):
