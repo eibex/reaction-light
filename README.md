@@ -48,11 +48,10 @@ pip install -U discord.py
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
 - Run `setup.py` and follow the instructions or edit the `config.ini.sample` file manually (rename it to `config.ini` when done):
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
-  - Choose a prefix of your liking (default is `rl!`)
-  - Set a name to appear in embed footers
-  - URL of the footer logo
-  - Set the admin role(s) by pasting their role IDs. In case you only have/need one admin role, fill the roles you do not need with `0`
-- Edit the `activities.csv.sample` file (it will be automatically copied to `activities.csv` when the bot is launched):
+  - Choose a prefix of your liking (default: `rl!`)
+  - Set a name to appear in embed footers (default: Reaction Light)
+  - URL of the footer logo (default: same as picture above)
+- **Optional**: Edit the `activities.csv.sample` file (it will be automatically copied to `activities.csv` when the bot is launched):
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
   - Do not use commas `,`.
@@ -60,6 +59,7 @@ pip install -U discord.py
   - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
   - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+- Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
 ## Running the bot
 The bot can be run by using:
