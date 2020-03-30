@@ -77,6 +77,7 @@ All commands require an admin role set in `config.ini`. The bot will reply with 
 
 - `rl!help` shows this set of commands along with a link to the repository.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
+- `rl!abort` aborts the creation process for a new reaction role message started by the command user in that channel.
 - `rl!edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
 - `rl!rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.
 - `rl!admin` adds the mentioned role or role id to the admin list, allowing members with a certain role to use the bot commands. Requires administrator permissions on the server.
