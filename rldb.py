@@ -163,17 +163,17 @@ def delete(message_id):
 
 
 def add_admin(role):
-    db.execute(f"INSERT INTO 'admins' ('role_id') values(?);", (role,))
+    db.execute("INSERT INTO 'admins' ('role_id') values(?);", (role,))
     database.commit()
 
 
 def remove_admin(role):
-    db.execute(f"DELETE FROM admins WHERE role_id = ?;", (role,))
+    db.execute("DELETE FROM admins WHERE role_id = ?;", (role,))
     database.commit()
 
 
 def get_admins():
-    db.execute(f"SELECT * FROM admins;")
+    db.execute("SELECT * FROM admins;")
     admins = []
     for row in db:
         role_id = row[0]
