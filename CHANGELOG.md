@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.1.1
+- Prevent SQL Injections ([#27](https://github.com/eibex/reaction-light/pull/27) by [arbaes](https://github.com/arbaes))
+- Allow to abort setup via `rl!abort` ([#24](https://github.com/eibex/reaction-light/pull/24) by [eibex](https://github.com/eibex))
+
 ### 1.1.0
 - Add `rl!admin` to allow members with a certain role to use the bot commands. Requires administrator permissions on the server ([#23](https://github.com/eibex/reaction-light/pull/23) by [eibex](https://github.com/eibex))
 - Add `rl!rm-admin` to prevent members with a certain role from using the bot commands. Requires administrator permissions on the server ([#23](https://github.com/eibex/reaction-light/pull/23) by [eibex](https://github.com/eibex))

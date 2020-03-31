@@ -34,7 +34,7 @@ class ReactionRoleCreationTracker:
         while True:
             self.reactionrole_id = randint(0, 100000)
             db.execute(
-                f"SELECT * FROM messages WHERE reactionrole_id = '{self.reactionrole_id}'"
+                "SELECT * FROM messages WHERE reactionrole_id = ?", (self.reactionrole_id,)
             )
             already_exists = db.fetchall()
             if already_exists:
@@ -43,12 +43,12 @@ class ReactionRoleCreationTracker:
 
     def commit(self):
         db.execute(
-            f"INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values('{self.message_id}', '{self.target_channel}', '{self.reactionrole_id}');"
+            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values(?, ?, ?);", (self.message_id, self.target_channel, self.reactionrole_id)
         )
         for reaction in self.combos:
             role_id = self.combos[reaction]
             db.execute(
-                f"INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values('{self.reactionrole_id}', '{reaction}', '{role_id}');"
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);", (self.reactionrole_id, reaction, role_id)
             )
         database.commit()
 
@@ -112,18 +112,18 @@ def end_creation(user, channel, message_id):
 
 
 def exists(message_id):
-    db.execute(f"SELECT * FROM messages WHERE message_id = '{message_id}';")
+    db.execute("SELECT * FROM messages WHERE message_id = ?;", (message_id,))
     result = db.fetchall()
     return result
 
 
 def get_reactions(message_id):
     db.execute(
-        f"SELECT reactionrole_id FROM messages WHERE message_id = '{message_id}';"
+        "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
     )
     reactionrole_id = db.fetchall()[0][0]
     db.execute(
-        f"SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = '{reactionrole_id}';"
+        "SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,)
     )
     combos = {}
     for row in db:
@@ -134,7 +134,7 @@ def get_reactions(message_id):
 
 
 def fetch_messages(channel):
-    db.execute(f"SELECT message_id FROM messages WHERE channel = '{channel}';")
+    db.execute("SELECT message_id FROM messages WHERE channel = ?;", (channel,))
     all_messages_in_channel = []
     for row in db:
         message_id = int(row[0])
@@ -163,12 +163,12 @@ def delete(message_id):
 
 
 def add_admin(role):
-    db.execute(f"INSERT INTO 'admins' ('role_id') values('{role}');")
+    db.execute(f"INSERT INTO 'admins' ('role_id') values(?);", (role,))
     database.commit()
 
 
 def remove_admin(role):
-    db.execute(f"DELETE FROM admins WHERE role_id = '{role}';")
+    db.execute(f"DELETE FROM admins WHERE role_id = ?;", (role,))
     database.commit()
 
 
