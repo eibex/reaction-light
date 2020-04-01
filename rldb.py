@@ -33,6 +33,7 @@ class ReactionRoleCreationTracker:
         self._generate_reactionrole_id()
 
     def _generate_reactionrole_id(self):
+        c = conn.cursor()
         while True:
             self.reactionrole_id = randint(0, 100000)
             c.execute(
@@ -41,6 +42,7 @@ class ReactionRoleCreationTracker:
             already_exists = c.fetchall()
             if already_exists:
                 continue
+            c.close()
             break
 
     def commit(self):
