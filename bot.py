@@ -5,6 +5,7 @@ from shutil import copy
 from itertools import cycle
 from urllib.request import urlopen
 from sys import platform, exit as shutdown
+
 import discord
 from discord.ext import commands, tasks
 
@@ -59,9 +60,6 @@ def isadmin(ctx, msg=False):
     # Checks if command author has one of config.ini admin role IDs
     admins = rldb.get_admins()
     if isinstance(admins, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error when fetching admins:\n\n{admins}")
         return False
     try:
         check = (
@@ -102,6 +100,12 @@ def restart():
     cmd.close()
 
 
+async def system_notification(text):
+    if system_channel:
+        channel = bot.get_channel(system_channel)
+        await channel.send(text)
+
+
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
@@ -113,9 +117,8 @@ async def maintain_presence():
 async def updates():
     # Sends a reminder once a day if there are updates available
     new_version = check_for_updates()
-    if system_channel and new_version:
-        channel = bot.get_channel(system_channel)
-        await channel.send(
+    if new_version:
+        await system_notification(
             f"An update is available. Download Reaction Light v{new_version} at https://github.com/eibex/reaction-light "
             f"or simply use `{prefix}update` (only works with git installations).\n\n"
             "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>"
@@ -127,9 +130,9 @@ async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = rldb.fetch_all_messages()
     if isinstance(messages, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error when fetching messages during database cleaning:\n\n{messages}")
+        await system_notification(
+            f"Database error when fetching messages during database cleaning:\n\n{messages}"
+        )
         return
     for message in messages:
         try:
@@ -139,24 +142,20 @@ async def cleandb():
         except discord.NotFound:
             delete = rldb.delete(message)
             if isinstance(delete, Exception):
-                if system_channel:
-                    channel = bot.get_channel(system_channel)
-                    await channel.send(f"Database error when deleting messages during database cleaning:\n\n{delete}")
+                await system_notification(
+                    f"Database error when deleting messages during database cleaning:\n\n{delete}"
+                )
                 return
-            if system_channel:
-                channel = bot.get_channel(system_channel)
-                await channel.send(
-                    "I deleted the database entries of a message that was removed."
-                    f"\n\nID: {message}"
-                )
+            await system_notification(
+                "I deleted the database entries of a message that was removed."
+                f"\n\nID: {message}"
+            )
         except discord.Forbidden:
-            if system_channel:
-                channel = bot.get_channel(system_channel)
-                await channel.send(
-                    "I do not have access to a message I have created anymore. "
-                    "I cannot manage the roles of users reacting to it."
-                    f"\n\nID: {message}"
-                )
+            await system_notification(
+                "I do not have access to a message I have created anymore. "
+                "I cannot manage the roles of users reacting to it."
+                f"\n\nID: {message}"
+            )
 
 
 @bot.event
@@ -297,10 +296,16 @@ async def on_message(message):
                         error = rldb.end_creation(user, channel, selector_msg.id)
                         if error and system_channel:
                             channel = bot.get_channel(system_channel)
-                            await message.channel.send("I could not commit the changes to the database. Check {0.mention} for more information.".format(system_channel))
+                            await message.channel.send(
+                                "I could not commit the changes to the database. Check {0.mention} for more information.".format(
+                                    system_channel
+                                )
+                            )
                             await channel.send(f"Database error:\n\n{error}")
                         elif error:
-                            await message.channel.send("I could not commit the changes to the database.")
+                            await message.channel.send(
+                                "I could not commit the changes to the database."
+                            )
                         for reaction in combos:
                             try:
                                 await selector_msg.add_reaction(reaction)
@@ -325,17 +330,17 @@ async def on_raw_reaction_add(payload):
     guild_id = payload.guild_id
     exists = rldb.exists(msg_id)
     if isinstance(exists, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error after a user added a reaction:\n\n{exists}")
+        await system_notification(
+            f"Database error after a user added a reaction:\n\n{exists}"
+        )
         return
     elif exists:
         # Checks that the message that was reacted to is a reaction-role message managed by the bot
         reactions = rldb.get_reactions(msg_id)
         if isinstance(reactions, Exception):
-            if system_channel:
-                channel = bot.get_channel(system_channel)
-                await channel.send(f"Database error when getting reactions:\n\n{reactions}")
+            await system_notification(
+                f"Database error when getting reactions:\n\n{reactions}"
+            )
             return
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
@@ -353,13 +358,11 @@ async def on_raw_reaction_add(payload):
                 try:
                     await member.add_roles(role)
                 except discord.Forbidden:
-                    if system_channel:
-                        channel = bot.get_channel(system_channel)
-                        await channel.send(
-                            "Someone tried to add a role to themselves but I do not have permissions to add it. "
-                            "Ensure that I have a role that is hierarchically higher than the role I have to assign, "
-                            "and that I have the `Manage Roles` permission."
-                        )
+                    await system_notification(
+                        "Someone tried to add a role to themselves but I do not have permissions to add it. "
+                        "Ensure that I have a role that is hierarchically higher than the role I have to assign, "
+                        "and that I have the `Manage Roles` permission."
+                    )
 
 
 @bot.event
@@ -370,17 +373,17 @@ async def on_raw_reaction_remove(payload):
     guild_id = payload.guild_id
     exists = rldb.exists(msg_id)
     if isinstance(exists, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error after a user removed a reaction:\n\n{exists}")
+        await system_notification(
+            f"Database error after a user removed a reaction:\n\n{exists}"
+        )
         return
     elif exists:
         # Checks that the message that was unreacted to is a reaction-role message managed by the bot
         reactions = rldb.get_reactions(msg_id)
         if isinstance(reactions, Exception):
-            if system_channel:
-                channel = bot.get_channel(system_channel)
-                await channel.send(f"Database error when getting reactions:\n\n{reactions}")
+            await system_notification(
+                f"Database error when getting reactions:\n\n{reactions}"
+            )
             return
         if reaction in reactions:
             role_id = reactions[reaction]
@@ -391,13 +394,11 @@ async def on_raw_reaction_remove(payload):
             try:
                 await member.remove_roles(role)
             except discord.Forbidden:
-                if system_channel:
-                    channel = bot.get_channel(system_channel)
-                    await channel.send(
-                        "Someone tried to remove a role from themselves but I do not have permissions to remove it. "
-                        "Ensure that I have a role that is hierarchically higher than the role I have to remove, "
-                        "and that I have the `Manage Roles` permission."
-                    )
+                await system_notification(
+                    "Someone tried to remove a role from themselves but I do not have permissions to remove it. "
+                    "Ensure that I have a role that is hierarchically higher than the role I have to remove, "
+                    "and that I have the `Manage Roles` permission."
+                )
 
 
 @bot.command(name="new")
@@ -455,9 +456,9 @@ async def edit_selector(ctx):
 
             all_messages = rldb.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
-                if system_channel:
-                    channel = bot.get_channel(system_channel)
-                    await channel.send(f"Database error when fetching messages:\n\n{all_messages}")
+                await system_notification(
+                    f"Database error when fetching messages:\n\n{all_messages}"
+                )
                 return
             channel = bot.get_channel(channel_id)
             if len(all_messages) == 1:
@@ -505,9 +506,9 @@ async def edit_selector(ctx):
                 selector_msg_number = msg_values[1]
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
-                    if system_channel:
-                        channel = bot.get_channel(system_channel)
-                        await channel.send(f"Database error when fetching messages:\n\n{all_messages}")
+                    await system_notification(
+                        f"Database error when fetching messages:\n\n{all_messages}"
+                    )
                     return
                 counter = 1
 
@@ -598,9 +599,9 @@ async def remove_selector_embed(ctx):
             channel = bot.get_channel(channel_id)
             all_messages = rldb.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
-                if system_channel:
-                    channel = bot.get_channel(system_channel)
-                    await channel.send(f"Database error when fetching messages:\n\n{all_messages}")
+                await system_notification(
+                    f"Database error when fetching messages:\n\n{all_messages}"
+                )
                 return
             if len(all_messages) == 1:
                 await ctx.send(
@@ -645,9 +646,9 @@ async def remove_selector_embed(ctx):
                 selector_msg_number = msg_values[1]
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
-                    if system_channel:
-                        channel = bot.get_channel(system_channel)
-                        await channel.send(f"Database error when fetching messages:\n\n{all_messages}")
+                    await system_notification(
+                        f"Database error when fetching messages:\n\n{all_messages}"
+                    )
                     return
                 counter = 1
 
@@ -765,9 +766,7 @@ async def add_admin(ctx):
             return
     add = rldb.add_admin(role)
     if isinstance(add, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error when adding a new admin:\n\n{add}")
+        await system_notification(f"Database error when adding a new admin:\n\n{add}")
         return
     await ctx.send("Added the role to my admin list.")
 
@@ -788,9 +787,8 @@ async def remove_admin(ctx):
             return
     remove = rldb.remove_admin(role)
     if isinstance(remove, Exception):
-        if system_channel:
-            channel = bot.get_channel(system_channel)
-            await channel.send(f"Database error when removing an admin:\n\n{remove}")
+        await system_notification(f"Database error when removing an admin:\n\n{remove}")
+        return
     await ctx.send("Removed the role from my admin list.")
 
 

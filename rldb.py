@@ -37,7 +37,8 @@ class ReactionRoleCreationTracker:
         while True:
             self.reactionrole_id = randint(0, 100000)
             c.execute(
-                "SELECT * FROM messages WHERE reactionrole_id = ?", (self.reactionrole_id,)
+                "SELECT * FROM messages WHERE reactionrole_id = ?",
+                (self.reactionrole_id,),
             )
             already_exists = c.fetchall()
             if already_exists:
@@ -48,12 +49,14 @@ class ReactionRoleCreationTracker:
     def commit(self):
         c = conn.cursor()
         c.execute(
-            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values(?, ?, ?);", (self.message_id, self.target_channel, self.reactionrole_id)
+            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values(?, ?, ?);",
+            (self.message_id, self.target_channel, self.reactionrole_id),
         )
         for reaction in self.combos:
             role_id = self.combos[reaction]
             c.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);", (self.reactionrole_id, reaction, role_id)
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);",
+                (self.reactionrole_id, reaction, role_id),
             )
         conn.commit()
         c.close()
@@ -139,7 +142,8 @@ def get_reactions(message_id):
         )
         reactionrole_id = c.fetchall()[0][0]
         c.execute(
-            "SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,)
+            "SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;",
+            (reactionrole_id,),
         )
         combos = {}
         for row in c:
@@ -189,7 +193,9 @@ def delete(message_id):
         )
         reactionrole_id = c.fetchall()[0][0]
         c.execute("DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,))
-        c.execute("DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
+        c.execute(
+            "DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,)
+        )
         conn.commit()
         c.close()
     except sqlite3.Error as e:
