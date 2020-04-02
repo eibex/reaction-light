@@ -185,11 +185,11 @@ def delete(message_id):
     try:
         c = conn.cursor()
         c.execute(
-            f"SELECT reactionrole_id FROM messages WHERE message_id = '{message_id}';"
+            "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
         )
         reactionrole_id = c.fetchall()[0][0]
-        c.execute(f"DELETE FROM messages WHERE reactionrole_id = '{reactionrole_id}'")
-        c.execute(f"DELETE FROM reactionroles WHERE reactionrole_id = '{reactionrole_id}'")
+        c.execute("DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,))
+        c.execute("DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
         conn.commit()
         c.close()
     except sqlite3.Error as e:
