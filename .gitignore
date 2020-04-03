@@ -12,5 +12,8 @@ __pycache__/
 *.csv
 *.db
 
+# Apple files
+.DS_Store
+
 # Other
 *.out
