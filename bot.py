@@ -102,8 +102,13 @@ def restart():
 
 async def system_notification(text):
     if system_channel:
-        channel = bot.get_channel(system_channel)
-        await channel.send(text)
+        try:
+            channel = bot.get_channel(system_channel)
+            await channel.send(text)
+        except discord.NotFound:
+            print("I cannot find the system channel.")
+        except discord.Forbidden:
+            print("I cannot send messages to the system channel.")
 
 
 @tasks.loop(seconds=30)
@@ -139,36 +144,36 @@ async def cleandb():
             channel_id = messages[message]
             channel = bot.get_channel(channel_id)
             await channel.fetch_message(message)
-        except discord.NotFound:
-            delete = rldb.delete(message)
-            if isinstance(delete, Exception):
+        except discord.NotFound as e:
+            if e.code == 10008 or e.code == 10003:
+                delete = rldb.delete(message)
+                if isinstance(delete, Exception):
+                    await system_notification(
+                        "Database error when deleting messages during database cleaning:"
+                        f"\n\n```python\n{delete}\n```"
+                    )
+                    return
                 await system_notification(
-                    f"Database error when deleting messages during database cleaning:\n\n{delete}"
+                    "I deleted the database entries of a message that was removed."
+                    f"\n\nID: {message} in {channel.mention}"
                 )
-                return
-            await system_notification(
-                "I deleted the database entries of a message that was removed."
-                f"\n\nID: {message}"
-            )
         except discord.Forbidden:
             await system_notification(
                 "I do not have access to a message I have created anymore. "
                 "I cannot manage the roles of users reacting to it."
-                f"\n\nID: {message}"
+                f"\n\nID: {message} in {channel.mention}"
             )
 
 
 @bot.event
 async def on_ready():
     print("Reaction Light ready!")
-    if migrated and system_channel:
-        channel = bot.get_channel(system_channel)
-        await channel.send(
+    if migrated:
+        await system_notification(
             "Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file."
         )
-    if config_migrated and system_channel:
-        channel = bot.get_channel(system_channel)
-        await channel.send(
+    if config_migrated:
+        await system_notification(
             "Your `config.ini` has been edited and your admin IDs are now stored in the database.\n"
             f"You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
         )
@@ -295,13 +300,12 @@ async def on_message(message):
                         combos = rldb.get_combos(user, channel)
                         error = rldb.end_creation(user, channel, selector_msg.id)
                         if error and system_channel:
-                            channel = bot.get_channel(system_channel)
                             await message.channel.send(
                                 "I could not commit the changes to the database. Check {0.mention} for more information.".format(
                                     system_channel
                                 )
                             )
-                            await channel.send(f"Database error:\n\n{error}")
+                            await system_notification(f"Database error:\n\n{error}")
                         elif error:
                             await message.channel.send(
                                 "I could not commit the changes to the database."
@@ -480,7 +484,7 @@ async def edit_selector(ctx):
                     except discord.Forbidden:
                         ctx.send(
                             "I do not have permissions to edit a reaction-role message that I previously created."
-                            f"\n\nID: {msg_id}"
+                            f"\n\nID: {msg_id} in {channel.mention}"
                         )
                         continue
                     entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
@@ -621,7 +625,7 @@ async def remove_selector_embed(ctx):
                     except discord.Forbidden:
                         ctx.send(
                             "I do not have permissions to edit a reaction-role message that I previously created."
-                            f"\n\nID: {msg_id}"
+                            f"\n\nID: {msg_id} in {channel.mention}"
                         )
                         continue
                     entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
