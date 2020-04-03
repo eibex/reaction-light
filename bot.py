@@ -118,6 +118,33 @@ async def updates():
         )
 
 
+@tasks.loop(seconds=86400)
+async def cleandb():
+    # Cleans the database by deleting rows of reaction role messages that don't exist anymore
+    messages = rldb.fetch_all_messages()
+    for message in messages:
+        try:
+            channel_id = messages[message]
+            channel = bot.get_channel(channel_id)
+            await channel.fetch_message(message)
+        except discord.NotFound:
+            rldb.delete(message)
+            if system_channel:
+                channel = bot.get_channel(system_channel)
+                await channel.send(
+                    "I deleted the database entries of a message that was removed."
+                    f"\n\nID: {message}"
+                )
+        except discord.Forbidden:
+            if system_channel:
+                channel = bot.get_channel(system_channel)
+                await channel.send(
+                    "I do not have access to a message I have created anymore. "
+                    "I cannot manage the roles of users reacting to it."
+                    f"\n\nID: {message}"
+                )
+
+
 @bot.event
 async def on_ready():
     print("Reaction Light ready!")
@@ -133,6 +160,7 @@ async def on_ready():
             f"You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
         )
     maintain_presence.start()
+    cleandb.start()
     updates.start()
 
 
@@ -406,6 +434,7 @@ async def edit_selector(ctx):
                     except discord.Forbidden:
                         ctx.send(
                             "I do not have permissions to edit a reaction-role message that I previously created."
+                            f"\n\nID: {msg_id}"
                         )
                         continue
                     entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
@@ -536,6 +565,7 @@ async def remove_selector_embed(ctx):
                     except discord.Forbidden:
                         ctx.send(
                             "I do not have permissions to edit a reaction-role message that I previously created."
+                            f"\n\nID: {msg_id}"
                         )
                         continue
                     entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
