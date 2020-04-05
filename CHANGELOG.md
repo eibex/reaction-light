@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.1.2
+- Automated database cleaning of deleted messages ([#26](https://github.com/eibex/reaction-light/pull/26) by [eibex](https://github.com/eibex))
+- Better error reporting and catching ([#29](https://github.com/eibex/reaction-light/pull/29) by [eibex](https://github.com/eibex))
+
 ### 1.1.1
 - Prevent SQL Injections ([#27](https://github.com/eibex/reaction-light/pull/27) by [arbaes](https://github.com/arbaes))
 - Allow to abort setup via `rl!abort` ([#24](https://github.com/eibex/reaction-light/pull/24) by [eibex](https://github.com/eibex))
