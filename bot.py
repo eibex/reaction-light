@@ -136,7 +136,7 @@ async def cleandb():
     messages = rldb.fetch_all_messages()
     if isinstance(messages, Exception):
         await system_notification(
-            f"Database error when fetching messages during database cleaning:\n\n{messages}"
+            f"Database error when fetching messages during database cleaning:\n```\n{messages}\n```"
         )
         return
     for message in messages:
@@ -150,7 +150,7 @@ async def cleandb():
                 if isinstance(delete, Exception):
                     await system_notification(
                         "Database error when deleting messages during database cleaning:"
-                        f"\n\n```python\n{delete}\n```"
+                        f"\n```\n{delete}\n```"
                     )
                     return
                 await system_notification(
@@ -305,7 +305,7 @@ async def on_message(message):
                                     system_channel
                                 )
                             )
-                            await system_notification(f"Database error:\n\n{error}")
+                            await system_notification(f"Database error:\n```\n{error}\n```")
                         elif error:
                             await message.channel.send(
                                 "I could not commit the changes to the database."
@@ -335,7 +335,7 @@ async def on_raw_reaction_add(payload):
     exists = rldb.exists(msg_id)
     if isinstance(exists, Exception):
         await system_notification(
-            f"Database error after a user added a reaction:\n\n{exists}"
+            f"Database error after a user added a reaction:\n```\n{exists}\n```"
         )
         return
     elif exists:
@@ -343,7 +343,7 @@ async def on_raw_reaction_add(payload):
         reactions = rldb.get_reactions(msg_id)
         if isinstance(reactions, Exception):
             await system_notification(
-                f"Database error when getting reactions:\n\n{reactions}"
+                f"Database error when getting reactions:\n```\n{reactions}\n```"
             )
             return
         ch = bot.get_channel(ch_id)
@@ -378,7 +378,7 @@ async def on_raw_reaction_remove(payload):
     exists = rldb.exists(msg_id)
     if isinstance(exists, Exception):
         await system_notification(
-            f"Database error after a user removed a reaction:\n\n{exists}"
+            f"Database error after a user removed a reaction:\n```\n{exists}\n```"
         )
         return
     elif exists:
@@ -386,7 +386,7 @@ async def on_raw_reaction_remove(payload):
         reactions = rldb.get_reactions(msg_id)
         if isinstance(reactions, Exception):
             await system_notification(
-                f"Database error when getting reactions:\n\n{reactions}"
+                f"Database error when getting reactions:\n```\n{reactions}\n```"
             )
             return
         if reaction in reactions:
@@ -461,7 +461,7 @@ async def edit_selector(ctx):
             all_messages = rldb.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
                 await system_notification(
-                    f"Database error when fetching messages:\n\n{all_messages}"
+                    f"Database error when fetching messages:\n```\n{all_messages}\n```"
                 )
                 return
             channel = bot.get_channel(channel_id)
@@ -511,7 +511,7 @@ async def edit_selector(ctx):
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
-                        f"Database error when fetching messages:\n\n{all_messages}"
+                        f"Database error when fetching messages:\n```\n{all_messages}\n```"
                     )
                     return
                 counter = 1
@@ -604,7 +604,7 @@ async def remove_selector_embed(ctx):
             all_messages = rldb.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
                 await system_notification(
-                    f"Database error when fetching messages:\n\n{all_messages}"
+                    f"Database error when fetching messages:\n```\n{all_messages}\n```"
                 )
                 return
             if len(all_messages) == 1:
@@ -651,7 +651,7 @@ async def remove_selector_embed(ctx):
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
-                        f"Database error when fetching messages:\n\n{all_messages}"
+                        f"Database error when fetching messages:\n```\n{all_messages}\n```"
                     )
                     return
                 counter = 1
@@ -770,7 +770,7 @@ async def add_admin(ctx):
             return
     add = rldb.add_admin(role)
     if isinstance(add, Exception):
-        await system_notification(f"Database error when adding a new admin:\n\n{add}")
+        await system_notification(f"Database error when adding a new admin:\n```\n{add}\n```")
         return
     await ctx.send("Added the role to my admin list.")
 
@@ -791,7 +791,7 @@ async def remove_admin(ctx):
             return
     remove = rldb.remove_admin(role)
     if isinstance(remove, Exception):
-        await system_notification(f"Database error when removing an admin:\n\n{remove}")
+        await system_notification(f"Database error when removing an admin:\n```\n{remove}\n```")
         return
     await ctx.send("Removed the role from my admin list.")
 
