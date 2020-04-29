@@ -46,12 +46,12 @@ pip install -U discord.py
 
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
-- Run `setup.py` and follow the instructions or make a copy of the `config.ini.sample` file renaming it to `config.ini` and edit it manually:
+- Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
   - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
   - Choose a prefix of your liking (default: `rl!`)
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
-- **Optional**: Edit the `activities.csv.sample` file (it will be automatically copied to `activities.csv` when the bot is launched):
+- **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
   - Do not use commas `,`.
