@@ -77,17 +77,17 @@ while True:
     else:
         break
 
+copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
+
 config = configparser.ConfigParser()
-config.read("{}/config.ini.sample".format(folder))
+config.read("{}/config.ini".format(folder))
 config["server"]["token"] = token
 config["server"]["prefix"] = prefix
 config["server"]["name"] = name
 config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
 
-with open("config.ini.sample", "w") as f:
+with open("config.ini", "w") as f:
     config.write(f)
-
-copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
 input("Done. You can now start the bot.")
