@@ -118,7 +118,7 @@ async def maintain_presence():
     await bot.change_presence(activity=discord.Game(name=current_activity))
 
 
-@tasks.loop(seconds=86400)
+@tasks.loop(hours=24)
 async def updates():
     # Sends a reminder once a day if there are updates available
     new_version = check_for_updates()
@@ -130,7 +130,7 @@ async def updates():
         )
 
 
-@tasks.loop(seconds=86400)
+@tasks.loop(hours=24)
 async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = rldb.fetch_all_messages()
