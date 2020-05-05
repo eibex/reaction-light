@@ -127,14 +127,10 @@ You can view new features in the [changelog](https://github.com/eibex/reaction-l
 
 If you set a system channel in `config.ini`, your bot will check for new versions from this repository. If updates are available a message is sent briefly outlining the update process. This process varies depending on how you installed the bot.
 
-### Update with a command
+### Update a git install with a command
 Type `rl!update` to update the bot and restart it.
 
 ### Manually updating a git install
-If you downloaded the bot with git, updating is trivial:
-- Run `rl!update`. This will `git fetch` and `git pull` for you and restart the bot too. If you made changes you made to the `*.py` files you have to update manually to handle stashing or resets.
-
-...or if you prefer to do it manually:
 - Navigate to the reaction-light directory
 - Run `git pull origin master`
 - Shutdown the bot by using the `rl!kill` command
