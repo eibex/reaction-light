@@ -109,6 +109,8 @@ async def system_notification(text):
             print("I cannot find the system channel.")
         except discord.Forbidden:
             print("I cannot send messages to the system channel.")
+    else:
+        print(text)
 
 
 @tasks.loop(seconds=30)

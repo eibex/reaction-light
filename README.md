@@ -116,8 +116,8 @@ User: done
 
 Next, you will be asked to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
 ```
-Bot: What would you like the message to say? Formatting is: `Title // Message_content`
-User: Select your roles // Click on the buttons below to give yourself some roles!
+Bot: What would you like the message to say? Formatting is: `Message // Embed_title // Embed_content`. `Embed_title` and `Embed_content` are optional. You can type `none` in any of the argument fields above (e.g. `Embed_title`) to make the bot ignore it.
+User: none // Select your roles // Click on the buttons below to give yourself some roles!
 ```
 
 Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
