@@ -5,3 +5,4 @@ prefix = rl!
 name = Reaction Light
 system_channel =
 logo =
+colour = 0xffff00
