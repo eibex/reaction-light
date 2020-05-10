@@ -75,6 +75,8 @@ def migrateconfig():
         config.get("server", "colour")
     except configparser.NoOptionError:
         config["server"]["colour"] = "0xffff00"
+        with open(configfile, "w") as f:
+            config.write(f)
         print("Migrated bot colour to config.ini")
     try:
         admins = [
