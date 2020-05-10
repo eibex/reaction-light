@@ -72,6 +72,11 @@ def migrateconfig():
     config = configparser.ConfigParser()
     config.read(configfile)
     try:
+        config.get("server", "colour")
+    except configparser.NoOptionError:
+        config["server"]["colour"] = "0xffff00"
+        print("Migrated bot colour to config.ini")
+    try:
         admins = [
             int(config.get("server_role", "admin_a")),
             int(config.get("server_role", "admin_b")),
@@ -89,5 +94,5 @@ def migrateconfig():
             config.write(f)
         return True
     except configparser.NoSectionError:
-        print("Nothing to migrate in config.ini.")
+        print("No admins to migrate in config.ini.")
         return False
