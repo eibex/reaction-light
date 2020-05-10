@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 1.1.2](https://img.shields.io/badge/Reaction%20Light-1.1.2-yellow.svg)
+![Reaction Light 1.2.0](https://img.shields.io/badge/Reaction%20Light-1.2.0-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -51,6 +51,7 @@ pip install -U discord.py
   - Choose a prefix of your liking (default: `rl!`)
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
+  - Hexadecimal value of embeds (default: 0xffff00 (yellow))
 - **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
