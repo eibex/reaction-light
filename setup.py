@@ -37,7 +37,6 @@ while True:
     else:
         break
 
-
 prefix = input("\nInsert the prefix of the bot (help not available for this) [rl!]  ")
 if prefix == "":
     prefix = "rl!"
@@ -77,6 +76,16 @@ while True:
     else:
         break
 
+while True:
+    colour = input(
+        "Insert the hexadecimal value of the embed colour you prefer [0xffff00]  "
+    )
+    if logo.lower() == "help":
+        print("\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n")
+        continue
+    else:
+        break
+
 copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
 config = configparser.ConfigParser()
@@ -86,6 +95,7 @@ config["server"]["prefix"] = prefix
 config["server"]["name"] = name
 config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
+config["server"]["colour"] = colour
 
 with open("config.ini", "w") as f:
     config.write(f)

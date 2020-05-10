@@ -29,6 +29,7 @@ config.read(f"{directory}/config.ini")
 TOKEN = str(config.get("server", "token"))
 prefix = str(config.get("server", "prefix"))
 botname = str(config.get("server", "name"))
+botcolour = discord.Colour(int(config.get("server", "colour"), 16))
 
 Client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
@@ -51,9 +52,6 @@ with open(activities_file, "r") as f:
         activity = row[0]
         activities.append(activity)
 activities = cycle(activities)
-
-# Colour palette - changes 'embeds' sideline colour
-botcolor = 0xFFFF00
 
 
 def isadmin(ctx, msg=False):
@@ -248,7 +246,7 @@ async def on_message(message):
                     selector_embed = discord.Embed(
                         title="Embed_title",
                         description="Embed_content",
-                        colour=botcolor,
+                        colour=botcolour,
                     )
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                     await message.channel.send(
@@ -267,7 +265,7 @@ async def on_message(message):
                 selector_msg_body = (
                     msg_values[0] if msg_values[0].lower() != "none" else None
                 )
-                selector_embed = discord.Embed(colour=botcolor)
+                selector_embed = discord.Embed(colour=botcolour)
                 selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                 if len(msg_values) > 1:
 
@@ -549,12 +547,12 @@ async def edit_selector(ctx):
                     selector_embed = old_msg.embeds[0]
                 if len(msg_values) > 3 and msg_values[3].lower() != "none":
                     selector_embed.title = msg_values[3]
-                    selector_embed.colour = botcolor
+                    selector_embed.colour = botcolour
                     if old_msg.embeds and len(msg_values) == 4:
                         selector_embed.description = old_msg.embeds[0].description
                 if len(msg_values) > 4 and msg_values[4].lower() != "none":
                     selector_embed.description = msg_values[4]
-                    selector_embed.colour = botcolor
+                    selector_embed.colour = botcolour
 
                 # Prevent sending an empty embed instead of removing it
                 selector_embed = (
@@ -734,6 +732,33 @@ async def set_systemchannel(ctx):
         await ctx.send("You do not have an admin role.")
 
 
+@bot.command(name="colour")
+async def set_colour(ctx):
+    if isadmin(ctx):
+        msg = ctx.message.content.split()
+        args = len(msg) - 1
+        if args:
+            global botcolour
+            colour = msg[1]
+            try:
+                botcolour = discord.Colour(int(msg[1], 16))
+
+                config["server"]["colour"] = colour
+                with open("config.ini", "w") as configfile:
+                    config.write(configfile)
+
+                example = discord.Embed(
+                        title="Example embed",
+                        description="This embed has a new colour!",
+                        colour=botcolour,
+                    )
+                await ctx.send("Colour changed.", embed=example)
+            except ValueError:
+                await ctx.send(f"Please provide a valid hexadecimal value. Example: `{prefix}colour 0xffff00`")
+        else:
+            await ctx.send(f"Please provide a hexadecimal value. Example: `{prefix}colour 0xffff00`")
+
+
 @bot.command(name="help")
 async def hlp(ctx):
     if isadmin(ctx):
@@ -742,6 +767,7 @@ async def hlp(ctx):
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
             f"- `{prefix}abort` aborts the creation process for a new reaction role message started by the command user in that channel.\n"
             f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}colour` changes the colour of the embeds of new and newly edited reaction role messages.\n"
             f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
             f"- `{prefix}admin` adds the mentioned role to the list of {botname} admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n"
             f"- `{prefix}rm-admin` removes the mentioned role from the list of {botname} admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n"
