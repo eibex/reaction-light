@@ -31,7 +31,6 @@ while True:
         print(
             "\nThe bot token looks like this: NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
         )
-        continue
     elif token == "":
         continue
     else:
@@ -57,7 +56,6 @@ while True:
     )
     if logo.lower() == "help":
         print("\nThe logo is the picture shown in the footer of the embeds.\n")
-        continue
     elif logo == "":
         logo = "https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg"
         break
@@ -72,7 +70,6 @@ while True:
         print(
             "Currently only new versions are going to be fetched. Less than one message per week. Leave blank if no updates or error notifications want to be received."
         )
-        continue
     else:
         break
 
@@ -80,9 +77,11 @@ while True:
     colour = input(
         "Insert the hexadecimal value of the embed colour you prefer [0xffff00]  "
     )
-    if logo.lower() == "help":
+    if colour.lower() == "help":
         print("\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n")
-        continue
+    elif colour.lower() == "":
+        colour = "0xffff00"
+        break
     else:
         break
 
