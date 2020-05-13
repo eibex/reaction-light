@@ -78,7 +78,9 @@ while True:
         "Insert the hexadecimal value of the embed colour you prefer [0xffff00]  "
     )
     if colour.lower() == "help":
-        print("\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n")
+        print(
+            "\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n"
+        )
     elif colour.lower() == "":
         colour = "0xffff00"
         break

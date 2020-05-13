@@ -26,18 +26,17 @@ with open(f"{directory}/.version") as f:
 folder = f"{directory}/files"
 config = configparser.ConfigParser()
 config.read(f"{directory}/config.ini")
+logo = str(config.get("server", "logo"))
 TOKEN = str(config.get("server", "token"))
-prefix = str(config.get("server", "prefix"))
 botname = str(config.get("server", "name"))
+prefix = str(config.get("server", "prefix"))
+system_channel = int(config.get("server", "system_channel"))
 botcolour = discord.Colour(int(config.get("server", "colour"), 16))
 
 Client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
-# IDs
-system_channel = int(config.get("server", "system_channel"))
-logo = str(config.get("server", "logo"))
 activities = []
 
 if not os.path.isfile(f"{folder}/activities.csv"):
@@ -305,7 +304,9 @@ async def on_message(message):
                                     system_channel
                                 )
                             )
-                            await system_notification(f"Database error:\n```\n{error}\n```")
+                            await system_notification(
+                                f"Database error:\n```\n{error}\n```"
+                            )
                         elif error:
                             await message.channel.send(
                                 "I could not commit the changes to the database."
@@ -741,22 +742,26 @@ async def set_colour(ctx):
             global botcolour
             colour = msg[1]
             try:
-                botcolour = discord.Colour(int(msg[1], 16))
+                botcolour = discord.Colour(int(colour, 16))
 
                 config["server"]["colour"] = colour
                 with open("config.ini", "w") as configfile:
                     config.write(configfile)
 
                 example = discord.Embed(
-                        title="Example embed",
-                        description="This embed has a new colour!",
-                        colour=botcolour,
-                    )
+                    title="Example embed",
+                    description="This embed has a new colour!",
+                    colour=botcolour,
+                )
                 await ctx.send("Colour changed.", embed=example)
             except ValueError:
-                await ctx.send(f"Please provide a valid hexadecimal value. Example: `{prefix}colour 0xffff00`")
+                await ctx.send(
+                    f"Please provide a valid hexadecimal value. Example: `{prefix}colour 0xffff00`"
+                )
         else:
-            await ctx.send(f"Please provide a hexadecimal value. Example: `{prefix}colour 0xffff00`")
+            await ctx.send(
+                f"Please provide a hexadecimal value. Example: `{prefix}colour 0xffff00`"
+            )
 
 
 @bot.command(name="help")
@@ -798,7 +803,9 @@ async def add_admin(ctx):
             return
     add = rldb.add_admin(role)
     if isinstance(add, Exception):
-        await system_notification(f"Database error when adding a new admin:\n```\n{add}\n```")
+        await system_notification(
+            f"Database error when adding a new admin:\n```\n{add}\n```"
+        )
         return
     await ctx.send("Added the role to my admin list.")
 
@@ -819,7 +826,9 @@ async def remove_admin(ctx):
             return
     remove = rldb.remove_admin(role)
     if isinstance(remove, Exception):
-        await system_notification(f"Database error when removing an admin:\n```\n{remove}\n```")
+        await system_notification(
+            f"Database error when removing an admin:\n```\n{remove}\n```"
+        )
         return
     await ctx.send("Removed the role from my admin list.")
 
