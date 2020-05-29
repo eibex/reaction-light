@@ -1,7 +1,11 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.2.1
+- Fix saving of colour variables to the configuration file when updated via command
+
 ### 1.2.0
 - Add configurable embed colours via `rl!colour` ([#32](https://github.com/eibex/reaction-light/pull/32) by [eibex](https://github.com/eibex))
+
 ### 1.1.2
 - Automated database cleaning of deleted messages ([#26](https://github.com/eibex/reaction-light/pull/26) by [eibex](https://github.com/eibex))
 - Better error reporting and catching ([#29](https://github.com/eibex/reaction-light/pull/29) by [eibex](https://github.com/eibex))
