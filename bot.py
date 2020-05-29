@@ -79,7 +79,7 @@ def get_latest():
     for line in data:
         latest = line.decode()
         break
-    return latest
+    return latest.rstrip("\n").rstrip("\r")
 
 
 def check_for_updates():
