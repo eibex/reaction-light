@@ -719,7 +719,7 @@ async def set_systemchannel(ctx):
 
             config["server"]["system_channel"] = str(system_channel)
 
-            with open("config.ini", "w") as configfile:
+            with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
 
             await ctx.send("System channel updated.")
@@ -745,7 +745,7 @@ async def set_colour(ctx):
                 botcolour = discord.Colour(int(colour, 16))
 
                 config["server"]["colour"] = colour
-                with open("config.ini", "w") as configfile:
+                with open(f"{directory}/config.ini", "w") as configfile:
                     config.write(configfile)
 
                 example = discord.Embed(
