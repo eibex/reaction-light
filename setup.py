@@ -98,7 +98,7 @@ config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
 config["server"]["colour"] = colour
 
-with open("config.ini", "w") as f:
+with open("{}/config.ini".format(folder), "w") as f:
     config.write(f)
 
 input("Done. You can now start the bot.")
