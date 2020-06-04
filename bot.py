@@ -53,20 +53,14 @@ with open(activities_file, "r") as f:
 activities = cycle(activities)
 
 
-def isadmin(ctx, msg=False):
+def isadmin(user):
     # Checks if command author has one of config.ini admin role IDs
     admins = rldb.get_admins()
     if isinstance(admins, Exception):
         return False
     try:
-        check = (
-            [role.id for role in ctx.author.roles]
-            if msg
-            else [role.id for role in ctx.message.author.roles]
-        )
-        if [role for role in admins if role in check]:
-            return True
-        return False
+        user_roles = [role.id for role in user.roles]
+        return [admin_role for admin_role in admins if admin_role in user_roles]
     except AttributeError:
         # Error raised from 'fake' users, such as webhooks
         return False
@@ -185,7 +179,7 @@ async def on_ready():
 async def on_message(message):
     await bot.process_commands(message)
 
-    if isadmin(message, msg=True):
+    if isadmin(message.author):
         user = str(message.author.id)
         channel = str(message.channel.id)
         step = rldb.step(user, channel)
@@ -408,7 +402,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.command(name="new")
 async def new(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
         started = rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
@@ -427,7 +421,7 @@ async def new(ctx):
 
 @bot.command(name="abort")
 async def abort(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         # Aborts setup process
         aborted = rldb.abort(ctx.message.author.id, ctx.message.channel.id)
         if aborted:
@@ -442,7 +436,7 @@ async def abort(ctx):
 
 @bot.command(name="edit")
 async def edit_selector(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         # Reminds user of formatting if it is wrong
         msg_values = ctx.message.content.split()
         if len(msg_values) < 2:
@@ -584,7 +578,7 @@ async def edit_selector(ctx):
 
 @bot.command(name="rm-embed")
 async def remove_selector_embed(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         # Reminds user of formatting if it is wrong
         msg_values = ctx.message.content.split()
         if len(msg_values) < 2:
@@ -703,7 +697,7 @@ async def remove_selector_embed(ctx):
 
 @bot.command(name="systemchannel")
 async def set_systemchannel(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         global system_channel
         try:
             system_channel = ctx.message.channel_mentions[0].id
@@ -735,7 +729,7 @@ async def set_systemchannel(ctx):
 
 @bot.command(name="colour")
 async def set_colour(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         msg = ctx.message.content.split()
         args = len(msg) - 1
         if args:
@@ -766,7 +760,7 @@ async def set_colour(ctx):
 
 @bot.command(name="help")
 async def hlp(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         await ctx.send(
             "Commands are:\n"
             f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
@@ -835,7 +829,7 @@ async def remove_admin(ctx):
 
 @bot.command(name="version")
 async def print_version(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         latest = get_latest()
         await ctx.send(
             f"I am currently running v{__version__}. The latest available version is v{latest}."
@@ -846,7 +840,7 @@ async def print_version(ctx):
 
 @bot.command(name="kill")
 async def kill(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         await ctx.send("Shutting down...")
         shutdown()  # sys.exit()
     else:
@@ -855,7 +849,7 @@ async def kill(ctx):
 
 @bot.command(name="restart")
 async def restart_cmd(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         if platform != "win32":
             restart()
             await ctx.send("Restarting...")
@@ -868,7 +862,7 @@ async def restart_cmd(ctx):
 
 @bot.command(name="update")
 async def update(ctx):
-    if isadmin(ctx):
+    if isadmin(ctx.message.author):
         if platform != "win32":
             await ctx.send("Attempting update...")
             os.chdir(directory)
