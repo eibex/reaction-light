@@ -158,6 +158,10 @@ Open a new issue if you would like to see a feature implemented, and/or open a p
 
 Ensure that you moved the `Reaction Light` role to a position that is hierarchically higher than the role you are trying to assign.
 
+**The bot says I am not an admin, even though I own the server (or have admin rights for it)**
+
+Run `rl!admin @Role` to give all users with that role permission to manage Reaction Light. This is done to have server staff use the bot without giving them unnecessary server rights. The only server admin (not bot admin) commands are `rl!admin` and `rl!rm-admin`.
+
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
 
