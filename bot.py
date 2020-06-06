@@ -122,9 +122,10 @@ async def updates():
     new_version = check_for_updates()
     if new_version:
         await system_notification(
-            f"An update is available. Download Reaction Light v{new_version} at https://github.com/eibex/reaction-light "
-            f"or simply use `{prefix}update` (only works with git installations).\n\n"
-            "You can view what has changed here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>"
+            f"An update is available. Download Reaction Light v{new_version} at"
+            f" https://github.com/eibex/reaction-light or simply use `{prefix}update`"
+            " (only works with git installations).\n\nYou can view what has changed"
+            " here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>"
         )
 
 
@@ -134,7 +135,8 @@ async def cleandb():
     messages = rldb.fetch_all_messages()
     if isinstance(messages, Exception):
         await system_notification(
-            f"Database error when fetching messages during database cleaning:\n```\n{messages}\n```"
+            "Database error when fetching messages during database"
+            f" cleaning:\n```\n{messages}\n```"
         )
         return
     for message in messages:
@@ -147,8 +149,8 @@ async def cleandb():
                 delete = rldb.delete(message)
                 if isinstance(delete, Exception):
                     await system_notification(
-                        "Database error when deleting messages during database cleaning:"
-                        f"\n```\n{delete}\n```"
+                        "Database error when deleting messages during database"
+                        f" cleaning:\n```\n{delete}\n```"
                     )
                     return
                 await system_notification(
@@ -168,12 +170,14 @@ async def on_ready():
     print("Reaction Light ready!")
     if migrated:
         await system_notification(
-            "Your CSV files have been deleted and migrated to an SQLite `reactionlight.db` file."
+            "Your CSV files have been deleted and migrated to an SQLite"
+            " `reactionlight.db` file."
         )
     if config_migrated:
         await system_notification(
-            "Your `config.ini` has been edited and your admin IDs are now stored in the database.\n"
-            f"You can add or remove them with `{prefix}admin` and `{prefix}rm-admin`."
+            "Your `config.ini` has been edited and your admin IDs are now stored in"
+            f" the database.\nYou can add or remove them with `{prefix}admin` and"
+            f" `{prefix}rm-admin`."
         )
     maintain_presence.start()
     cleandb.start()
@@ -218,8 +222,9 @@ async def on_message(message):
 
                 rldb.step1(user, channel, target_channel)
                 await message.channel.send(
-                    "Attach roles and emojis separated by one space (one combination per message). "
-                    "When you are done type `done`. Example:\n:smile: `@Role`"
+                    "Attach roles and emojis separated by one space (one combination"
+                    " per message). When you are done type `done`. Example:\n:smile:"
+                    " `@Role`"
                 )
             elif step == 2:
                 if msg[0].lower() != "done":
@@ -231,11 +236,13 @@ async def on_message(message):
                         rldb.step2(user, channel, role, reaction)
                     except IndexError:
                         await message.channel.send(
-                            "Mention a role after the reaction. Example:\n:smile: `@Role`"
+                            "Mention a role after the reaction. Example:\n:smile:"
+                            " `@Role`"
                         )
                     except discord.HTTPException:
                         await message.channel.send(
-                            "You can only use reactions uploaded to this server or standard emojis."
+                            "You can only use reactions uploaded to this server or"
+                            " standard emojis."
                         )
                 else:
                     # Advances to step three
@@ -248,12 +255,11 @@ async def on_message(message):
                     )
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
                     await message.channel.send(
-                        "What would you like the message to say?"
-                        "\nFormatting is: `Message // Embed_title // Embed_content`."
-                        "\n\n`Embed_title` and `Embed_content` are optional. "
-                        "You can type `none` in any of the argument fields above (e.g. `Embed_title`) to "
-                        "make the bot ignore it."
-                        "\n\n\nMessage",
+                        "What would you like the message to say?\nFormatting is:"
+                        " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
+                        " and `Embed_content` are optional. You can type `none` in any"
+                        " of the argument fields above (e.g. `Embed_title`) to make the"
+                        " bot ignore it.\n\n\nMessage",
                         embed=selector_embed,
                     )
             elif step == 3:
@@ -290,16 +296,16 @@ async def on_message(message):
                         )
                     except discord.Forbidden:
                         await message.channel.send(
-                            "I don't have permission to send selector_msg messages to the channel {0.mention}.".format(
-                                target_channel
-                            )
+                            "I don't have permission to send selector_msg messages to"
+                            " the channel {0.mention}.".format(target_channel)
                         )
                     if isinstance(selector_msg, discord.Message):
                         combos = rldb.get_combos(user, channel)
                         error = rldb.end_creation(user, channel, selector_msg.id)
                         if error and system_channel:
                             await message.channel.send(
-                                "I could not commit the changes to the database. Check {0.mention} for more information.".format(
+                                "I could not commit the changes to the database. Check"
+                                " {0.mention} for more information.".format(
                                     system_channel
                                 )
                             )
@@ -315,9 +321,8 @@ async def on_message(message):
                                 await selector_msg.add_reaction(reaction)
                             except discord.Forbidden:
                                 await message.channel.send(
-                                    "I don't have permission to react to messages from the channel {0.mention}.".format(
-                                        target_channel
-                                    )
+                                    "I don't have permission to react to messages from"
+                                    " the channel {0.mention}.".format(target_channel)
                                 )
                 else:
                     await message.channel.send(
@@ -363,9 +368,10 @@ async def on_raw_reaction_add(payload):
                     await member.add_roles(role)
                 except discord.Forbidden:
                     await system_notification(
-                        "Someone tried to add a role to themselves but I do not have permissions to add it. "
-                        "Ensure that I have a role that is hierarchically higher than the role I have to assign, "
-                        "and that I have the `Manage Roles` permission."
+                        "Someone tried to add a role to themselves but I do not have"
+                        " permissions to add it. Ensure that I have a role that is"
+                        " hierarchically higher than the role I have to assign, and"
+                        " that I have the `Manage Roles` permission."
                     )
 
 
@@ -399,9 +405,10 @@ async def on_raw_reaction_remove(payload):
                 await member.remove_roles(role)
             except discord.Forbidden:
                 await system_notification(
-                    "Someone tried to remove a role from themselves but I do not have permissions to remove it. "
-                    "Ensure that I have a role that is hierarchically higher than the role I have to remove, "
-                    "and that I have the `Manage Roles` permission."
+                    "Someone tried to remove a role from themselves but I do not have"
+                    " permissions to remove it. Ensure that I have a role that is"
+                    " hierarchically higher than the role I have to remove, and that I"
+                    " have the `Manage Roles` permission."
                 )
 
 
@@ -420,7 +427,8 @@ async def new(ctx):
             )
     else:
         await ctx.send(
-            f"You do not have an admin role. You might want to use `{prefix}admin` first."
+            f"You do not have an admin role. You might want to use `{prefix}admin`"
+            " first."
         )
 
 
@@ -433,7 +441,8 @@ async def abort(ctx):
             await ctx.send("Reaction-role message creation aborted.")
         else:
             await ctx.send(
-                "There are no reaction-role message creation processes started by you in this channel."
+                "There are no reaction-role message creation processes started by you"
+                " in this channel."
             )
     else:
         await ctx.send(f"You do not have an admin role.")
@@ -446,9 +455,9 @@ async def edit_selector(ctx):
         msg_values = ctx.message.content.split()
         if len(msg_values) < 2:
             await ctx.send(
-                f"**Type** `{prefix}edit #channelname` to get started. Replace `#channelname` "
-                "with the channel where the reaction-role message "
-                "you wish to edit is located."
+                f"**Type** `{prefix}edit #channelname` to get started. Replace"
+                " `#channelname` with the channel where the reaction-role message you"
+                " wish to edit is located."
             )
             return
         elif len(msg_values) == 2:
@@ -467,10 +476,12 @@ async def edit_selector(ctx):
             channel = bot.get_channel(channel_id)
             if len(all_messages) == 1:
                 await ctx.send(
-                    "There is only one reaction-role message in this channel. **Type**:"
-                    f"\n```\n{prefix}edit #{channel.name} // 1 // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
-                    "\nto edit the reaction-role message. You can type `none` in any of the argument fields above (e.g. `New Message`) to "
-                    "make the bot ignore it."
+                    "There is only one reaction-role message in this channel."
+                    f" **Type**:\n```\n{prefix}edit #{channel.name} // 1 // New Message"
+                    " // New Embed Title (Optional) // New Embed Description"
+                    " (Optional)\n```\nto edit the reaction-role message. You can type"
+                    " `none` in any of the argument fields above (e.g. `New Message`)"
+                    " to make the bot ignore it."
                 )
             elif len(all_messages) > 1:
                 selector_msgs = []
@@ -483,19 +494,26 @@ async def edit_selector(ctx):
                         continue
                     except discord.Forbidden:
                         ctx.send(
-                            "I do not have permissions to edit a reaction-role message that I previously created."
-                            f"\n\nID: {msg_id} in {channel.mention}"
+                            "I do not have permissions to edit a reaction-role message"
+                            f" that I previously created.\n\nID: {msg_id} in"
+                            f" {channel.mention}"
                         )
                         continue
-                    entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    entry = (
+                        f"`{counter}`"
+                        f" {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    )
                     selector_msgs.append(entry)
                     counter += 1
 
                 await ctx.send(
-                    f"There are **{len(all_messages)}** reaction-role messages in this channel. **Type**:"
-                    f"\n```\n{prefix}edit #{channel.name} // MESSAGE_NUMBER // New Message // New Embed Title (Optional) // New Embed Description (Optional)\n```"
-                    "\nto edit the desired one. You can type `none` in any of the argument fields above (e.g. `New Message`) to make the bot ignore it. "
-                    "The list of the current reaction-role messages is:\n\n"
+                    f"There are **{len(all_messages)}** reaction-role messages in this"
+                    f" channel. **Type**:\n```\n{prefix}edit #{channel.name} //"
+                    " MESSAGE_NUMBER // New Message // New Embed Title (Optional) //"
+                    " New Embed Description (Optional)\n```\nto edit the desired one."
+                    " You can type `none` in any of the argument fields above (e.g."
+                    " `New Message`) to make the bot ignore it. The list of the"
+                    " current reaction-role messages is:\n\n"
                     + "\n".join(selector_msgs)
                 )
             else:
@@ -511,7 +529,8 @@ async def edit_selector(ctx):
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
-                        f"Database error when fetching messages:\n```\n{all_messages}\n```"
+                        "Database error when fetching"
+                        f" messages:\n```\n{all_messages}\n```"
                     )
                     return
                 counter = 1
@@ -534,7 +553,9 @@ async def edit_selector(ctx):
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
                     await ctx.send(
-                        "Select a valid reaction-role message number (i.e. the number to the left of the reaction-role message content in the list above)."
+                        "Select a valid reaction-role message number (i.e. the number"
+                        " to the left of the reaction-role message content in the list"
+                        " above)."
                     )
                     return
 
@@ -588,9 +609,9 @@ async def remove_selector_embed(ctx):
         msg_values = ctx.message.content.split()
         if len(msg_values) < 2:
             await ctx.send(
-                f"**Type** `{prefix}rm-embed #channelname` to get started. Replace `#channelname` "
-                "with the channel where the reaction-role message "
-                "you wish to remove its embed is located."
+                f"**Type** `{prefix}rm-embed #channelname` to get started. Replace"
+                " `#channelname` with the channel where the reaction-role message you"
+                " wish to remove its embed is located."
             )
             return
         elif len(msg_values) == 2:
@@ -624,18 +645,23 @@ async def remove_selector_embed(ctx):
                         continue
                     except discord.Forbidden:
                         ctx.send(
-                            "I do not have permissions to edit a reaction-role message that I previously created."
-                            f"\n\nID: {msg_id} in {channel.mention}"
+                            "I do not have permissions to edit a reaction-role message"
+                            f" that I previously created.\n\nID: {msg_id} in"
+                            f" {channel.mention}"
                         )
                         continue
-                    entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    entry = (
+                        f"`{counter}`"
+                        f" {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+                    )
                     selector_msgs.append(entry)
                     counter += 1
 
                 await ctx.send(
-                    f"There are **{len(all_messages)}** reaction-role messages in this channel. **Type**:"
-                    f"\n```\n{prefix}rm-embed #{channel.name} // MESSAGE_NUMBER\n```"
-                    "\nto remove its embed. The list of the current reaction-role messages is:\n\n"
+                    f"There are **{len(all_messages)}** reaction-role messages in this"
+                    f" channel. **Type**:\n```\n{prefix}rm-embed #{channel.name} //"
+                    " MESSAGE_NUMBER\n```\nto remove its embed. The list of the"
+                    " current reaction-role messages is:\n\n"
                     + "\n".join(selector_msgs)
                 )
             else:
@@ -651,7 +677,8 @@ async def remove_selector_embed(ctx):
                 all_messages = rldb.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
-                        f"Database error when fetching messages:\n```\n{all_messages}\n```"
+                        "Database error when fetching"
+                        f" messages:\n```\n{all_messages}\n```"
                     )
                     return
                 counter = 1
@@ -674,7 +701,9 @@ async def remove_selector_embed(ctx):
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
                     await ctx.send(
-                        "Select a valid reaction-role message number (i.e. the number to the left of the reaction-role message content in the list above)."
+                        "Select a valid reaction-role message number (i.e. the number"
+                        " to the left of the reaction-role message content in the list"
+                        " above)."
                     )
                     return
 
@@ -684,8 +713,10 @@ async def remove_selector_embed(ctx):
                 except discord.HTTPException as e:
                     if e.code == 50006:
                         await ctx.send(
-                            "You can't remove an embed if its message is empty. Please edit the message first with: "
-                            f"\n`{prefix}edit #{ctx.message.channel_mentions[0]} // {selector_msg_number} // New Message`"
+                            "You can't remove an embed if its message is empty. Please"
+                            f" edit the message first with: \n`{prefix}edit"
+                            f" #{ctx.message.channel_mentions[0]} //"
+                            f" {selector_msg_number} // New Message`"
                         )
                     else:
                         await ctx.send(str(e))
@@ -755,11 +786,13 @@ async def set_colour(ctx):
                 await ctx.send("Colour changed.", embed=example)
             except ValueError:
                 await ctx.send(
-                    f"Please provide a valid hexadecimal value. Example: `{prefix}colour 0xffff00`"
+                    "Please provide a valid hexadecimal value. Example:"
+                    f" `{prefix}colour 0xffff00`"
                 )
         else:
             await ctx.send(
-                f"Please provide a hexadecimal value. Example: `{prefix}colour 0xffff00`"
+                f"Please provide a hexadecimal value. Example: `{prefix}colour"
+                " 0xffff00`"
             )
 
 
@@ -767,20 +800,29 @@ async def set_colour(ctx):
 async def hlp(ctx):
     if isadmin(ctx.message.author):
         await ctx.send(
-            "Commands are:\n"
-            f"- `{prefix}new` starts the creation process for a new reaction role message.\n"
-            f"- `{prefix}abort` aborts the creation process for a new reaction role message started by the command user in that channel.\n"
-            f"- `{prefix}edit` edits an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
-            f"- `{prefix}colour` changes the colour of the embeds of new and newly edited reaction role messages.\n"
-            f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.\n"
-            f"- `{prefix}admin` adds the mentioned role to the list of {botname} admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n"
-            f"- `{prefix}rm-admin` removes the mentioned role from the list of {botname} admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n"
-            f"- `{prefix}systemchannel` updates the system channel where the bot sends errors and update notifications.\n"
-            f"- `{prefix}kill` shuts down the bot.\n"
-            f"- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n"
-            f"- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations running on GNU/Linux.\n"
-            f"- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n"
-            f"{botname} is running version {__version__} of Reaction Light. Find more resources at: <https://github.com/eibex/reaction-light>"
+            f"Commands are:\n- `{prefix}new` starts the creation process for a new"
+            f" reaction role message.\n- `{prefix}abort` aborts the creation process"
+            " for a new reaction role message started by the command user in that"
+            f" channel.\n- `{prefix}edit` edits an existing reaction-role message or"
+            " provides instructions on how to do so if no arguments are passed.\n-"
+            f" `{prefix}colour` changes the colour of the embeds of new and newly"
+            f" edited reaction role messages.\n- `{prefix}rm-embed` suppresses the"
+            " embed of an existing reaction-role message or provides instructions on"
+            f" how to do so if no arguments are passed.\n- `{prefix}admin` adds the"
+            f" mentioned role to the list of {botname} admins, allowing them to create"
+            " and edit reaction-role messages. You need to be a server administrator"
+            f" to use this command.\n- `{prefix}rm-admin` removes the mentioned role"
+            f" from the list of {botname} admins, preventing them from creating and"
+            " editing reaction-role messages. You need to be a server administrator to"
+            f" use this command.\n- `{prefix}systemchannel` updates the system channel"
+            f" where the bot sends errors and update notifications.\n- `{prefix}kill`"
+            f" shuts down the bot.\n- `{prefix}restart` restarts the bot. Only works on"
+            f" installations running on GNU/Linux.\n- `{prefix}update` updates the bot"
+            " and restarts it. Only works on `git clone` installations running on"
+            f" GNU/Linux.\n- `{prefix}version` reports the bot's current version and"
+            f" the latest available one from GitHub.\n\n{botname} is running version"
+            f" {__version__} of Reaction Light. Find more resources at:"
+            " <https://github.com/eibex/reaction-light>"
         )
     else:
         await ctx.send("You do not have an admin role.")
@@ -839,7 +881,8 @@ async def print_version(ctx):
     if isadmin(ctx.message.author):
         latest = get_latest()
         await ctx.send(
-            f"I am currently running v{__version__}. The latest available version is v{latest}."
+            f"I am currently running v{__version__}. The latest available version is"
+            f" v{latest}."
         )
     else:
         await ctx.send("You do not have an admin role.")
