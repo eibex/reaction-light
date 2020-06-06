@@ -40,12 +40,14 @@ bot.remove_command("help")
 activities = []
 
 if not os.path.isfile(f"{folder}/activities.csv"):
+    # Create activities.csv from the sample if it does not already exist
     copy(
         f"{folder}/activities.csv.sample", f"{folder}/activities.csv",
     )
 
 activities_file = f"{folder}/activities.csv"
 with open(activities_file, "r") as f:
+    # Get activities.csv contents
     reader = csv.reader(f, delimiter=",")
     for row in reader:
         activity = row[0]
@@ -54,7 +56,7 @@ activities = cycle(activities)
 
 
 def isadmin(user):
-    # Checks if command author has one of config.ini admin role IDs
+    # Checks if command author has an admin role that was added with rl!admin
     admins = rldb.get_admins()
     if isinstance(admins, Exception):
         return False
@@ -67,6 +69,7 @@ def isadmin(user):
 
 
 def get_latest():
+    # Get latest version string from GitHub
     data = urlopen(
         "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
     )
@@ -85,6 +88,7 @@ def check_for_updates():
 
 
 def restart():
+    # Create a new python process of bot.py and stops the current one
     os.chdir(directory)
     python = "python" if platform == "win32" else "python3"
     cmd = os.popen(f"nohup {python} bot.py &")
@@ -92,6 +96,7 @@ def restart():
 
 
 async def system_notification(text):
+    # Send a message to the system channel (if set)
     if system_channel:
         try:
             channel = bot.get_channel(system_channel)
@@ -784,6 +789,7 @@ async def hlp(ctx):
 @bot.command(name="admin")
 @commands.has_permissions(administrator=True)
 async def add_admin(ctx):
+    # Adds an admin role ID to the database
     try:
         role = ctx.message.role_mentions[0].id
     except IndexError:
@@ -807,6 +813,7 @@ async def add_admin(ctx):
 @bot.command(name="rm-admin")
 @commands.has_permissions(administrator=True)
 async def remove_admin(ctx):
+    # Removes an admin role ID from the database
     try:
         role = ctx.message.role_mentions[0].id
     except IndexError:
