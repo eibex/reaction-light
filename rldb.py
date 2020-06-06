@@ -10,10 +10,12 @@ conn = sqlite3.connect(f"{directory}/files/reactionlight.db")
 
 cursor = conn.cursor()
 cursor.execute(
-    "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'reactionrole_id' INT);"
+    "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
+    " 'reactionrole_id' INT);"
 )
 cursor.execute(
-    "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);"
+    "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction'"
+    " NVCARCHAR, 'role_id' INT);"
 )
 cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);")
 conn.commit()
@@ -49,13 +51,15 @@ class ReactionRoleCreationTracker:
     def commit(self):
         c = conn.cursor()
         c.execute(
-            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id') values(?, ?, ?);",
+            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id')"
+            " values(?, ?, ?);",
             (self.message_id, self.target_channel, self.reactionrole_id),
         )
         for reaction in self.combos:
             role_id = self.combos[reaction]
             c.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);",
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id')"
+                " values(?, ?, ?);",
                 (self.reactionrole_id, reaction, role_id),
             )
         conn.commit()

@@ -14,22 +14,27 @@ print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
 print(
-    "If you would like more information about any of the steps, type 'help' as an answer."
+    "If you would like more information about any of the steps, type 'help' as an"
+    " answer."
 )
 print(
-    "If you would like to abort the configuration close the program. No input will be written to file until the setup is complete."
+    "If you would like to abort the configuration close the program. No input will be"
+    " written to file until the setup is complete."
 )
 print(
-    "Default values are shown inside square brackets [] where applicable. Pressing enter and leaving the field empty will accept the default value."
+    "Default values are shown inside square brackets [] where applicable. Pressing"
+    " enter and leaving the field empty will accept the default value."
 )
 
 while True:
     token = input(
-        "\nPaste the token of your bot user (you can create one at: https://discordapp.com/developers/applications/)  "
+        "\nPaste the token of your bot user (you can create one at:"
+        " https://discordapp.com/developers/applications/)  "
     )
     if token.lower() == "help":
         print(
-            "\nThe bot token looks like this: NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
+            "\nThe bot token looks like this:"
+            " NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
         )
     elif token == "":
         continue
@@ -52,7 +57,8 @@ while True:
 
 while True:
     logo = input(
-        "\nPaste the URL to your preferred logo file (should end in *.png, *.jpg, *.webp, ...)  [readme.md logo]  "
+        "\nPaste the URL to your preferred logo file (should end in *.png, *.jpg,"
+        " *.webp, ...)  [readme.md logo]  "
     )
     if logo.lower() == "help":
         print("\nThe logo is the picture shown in the footer of the embeds.\n")
@@ -64,11 +70,15 @@ while True:
 
 while True:
     system_channel = input(
-        "Paste the ID of the channel you wish to receive system notifications (e.g. errors, new versions of the bot). This is optional and you can set it up later by using the systemchannel command.\n"
+        "Paste the ID of the channel you wish to receive system notifications (e.g."
+        " errors, new versions of the bot). This is optional and you can set it up"
+        " later by using the systemchannel command.\n"
     )
     if system_channel.lower() == "help":
         print(
-            "Currently only new versions are going to be fetched. Less than one message per week. Leave blank if no updates or error notifications want to be received."
+            "Currently only new versions are going to be fetched. Less than one message"
+            " per week. Leave blank if no updates or error notifications want to be"
+            " received."
         )
     else:
         break
@@ -79,7 +89,8 @@ while True:
     )
     if colour.lower() == "help":
         print(
-            "\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n"
+            "\nThe default is yellow. You can use a colour hex picker. You can change"
+            " the colour later with a command\n"
         )
     elif colour.lower() == "":
         colour = "0xffff00"
