@@ -1,3 +1,27 @@
+"""
+MIT License
+
+Copyright (c) 2019-2020 eibex
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 import os
 import csv
 import configparser
@@ -12,8 +36,6 @@ from discord.ext import commands, tasks
 import rldb
 import migration
 
-# Original Repository: https://github.com/eibex/reaction-light
-# License: MIT - Copyright 2019-2020 eibex
 
 directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -297,7 +319,7 @@ async def on_message(message):
                     except discord.Forbidden:
                         await message.channel.send(
                             "I don't have permission to send selector_msg messages to"
-                            " the channel {0.mention}.".format(target_channel)
+                            f" the channel {target_channel.mention}."
                         )
                     if isinstance(selector_msg, discord.Message):
                         combos = rldb.get_combos(user, channel)
@@ -305,9 +327,7 @@ async def on_message(message):
                         if error and system_channel:
                             await message.channel.send(
                                 "I could not commit the changes to the database. Check"
-                                " {0.mention} for more information.".format(
-                                    system_channel
-                                )
+                                f" {system_channel.mention} for more information."
                             )
                             await system_notification(
                                 f"Database error:\n```\n{error}\n```"
@@ -322,7 +342,7 @@ async def on_message(message):
                             except discord.Forbidden:
                                 await message.channel.send(
                                     "I don't have permission to react to messages from"
-                                    " the channel {0.mention}.".format(target_channel)
+                                    f" the channel {target_channel.mention}."
                                 )
                 else:
                     await message.channel.send(
@@ -800,29 +820,38 @@ async def set_colour(ctx):
 async def hlp(ctx):
     if isadmin(ctx.message.author):
         await ctx.send(
-            f"Commands are:\n- `{prefix}new` starts the creation process for a new"
-            f" reaction role message.\n- `{prefix}abort` aborts the creation process"
+            "Commands are:\n"
+            f"- `{prefix}new` starts the creation process for a new"
+            " reaction role message.\n"
+            f"- `{prefix}abort` aborts the creation process"
             " for a new reaction role message started by the command user in that"
-            f" channel.\n- `{prefix}edit` edits an existing reaction-role message or"
-            " provides instructions on how to do so if no arguments are passed.\n-"
-            f" `{prefix}colour` changes the colour of the embeds of new and newly"
-            f" edited reaction role messages.\n- `{prefix}rm-embed` suppresses the"
-            " embed of an existing reaction-role message or provides instructions on"
-            f" how to do so if no arguments are passed.\n- `{prefix}admin` adds the"
-            f" mentioned role to the list of {botname} admins, allowing them to create"
-            " and edit reaction-role messages. You need to be a server administrator"
-            f" to use this command.\n- `{prefix}rm-admin` removes the mentioned role"
-            f" from the list of {botname} admins, preventing them from creating and"
-            " editing reaction-role messages. You need to be a server administrator to"
-            f" use this command.\n- `{prefix}systemchannel` updates the system channel"
-            f" where the bot sends errors and update notifications.\n- `{prefix}kill`"
-            f" shuts down the bot.\n- `{prefix}restart` restarts the bot. Only works on"
-            f" installations running on GNU/Linux.\n- `{prefix}update` updates the bot"
-            " and restarts it. Only works on `git clone` installations running on"
-            f" GNU/Linux.\n- `{prefix}version` reports the bot's current version and"
-            f" the latest available one from GitHub.\n\n{botname} is running version"
-            f" {__version__} of Reaction Light. Find more resources at:"
-            " <https://github.com/eibex/reaction-light>"
+            " channel.\n"
+            f"- `{prefix}edit` edits an existing reaction-role message or"
+            " provides instructions on how to do so if no arguments are passed.\n"
+            f"- `{prefix}colour` changes the colour of the embeds of new and newly"
+            " edited reaction role messages.\n"
+            f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role"
+            " message or provides instructions on how to do so if no arguments are"
+            " passed.\n"
+            f"- `{prefix}admin` adds the mentioned role to the list of {botname}"
+            " admins, allowing them to create and edit reaction-role messages."
+            " You need to be a server administrator to use this command.\n"
+            f"- `{prefix}rm-admin` removes the mentioned role from the list of"
+            f" {botname} admins, preventing them from creating and editing"
+            " reaction-role messages. You need to be a server administrator to"
+            " use this command.\n"
+            f"- `{prefix}systemchannel` updates the system channel where the bot"
+            " sends errors and update notifications.\n"
+            f"- `{prefix}kill` shuts down the bot.\n"
+            f"- `{prefix}restart` restarts the bot. Only works on installations"
+            " running on GNU/Linux.\n"
+            f"- `{prefix}update` updates the bot and restarts it. Only works on"
+            " `git clone` installations running on GNU/Linux.\n"
+            f"- `{prefix}version` reports the bot's current version and the latest"
+            " available one from GitHub.\n\n"
+            f"{botname} is running version {__version__} of Reaction Light. You can"
+            " find more resources, submit feedback, and report bugs at: "
+            "<https://github.com/eibex/reaction-light>"
         )
     else:
         await ctx.send("You do not have an admin role.")
