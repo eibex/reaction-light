@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.3.0
+- Add `rl!adminlist` command to show the current bot admins registered in the database
+
 ### 1.2.1
 - Fix saving of colour variables to the configuration file when updated via command
 

@@ -840,6 +840,10 @@ async def hlp(ctx):
             f" {botname} admins, preventing them from creating and editing"
             " reaction-role messages. You need to be a server administrator to"
             " use this command.\n"
+            f"- `{prefix}adminlist` lists the current admins on the server the"
+            " command was run in by mentioning them and the current admins from"
+            " other servers by printing out the role IDs. You need to be a server"
+            " administrator to use this command.\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot"
             " sends errors and update notifications.\n"
             f"- `{prefix}kill` shuts down the bot.\n"
@@ -923,7 +927,7 @@ async def list_admin(ctx):
         if role is not None:
             local_admins.append(role.mention)
         else:
-            foreign_admins.append(str(admin_id))
+            foreign_admins.append(f"`{admin_id}`")
 
     if local_admins and foreign_admins:
         await ctx.send(
