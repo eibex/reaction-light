@@ -905,6 +905,49 @@ async def remove_admin(ctx):
     await ctx.send("Removed the role from my admin list.")
 
 
+@bot.command(name="adminlist")
+@commands.has_permissions(administrator=True)
+async def list_admin(ctx):
+    # Lists all admin IDs in the database, mentioning them if possible
+    admin_ids = rldb.get_admins()
+    if isinstance(admin_ids, Exception):
+        await system_notification(
+            f"Database error when adding a new admin:\n```\n{admin_ids}\n```"
+        )
+        return
+    server = bot.get_guild(ctx.message.guild.id)
+    local_admins = []
+    foreign_admins = []
+    for admin_id in admin_ids:
+        role = discord.utils.get(server.roles, id=admin_id)
+        if role is not None:
+            local_admins.append(role.mention)
+        else:
+            foreign_admins.append(str(admin_id))
+
+    if local_admins and foreign_admins:
+        await ctx.send(
+            "The bot admins on this server are:\n"
+            + "\n".join(local_admins)
+            + "\n\nThe bot admins from other servers are:\n"
+            + "\n".join(foreign_admins)
+        )
+    elif local_admins and not foreign_admins:
+        await ctx.send(
+            "The bot admins on this server are:\n"
+            + "\n".join(local_admins)
+            + "\n\nThere are no bot admins from other servers."
+        )
+    elif not local_admins and foreign_admins:
+        await ctx.send(
+            "There are no bot admins on this server.\n\nThe bot admins from other"
+            " servers are:\n"
+            + "\n".join(foreign_admins)
+        )
+    else:
+        await ctx.send("There are no bot admins registered.")
+
+
 @bot.command(name="version")
 async def print_version(ctx):
     if isadmin(ctx.message.author):
