@@ -916,7 +916,7 @@ async def list_admin(ctx):
     admin_ids = rldb.get_admins()
     if isinstance(admin_ids, Exception):
         await system_notification(
-            f"Database error when adding a new admin:\n```\n{admin_ids}\n```"
+            f"Database error when fetching admins:\n```\n{admin_ids}\n```"
         )
         return
     server = bot.get_guild(ctx.message.guild.id)
