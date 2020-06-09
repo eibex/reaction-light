@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 1.2.1](https://img.shields.io/badge/Reaction%20Light-1.2.1-yellow.svg)
+![Reaction Light 1.3.0](https://img.shields.io/badge/Reaction%20Light-1.3.0-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -84,6 +84,7 @@ All commands require an admin role which you can set by using `rl!admin` (requir
 - `rl!rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.
 - `rl!admin` adds the mentioned role or role id to the admin list, allowing members with a certain role to use the bot commands. Requires administrator permissions on the server.
 - `rl!rm-admin` removes the mentioned role or role id from the admin list, preventing members with a certain role from using the bot commands. Requires administrator permissions on the server.
+- `rl!adminlist` lists the current admins on the server the command was run in by mentioning them and the current admins from other servers by printing out the role IDs. Requires administrator permissions on the server.
 - `rl!kill` shuts down the bot.
 - `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
 - `rl!restart` restarts the bot.
