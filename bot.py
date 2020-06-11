@@ -931,22 +931,22 @@ async def list_admin(ctx):
 
     if local_admins and foreign_admins:
         await ctx.send(
-            "The bot admins on this server are:\n"
-            + "\n".join(local_admins)
-            + "\n\nThe bot admins from other servers are:\n"
-            + "\n".join(foreign_admins)
+            "The bot admins on this server are:\n- "
+            + "\n- ".join(local_admins)
+            + "\n\nThe bot admins from other servers are:\n- "
+            + "\n- ".join(foreign_admins)
         )
     elif local_admins and not foreign_admins:
         await ctx.send(
-            "The bot admins on this server are:\n"
-            + "\n".join(local_admins)
+            "The bot admins on this server are:\n- "
+            + "\n- ".join(local_admins)
             + "\n\nThere are no bot admins from other servers."
         )
     elif not local_admins and foreign_admins:
         await ctx.send(
             "There are no bot admins on this server.\n\nThe bot admins from other"
-            " servers are:\n"
-            + "\n".join(foreign_admins)
+            " servers are:\n- "
+            + "\n- ".join(foreign_admins)
         )
     else:
         await ctx.send("There are no bot admins registered.")
@@ -965,6 +965,16 @@ async def add_activity(ctx):
             w = csv.writer(f, delimiter=",", lineterminator="\n")
             w.writerow([activity])
         await ctx.send(f"The activity `{activity}` was added succesfully.")
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="activitylist")
+async def list_activities(ctx):
+    if isadmin(ctx.message.author):
+        await ctx.send("The current activities are:\n- " + "\n- ".join(activities))
+    else:
+        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="version")
