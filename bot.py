@@ -952,6 +952,21 @@ async def list_admin(ctx):
         await ctx.send("There are no bot admins registered.")
 
 
+@bot.command(name="activity")
+async def add_activity(ctx):
+    if isadmin(ctx.message.author):
+        activity = ctx.message.content[len(prefix)].strip()
+        if not activity:
+            await ctx.send(
+                "Please provide the activity you would like to"
+                f" add.\n```\n{prefix}activity your activity text here\n```"
+            )
+        with open(activities_file, "a", encoding="utf-8") as f:
+            w = csv.writer(f, delimiter=",", lineterminator="\n")
+            w.writerow([activity])
+        await ctx.send(f"The activity `{activity}` was added succesfully.")
+
+
 @bot.command(name="version")
 async def print_version(ctx):
     if isadmin(ctx.message.author):
