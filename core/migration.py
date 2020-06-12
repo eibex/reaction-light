@@ -26,7 +26,6 @@ SOFTWARE.
 import os
 import csv
 import configparser
-from . import activities
 from . import rldb
 
 
