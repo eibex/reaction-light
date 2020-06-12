@@ -34,7 +34,7 @@ from sys import platform, exit as shutdown
 import discord
 from discord.ext import commands, tasks
 
-from core import rldb, migration, activity
+from core import database, migration, activity
 
 
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -65,7 +65,7 @@ activity_list = activities.load()
 
 def isadmin(user):
     # Checks if command author has an admin role that was added with rl!admin
-    admins = rldb.get_admins()
+    admins = database.get_admins()
     if isinstance(admins, Exception):
         return False
     try:
@@ -140,7 +140,7 @@ async def updates():
 @tasks.loop(hours=24)
 async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
-    messages = rldb.fetch_all_messages()
+    messages = database.fetch_all_messages()
     if isinstance(messages, Exception):
         await system_notification(
             "Database error when fetching messages during database"
@@ -154,7 +154,7 @@ async def cleandb():
             await channel.fetch_message(message)
         except discord.NotFound as e:
             if e.code == 10008 or e.code == 10003:
-                delete = rldb.delete(message)
+                delete = database.delete(message)
                 if isinstance(delete, Exception):
                     await system_notification(
                         "Database error when deleting messages during database"
@@ -199,14 +199,14 @@ async def on_message(message):
     if isadmin(message.author):
         user = str(message.author.id)
         channel = str(message.channel.id)
-        step = rldb.step(user, channel)
+        step = database.step(user, channel)
         msg = message.content.split()
 
         if step is not None:
             # Checks if the setup process was started before.
             # If it was not, it ignores the message.
             if step == 0:
-                rldb.step0(user, channel)
+                database.step0(user, channel)
             elif step == 1:
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
@@ -228,7 +228,7 @@ async def on_message(message):
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
 
-                rldb.step1(user, channel, target_channel)
+                database.step1(user, channel, target_channel)
                 await message.channel.send(
                     "Attach roles and emojis separated by one space (one combination"
                     " per message). When you are done type `done`. Example:\n:smile:"
@@ -241,7 +241,7 @@ async def on_message(message):
                         reaction = msg[0]
                         role = message.role_mentions[0].id
                         await message.add_reaction(reaction)
-                        rldb.step2(user, channel, role, reaction)
+                        database.step2(user, channel, role, reaction)
                     except IndexError:
                         await message.channel.send(
                             "Mention a role after the reaction. Example:\n:smile:"
@@ -254,7 +254,7 @@ async def on_message(message):
                         )
                 else:
                     # Advances to step three
-                    rldb.step2(user, channel, done=True)
+                    database.step2(user, channel, done=True)
 
                     selector_embed = discord.Embed(
                         title="Embed_title",
@@ -295,7 +295,7 @@ async def on_message(message):
 
                 if selector_msg_body or selector_embed:
                     target_channel = bot.get_channel(
-                        rldb.get_targetchannel(user, channel)
+                        database.get_targetchannel(user, channel)
                     )
                     selector_msg = None
                     try:
@@ -308,8 +308,8 @@ async def on_message(message):
                             f" the channel {target_channel.mention}."
                         )
                     if isinstance(selector_msg, discord.Message):
-                        combos = rldb.get_combos(user, channel)
-                        error = rldb.end_creation(user, channel, selector_msg.id)
+                        combos = database.get_combos(user, channel)
+                        error = database.end_creation(user, channel, selector_msg.id)
                         if error and system_channel:
                             await message.channel.send(
                                 "I could not commit the changes to the database. Check"
@@ -343,7 +343,7 @@ async def on_raw_reaction_add(payload):
     ch_id = payload.channel_id
     user_id = payload.user_id
     guild_id = payload.guild_id
-    exists = rldb.exists(msg_id)
+    exists = database.exists(msg_id)
     if isinstance(exists, Exception):
         await system_notification(
             f"Database error after a user added a reaction:\n```\n{exists}\n```"
@@ -351,7 +351,7 @@ async def on_raw_reaction_add(payload):
         return
     elif exists:
         # Checks that the message that was reacted to is a reaction-role message managed by the bot
-        reactions = rldb.get_reactions(msg_id)
+        reactions = database.get_reactions(msg_id)
         if isinstance(reactions, Exception):
             await system_notification(
                 f"Database error when getting reactions:\n```\n{reactions}\n```"
@@ -387,7 +387,7 @@ async def on_raw_reaction_remove(payload):
     msg_id = payload.message_id
     user_id = payload.user_id
     guild_id = payload.guild_id
-    exists = rldb.exists(msg_id)
+    exists = database.exists(msg_id)
     if isinstance(exists, Exception):
         await system_notification(
             f"Database error after a user removed a reaction:\n```\n{exists}\n```"
@@ -395,7 +395,7 @@ async def on_raw_reaction_remove(payload):
         return
     elif exists:
         # Checks that the message that was unreacted to is a reaction-role message managed by the bot
-        reactions = rldb.get_reactions(msg_id)
+        reactions = database.get_reactions(msg_id)
         if isinstance(reactions, Exception):
             await system_notification(
                 f"Database error when getting reactions:\n```\n{reactions}\n```"
@@ -423,7 +423,7 @@ async def new(ctx):
     if isadmin(ctx.message.author):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
-        started = rldb.start_creation(ctx.message.author.id, ctx.message.channel.id)
+        started = database.start_creation(ctx.message.author.id, ctx.message.channel.id)
         if started:
             await ctx.send("Mention the #channel where to send the auto-role message.")
         else:
@@ -442,7 +442,7 @@ async def new(ctx):
 async def abort(ctx):
     if isadmin(ctx.message.author):
         # Aborts setup process
-        aborted = rldb.abort(ctx.message.author.id, ctx.message.channel.id)
+        aborted = database.abort(ctx.message.author.id, ctx.message.channel.id)
         if aborted:
             await ctx.send("Reaction-role message creation aborted.")
         else:
@@ -473,7 +473,7 @@ async def edit_selector(ctx):
                 await ctx.send("You need to mention a channel.")
                 return
 
-            all_messages = rldb.fetch_messages(channel_id)
+            all_messages = database.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
                 await system_notification(
                     f"Database error when fetching messages:\n```\n{all_messages}\n```"
@@ -532,7 +532,7 @@ async def edit_selector(ctx):
                 channel = bot.get_channel(channel_id)
                 msg_values = ctx.message.content.split(" // ")
                 selector_msg_number = msg_values[1]
-                all_messages = rldb.fetch_messages(channel_id)
+                all_messages = database.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         "Database error when fetching"
@@ -628,7 +628,7 @@ async def remove_selector_embed(ctx):
                 return
 
             channel = bot.get_channel(channel_id)
-            all_messages = rldb.fetch_messages(channel_id)
+            all_messages = database.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
                 await system_notification(
                     f"Database error when fetching messages:\n```\n{all_messages}\n```"
@@ -680,7 +680,7 @@ async def remove_selector_embed(ctx):
                 channel = bot.get_channel(channel_id)
                 msg_values = ctx.message.content.split(" // ")
                 selector_msg_number = msg_values[1]
-                all_messages = rldb.fetch_messages(channel_id)
+                all_messages = database.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         "Database error when fetching"
@@ -862,7 +862,7 @@ async def add_admin(ctx):
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
-    add = rldb.add_admin(role)
+    add = database.add_admin(role)
     if isinstance(add, Exception):
         await system_notification(
             f"Database error when adding a new admin:\n```\n{add}\n```"
@@ -886,7 +886,7 @@ async def remove_admin(ctx):
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
-    remove = rldb.remove_admin(role)
+    remove = database.remove_admin(role)
     if isinstance(remove, Exception):
         await system_notification(
             f"Database error when removing an admin:\n```\n{remove}\n```"
@@ -899,7 +899,7 @@ async def remove_admin(ctx):
 @commands.has_permissions(administrator=True)
 async def list_admin(ctx):
     # Lists all admin IDs in the database, mentioning them if possible
-    admin_ids = rldb.get_admins()
+    admin_ids = database.get_admins()
     if isinstance(admin_ids, Exception):
         await system_notification(
             f"Database error when fetching admins:\n```\n{admin_ids}\n```"
@@ -957,7 +957,10 @@ async def add_activity(ctx):
 async def list_activities(ctx):
     if isadmin(ctx.message.author):
         if activities.activity_list:
-            await ctx.send("The current activities are:\n- " + "\n- ".join(activities.activity_list))
+            await ctx.send(
+                "The current activities are:\n- "
+                + "\n- ".join(activities.activity_list)
+            )
         else:
             await ctx.send("There are no activities to show.")
     else:

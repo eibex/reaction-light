@@ -26,7 +26,7 @@ SOFTWARE.
 import os
 import csv
 import configparser
-from . import rldb
+from . import database
 
 
 def migrate():
@@ -69,7 +69,7 @@ def migrate():
                             # reverse lookup of message_id via CSV embed_id
                             message_id = int(row[0])
                             break
-                tracker = rldb.ReactionRoleCreationTracker(user=None, channel=None)
+                tracker = database.ReactionRoleCreationTracker(user=None, channel=None)
                 print(f"Getting target channel: {channel_id}")
                 tracker.target_channel = channel_id
                 print(f"Getting reaction-roles:\n{reaction_role}")
@@ -110,7 +110,7 @@ def migrateconfig():
         ]
         for admin in admins:
             if admin != 0:
-                rldb.add_admin(admin)
+                database.add_admin(admin)
         print("\nAdmin migration completed.")
         config.remove_option("server_role", "admin_a")
         config.remove_option("server_role", "admin_b")
