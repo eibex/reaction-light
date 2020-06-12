@@ -32,6 +32,7 @@ from itertools import cycle
 class Activities:
     def __init__(self, file):
         self.file = file
+        self.load()
 
     def load(self):
         self.activity_list = []
@@ -46,10 +47,24 @@ class Activities:
             for row in reader:
                 activity = row[0]
                 self.activity_list.append(activity)
-        activities = cycle(self.activity_list)
-        return activities
+        self.loop = cycle(self.activity_list)
+
+    def get(self):
+        return next(self.loop)
 
     def add(self, activity):
         with open(self.file, "a", encoding="utf-8") as f:
             w = csv.writer(f, delimiter=",", lineterminator="\n")
             w.writerow([activity])
+        self.load()
+
+    def remove(self, activity):
+        if activity not in self.activity_list:
+            return False
+        self.activity_list.remove(activity)
+        with open(self.file, "w", encoding="utf-8") as f:
+            w = csv.writer(f, delimiter=",", lineterminator="\n")
+            for row in self.activity_list:
+                w.writerow([row])
+        self.load()
+        return True
