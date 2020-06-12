@@ -1,5 +1,12 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.4.0
+- Add `rl!activity` command to add activities to show as bot status from within Discord.
+- Add `rl!rm-activity` command to remove a given activity.
+- Add `rl!activitylist` command to show all activities.
+- Fix a crash (sorry!) ([#35](https://github.com/eibex/reaction-light/pull/35) by [eibex](https://github.com/eibex))
+- Fix a wrong error description when failing to fetch admins
+
 ### 1.3.0
 - Add `rl!adminlist` command to show the current bot admins registered in the database
 

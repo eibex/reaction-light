@@ -27,7 +27,6 @@ import os
 import csv
 import configparser
 from shutil import copy
-from itertools import cycle
 from urllib.request import urlopen
 from sys import platform, exit as shutdown
 
@@ -60,7 +59,6 @@ bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
 activities = activity.Activities(f"{directory}/files/activities.csv")
-activity_list = activities.load()
 
 
 def isadmin(user):
@@ -120,8 +118,8 @@ async def system_notification(text):
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
-    current_activity = next(activity_list)
-    await bot.change_presence(activity=discord.Game(name=current_activity))
+    activity = activities.get()
+    await bot.change_presence(activity=discord.Game(name=activity))
 
 
 @tasks.loop(hours=24)
@@ -806,7 +804,7 @@ async def set_colour(ctx):
 async def hlp(ctx):
     if isadmin(ctx.message.author):
         await ctx.send(
-            "Commands are:\n"
+            "**Reaction Role Messages**\n"
             f"- `{prefix}new` starts the creation process for a new"
             " reaction role message.\n"
             f"- `{prefix}abort` aborts the creation process"
@@ -819,6 +817,15 @@ async def hlp(ctx):
             f"- `{prefix}rm-embed` suppresses the embed of an existing reaction-role"
             " message or provides instructions on how to do so if no arguments are"
             " passed.\n"
+            "**Activities**\n"
+            f"- `{prefix}activity` adds an activity for the bot to loop through and"
+            " show as status.\n"
+            f"- `{prefix}rm-activity` removes an activity from the bot's list.\n"
+            f"- `{prefix}activitylist` lists the current activities used by the"
+            " bot as statuses.\n"
+        )
+        await ctx.send(
+            "**Admins**\n"
             f"- `{prefix}admin` adds the mentioned role to the list of {botname}"
             " admins, allowing them to create and edit reaction-role messages."
             " You need to be a server administrator to use this command.\n"
@@ -830,8 +837,10 @@ async def hlp(ctx):
             " command was run in by mentioning them and the current admins from"
             " other servers by printing out the role IDs. You need to be a server"
             " administrator to use this command.\n"
+            "**System**\n"
             f"- `{prefix}systemchannel` updates the system channel where the bot"
             " sends errors and update notifications.\n"
+            "**Bot Control**\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations"
             " running on GNU/Linux.\n"
@@ -843,6 +852,59 @@ async def hlp(ctx):
             " find more resources, submit feedback, and report bugs at: "
             "<https://github.com/eibex/reaction-light>"
         )
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="activity")
+async def add_activity(ctx):
+    if isadmin(ctx.message.author):
+        activity = ctx.message.content[(len(prefix) + len("activity")) :].strip()
+        if not activity:
+            await ctx.send(
+                "Please provide the activity you would like to"
+                f" add.\n```\n{prefix}activity your activity text here\n```"
+            )
+        elif "," in activity:
+            await ctx.send("Please do not use commas `,` in your activity.")
+        else:
+            activities.add(activity)
+            await ctx.send(f"The activity `{activity}` was added succesfully.")
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="activitylist")
+async def list_activities(ctx):
+    if isadmin(ctx.message.author):
+        if activities.activity_list:
+            formatted_list = []
+            for activity in activities.activity_list:
+                formatted_list.append(f"`{activity}`")
+            await ctx.send(
+                "The current activities are:\n- " + "\n- ".join(formatted_list)
+            )
+        else:
+            await ctx.send("There are no activities to show.")
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="rm-activity")
+async def remove_activity(ctx):
+    if isadmin(ctx.message.author):
+        activity = ctx.message.content[(len(prefix) + len("rm-activity")) :].strip()
+        if not activity:
+            await ctx.send(
+                "Please paste the activity you would like to"
+                f" remove.\n```\n{prefix}rm-activity your activity text here\n```"
+            )
+            return
+        removed = activities.remove(activity)
+        if removed:
+            await ctx.send(f"The activity `{activity}` was removed.")
+        else:
+            await ctx.send("The activity you mentioned does not exist.")
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -936,35 +998,6 @@ async def list_admin(ctx):
         )
     else:
         await ctx.send("There are no bot admins registered.")
-
-
-@bot.command(name="activity")
-async def add_activity(ctx):
-    if isadmin(ctx.message.author):
-        activity = ctx.message.content[len(prefix)].strip()
-        if not activity:
-            await ctx.send(
-                "Please provide the activity you would like to"
-                f" add.\n```\n{prefix}activity your activity text here\n```"
-            )
-        activities.add(activity)
-        await ctx.send(f"The activity `{activity}` was added succesfully.")
-    else:
-        await ctx.send("You do not have an admin role.")
-
-
-@bot.command(name="activitylist")
-async def list_activities(ctx):
-    if isadmin(ctx.message.author):
-        if activities.activity_list:
-            await ctx.send(
-                "The current activities are:\n- "
-                + "\n- ".join(activities.activity_list)
-            )
-        else:
-            await ctx.send("There are no activities to show.")
-    else:
-        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="version")
