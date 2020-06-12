@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+
 import os
 import csv
 import configparser
@@ -33,8 +34,7 @@ from sys import platform, exit as shutdown
 import discord
 from discord.ext import commands, tasks
 
-import rldb
-import migration
+from core import rldb, migration, activity
 
 
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -59,22 +59,8 @@ Client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
-activities = []
-
-if not os.path.isfile(f"{folder}/activities.csv"):
-    # Create activities.csv from the sample if it does not already exist
-    copy(
-        f"{folder}/activities.csv.sample", f"{folder}/activities.csv",
-    )
-
-activities_file = f"{folder}/activities.csv"
-with open(activities_file, "r") as f:
-    # Get activities.csv contents
-    reader = csv.reader(f, delimiter=",")
-    for row in reader:
-        activity = row[0]
-        activities.append(activity)
-activities = cycle(activities)
+activities = activity.Activities(f"{directory}/files/activities.csv")
+activity_list = activities.load()
 
 
 def isadmin(user):
@@ -134,7 +120,7 @@ async def system_notification(text):
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
-    current_activity = next(activities)
+    current_activity = next(activity_list)
     await bot.change_presence(activity=discord.Game(name=current_activity))
 
 
@@ -961,9 +947,7 @@ async def add_activity(ctx):
                 "Please provide the activity you would like to"
                 f" add.\n```\n{prefix}activity your activity text here\n```"
             )
-        with open(activities_file, "a", encoding="utf-8") as f:
-            w = csv.writer(f, delimiter=",", lineterminator="\n")
-            w.writerow([activity])
+        activities.add(activity)
         await ctx.send(f"The activity `{activity}` was added succesfully.")
     else:
         await ctx.send("You do not have an admin role.")
@@ -972,7 +956,10 @@ async def add_activity(ctx):
 @bot.command(name="activitylist")
 async def list_activities(ctx):
     if isadmin(ctx.message.author):
-        await ctx.send("The current activities are:\n- " + "\n- ".join(activities))
+        if activities.activity_list:
+            await ctx.send("The current activities are:\n- " + "\n- ".join(activities.activity_list))
+        else:
+            await ctx.send("There are no activities to show.")
     else:
         await ctx.send("You do not have an admin role.")
 
