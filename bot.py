@@ -24,7 +24,6 @@ SOFTWARE.
 
 
 import os
-import csv
 import configparser
 from sys import platform, exit as shutdown
 
