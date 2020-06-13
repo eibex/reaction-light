@@ -26,14 +26,12 @@ SOFTWARE.
 import os
 import csv
 import configparser
-from shutil import copy
-from urllib.request import urlopen
 from sys import platform, exit as shutdown
 
 import discord
 from discord.ext import commands, tasks
 
-from core import database, migration, activity
+from core import database, migration, activity, github
 
 
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -74,25 +72,6 @@ def isadmin(user):
         return False
 
 
-def get_latest():
-    # Get latest version string from GitHub
-    data = urlopen(
-        "https://raw.githubusercontent.com/eibex/reaction-light/master/.version"
-    )
-    for line in data:
-        latest = line.decode()
-        break
-    return latest.rstrip("\n").rstrip("\r")
-
-
-def check_for_updates():
-    # Get latest version from GitHub repo and checks it against the current one
-    latest = get_latest()
-    if latest > __version__:
-        return latest
-    return False
-
-
 def restart():
     # Create a new python process of bot.py and stops the current one
     os.chdir(directory)
@@ -125,7 +104,7 @@ async def maintain_presence():
 @tasks.loop(hours=24)
 async def updates():
     # Sends a reminder once a day if there are updates available
-    new_version = check_for_updates()
+    new_version = github.check_for_updates(__version__)
     if new_version:
         await system_notification(
             f"An update is available. Download Reaction Light v{new_version} at"
@@ -1003,7 +982,7 @@ async def list_admin(ctx):
 @bot.command(name="version")
 async def print_version(ctx):
     if isadmin(ctx.message.author):
-        latest = get_latest()
+        latest = github.get_latest()
         await ctx.send(
             f"I am currently running v{__version__}. The latest available version is"
             f" v{latest}."
