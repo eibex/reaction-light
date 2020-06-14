@@ -55,6 +55,7 @@ class ReactionRoleCreationTracker:
     def _generate_reactionrole_id(self):
         while True:
             self.reactionrole_id = randint(0, 100000)
+            self.cursor = self.conn.cursor()
             self.cursor.execute(
                 "SELECT * FROM messages WHERE reactionrole_id = ?",
                 (self.reactionrole_id,),
@@ -66,6 +67,7 @@ class ReactionRoleCreationTracker:
             break
 
     def commit(self):
+        self.cursor = self.conn.cursor()
         self.cursor.execute(
             "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id')"
             " values(?, ?, ?);",
@@ -166,6 +168,7 @@ class Database:
 
     def exists(self, message_id):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute("SELECT * FROM messages WHERE message_id = ?;", (message_id,))
             result = self.cursor.fetchall()
             self.cursor.close()
@@ -176,6 +179,7 @@ class Database:
 
     def get_reactions(self, message_id):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute(
                 "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
             )
@@ -197,6 +201,7 @@ class Database:
 
     def fetch_messages(self, channel):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute("SELECT message_id FROM messages WHERE channel = ?;", (channel,))
             all_messages_in_channel = []
             for row in self.cursor:
@@ -210,6 +215,7 @@ class Database:
 
     def fetch_all_messages(self):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute(f"SELECT message_id, channel FROM messages;")
             all_messages = {}
             for row in self.cursor:
@@ -224,6 +230,7 @@ class Database:
 
     def delete(self, message_id):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute(
                 "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
             )
@@ -240,6 +247,7 @@ class Database:
 
     def add_admin(self, role):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute("INSERT INTO 'admins' ('role_id') values(?);", (role,))
             self.conn.commit()
             self.cursor.close()
@@ -249,6 +257,7 @@ class Database:
 
     def remove_admin(self, role):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute("DELETE FROM admins WHERE role_id = ?;", (role,))
             self.conn.commit()
             self.cursor.close()
@@ -258,6 +267,7 @@ class Database:
 
     def get_admins(self):
         try:
+            self.cursor = self.conn.cursor()
             self.cursor.execute("SELECT * FROM admins;")
             admins = []
             for row in self.cursor:
