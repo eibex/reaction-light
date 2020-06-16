@@ -69,7 +69,7 @@ def migrate():
                             # reverse lookup of message_id via CSV embed_id
                             message_id = int(row[0])
                             break
-                tracker = database.ReactionRoleCreationTracker(user=None, channel=None)
+                tracker = database.ReactionRoleCreationTracker(user=None, channel=None, database=f"{folder}/reactionlight.db")
                 print(f"Getting target channel: {channel_id}")
                 tracker.target_channel = channel_id
                 print(f"Getting reaction-roles:\n{reaction_role}")
