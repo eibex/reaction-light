@@ -69,3 +69,4 @@ class SchemaHandler:
         conn.commit()
         cursor.close()
         conn.close()
+        self.version = 1

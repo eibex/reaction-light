@@ -49,9 +49,6 @@ def initialize(database):
     cursor.close()
     conn.close()
 
-    updater = schema.SchemaHandler(database)
-    updater.update()
-
 
 class ReactionRoleCreationTracker:
     def __init__(self, user, channel, database):
@@ -230,6 +227,17 @@ class Database:
             cursor.close()
             conn.close()
             return all_messages
+        except sqlite3.Error as e:
+            return e
+
+    def add_guild(self, channel_id, guild_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("UPDATE messages SET guild_id = ? WHERE channel = ?;", (guild_id, channel_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
         except sqlite3.Error as e:
             return e
 
