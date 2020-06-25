@@ -30,7 +30,7 @@ from sys import platform, exit as shutdown
 import discord
 from discord.ext import commands, tasks
 
-from core import database, migration, activity, github
+from core import database, migration, activity, github, schema
 
 
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -56,6 +56,7 @@ bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
 activities = activity.Activities(f"{directory}/files/activities.csv")
+db_location = f"{directory}/files/reactionlight.db"
 db = database.Database(f"{directory}/files/reactionlight.db")
 
 
@@ -78,6 +79,17 @@ def restart():
     python = "python" if platform == "win32" else "python3"
     cmd = os.popen(f"nohup {python} bot.py &")
     cmd.close()
+
+
+def database_updates():
+    handler = schema.SchemaHandler(db_location)
+    if handler.version == 0:
+        handler.update()
+        messages = db.fetch_all_messages()
+        for message in messages:
+            channel_id = messages[message]
+            channel = bot.get_channel(channel_id)
+            db.add_guild(channel.id, channel.guild.id)
 
 
 async def system_notification(text):
@@ -164,6 +176,7 @@ async def on_ready():
             f" the database.\nYou can add or remove them with `{prefix}admin` and"
             f" `{prefix}rm-admin`."
         )
+    database_updates()
     maintain_presence.start()
     cleandb.start()
     updates.start()
