@@ -36,12 +36,12 @@ class SchemaHandler:
         cursor = conn.cursor()
         cursor.execute("SELECT version FROM dbinfo;")
         version = cursor.fetchall()
+        cursor.close()
+        conn.close()
         if not version:
             self.set_version(0)
             self.version_check()
             return
-        cursor.close()
-        conn.close()
         version = version[0][0]
         return version
 
