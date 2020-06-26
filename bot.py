@@ -55,9 +55,10 @@ Client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 bot.remove_command("help")
 
-activities = activity.Activities(f"{directory}/files/activities.csv")
-db_location = f"{directory}/files/reactionlight.db"
-db = database.Database(f"{directory}/files/reactionlight.db")
+activities_file = f"{directory}/files/activities.csv"
+activities = activity.Activities(activities_file)
+db_file = f"{directory}/files/reactionlight.db"
+db = database.Database(db_file)
 
 
 def isadmin(user):
@@ -82,7 +83,7 @@ def restart():
 
 
 def database_updates():
-    handler = schema.SchemaHandler(db_location)
+    handler = schema.SchemaHandler(db_file)
     if handler.version == 0:
         handler.update()
         messages = db.fetch_all_messages()
@@ -142,7 +143,8 @@ async def cleandb():
             channel = bot.get_channel(channel_id)
             await channel.fetch_message(message)
         except discord.NotFound as e:
-            if e.code == 10008 or e.code == 10003:
+            # If unknown channel or unknown guild or unknown message
+            if e.code == 10003 or e.code == 10004 or e.code == 10008:
                 delete = db.delete(message)
                 if isinstance(delete, Exception):
                     await system_notification(
@@ -150,6 +152,15 @@ async def cleandb():
                         f" cleaning:\n```\n{delete}\n```"
                     )
                     return
+                # If unknown guild
+                if e.code == 10004:
+                    delete = db.remove_systemchannel(channel_id)
+                    if isinstance(delete, Exception):
+                        await system_notification(
+                            "Database error when deleting system channels during"
+                            f" database cleaning:\n```\n{delete}\n```"
+                        )
+                        return
                 await system_notification(
                     "I deleted the database entries of a message that was removed."
                     f"\n\nID: {message} in {channel.mention}"
@@ -731,30 +742,46 @@ async def remove_selector_embed(ctx):
 async def set_systemchannel(ctx):
     if isadmin(ctx.message.author):
         global system_channel
-        try:
-            system_channel = ctx.message.channel_mentions[0].id
-
-            server = bot.get_guild(ctx.message.guild.id)
+        msg = ctx.message.content.split()
+        mentioned_channels = ctx.message.channel_mentions
+        if len(msg) < 3 or not mentioned_channels:
+            await ctx.send(
+                "Define if you are setting up a server or main system channel and"
+                f" mention the target channel.\n```\n{prefix}systemchannel"
+                " <main/server> #channelname\n```"
+            )
+        else:
+            system_channel = mentioned_channels[0].id
+            guild_id = ctx.message.guild.id
+            server = bot.get_guild(guild_id)
             bot_user = server.get_member(bot.user.id)
             bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
             writable = bot_permissions.read_messages
             readable = bot_permissions.view_channel
+
             if not writable or not readable:
                 await ctx.send("I cannot read or send messages in that channel.")
                 return
 
-            config["server"]["system_channel"] = str(system_channel)
-
-            with open(f"{directory}/config.ini", "w") as configfile:
-                config.write(configfile)
-
+            if msg[1].lower() == "main":
+                config["server"]["system_channel"] = str(system_channel)
+                with open(f"{directory}/config.ini", "w") as configfile:
+                    config.write(configfile)
+            elif msg[1].lower() == "server":
+                add_channel = db.add_systemchannel(guild_id, system_channel)
+                if isinstance(add_channel, Exception):
+                    system_notification(
+                        "Database error when adding a new system"
+                        f" channel:\n```\n{add_channel}\n```"
+                    )
+                    return
+            else:
+                await ctx.send(
+                    "Define if you are setting up a server or main system channel and"
+                    f" mention the target channel.\n```\n{prefix}systemchannel"
+                    " <main/server> #channelname\n```"
+                )
             await ctx.send("System channel updated.")
-
-        except IndexError:
-            await ctx.send(
-                "Mention the channel you would like to receive notifications in.\n"
-                f"`{prefix}systemchannel #channelname`"
-            )
     else:
         await ctx.send("You do not have an admin role.")
 
