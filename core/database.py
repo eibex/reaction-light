@@ -332,3 +332,17 @@ class Database:
             conn.close()
         except sqlite3.Error as e:
             return e
+
+    def fetch_systemchannel(self, guild_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT channel_id FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+            )
+            result = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return result
+        except sqlite3.Error as e:
+            return e
