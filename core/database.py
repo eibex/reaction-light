@@ -25,7 +25,6 @@ SOFTWARE.
 
 import sqlite3
 from random import randint
-from . import schema
 
 
 def initialize(database):
