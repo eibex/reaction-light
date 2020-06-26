@@ -25,6 +25,7 @@ SOFTWARE.
 
 import os
 import configparser
+from shutil import copy
 from sys import platform, exit as shutdown
 
 import discord
@@ -1088,6 +1089,7 @@ async def update(ctx):
             cmd.close()
             cmd = os.popen("git pull")
             cmd.close()
+            copy(db_file, f"{db_file}.bak")
             restart()
             await ctx.send("Restarting...")
             shutdown()  # sys.exit()
