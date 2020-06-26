@@ -1,5 +1,12 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.5.2
+- Fix migration for users directly migrating from 0.3.2 to 1.5.0+
+- Fix database cleaning 
+- Fix open database cursor and connection on schema updates
+
+Sorry for pushing out two patches to the 1.5.0 update in a single day. I noticed some old and new quirks that ought to be fixed and updated.
+
 ### 1.5.1
 - Fix system channel fall back
 
