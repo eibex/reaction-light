@@ -54,12 +54,11 @@ def initialize(database):
 
 
 class ReactionRoleCreationTracker:
-    def __init__(self, user, channel, database):
+    def __init__(self, guild, database):
         self.database = database
         initialize(self.database)
 
-        self.user = user
-        self.channel = channel
+        self.guild = guild
         self.step = 0
         self.target_channel = None
         self.combos = {}
@@ -93,9 +92,9 @@ class ReactionRoleCreationTracker:
         for reaction in self.combos:
             role_id = self.combos[reaction]
             cursor.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id')"
-                " values(?, ?, ?);",
-                (self.reactionrole_id, reaction, role_id),
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id',"
+                " 'guild_id') values(?, ?, ?, ?);",
+                (self.reactionrole_id, reaction, role_id, self.guild),
             )
         conn.commit()
         cursor.close()
@@ -109,8 +108,8 @@ class Database:
 
         self.reactionrole_creation = {}
 
-    def start_creation(self, user, channel):
-        tracker = ReactionRoleCreationTracker(user, channel, self.database)
+    def start_creation(self, user, channel, guild):
+        tracker = ReactionRoleCreationTracker(guild, self.database)
         if not f"{user}_{channel}" in self.reactionrole_creation:
             self.reactionrole_creation[f"{user}_{channel}"] = tracker
             return True
