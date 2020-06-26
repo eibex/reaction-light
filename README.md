@@ -89,7 +89,7 @@ All commands require an admin role which you can set by using `rl!admin` (requir
 - `rl!rm-admin` removes the mentioned role or role id from the admin list, preventing members with a certain role from using the bot commands. Requires administrator permissions on the server.
 - `rl!adminlist` lists the current admins on the server the command was run in by mentioning them and the current admins from other servers by printing out the role IDs. Requires administrator permissions on the server.
 - `rl!kill` shuts down the bot.
-- `rl!systemchannel` updates the system channel where the bot sends errors and update notifications.
+- `rl!systemchannel` updates the main or server system channel where the bot sends errors and update notifications.
 - `rl!restart` restarts the bot.
 - `rl!update` updates the bot and restarts it. Only works on `git clone` installations. Check the [setup](#setup) section to learn how to install with git.
 - `rl!version` reports the bot's current version and the latest available one from GitHub.

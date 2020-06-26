@@ -3,3 +3,4 @@ from .activity import *
 from .migration import *
 from .database import *
 from .github import *
+from .schema import *
