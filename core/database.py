@@ -25,6 +25,7 @@ SOFTWARE.
 
 import sqlite3
 from random import randint
+from . import schema
 
 
 def initialize(database):
@@ -32,25 +33,32 @@ def initialize(database):
     cursor = conn.cursor()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
-        " 'reactionrole_id' INT);"
+        " 'reactionrole_id' INT, 'guild_id' INT);"
     )
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction'"
         " NVCARCHAR, 'role_id' INT);"
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
+        " INT);"
+    )
+    cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
+    )
     conn.commit()
     cursor.close()
     conn.close()
 
 
 class ReactionRoleCreationTracker:
-    def __init__(self, user, channel, database):
+    def __init__(self, guild, database):
         self.database = database
         initialize(self.database)
 
-        self.user = user
-        self.channel = channel
+        self.guild = guild
         self.step = 0
         self.target_channel = None
         self.combos = {}
@@ -63,7 +71,7 @@ class ReactionRoleCreationTracker:
             self.reactionrole_id = randint(0, 100000)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT * FROM messages WHERE reactionrole_id = ?",
+                "SELECT * FROM messages WHERE reactionrole_id = ?;",
                 (self.reactionrole_id,),
             )
             already_exists = cursor.fetchall()
@@ -84,9 +92,9 @@ class ReactionRoleCreationTracker:
         for reaction in self.combos:
             role_id = self.combos[reaction]
             cursor.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id')"
-                " values(?, ?, ?);",
-                (self.reactionrole_id, reaction, role_id),
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id',"
+                " 'guild_id') values(?, ?, ?, ?);",
+                (self.reactionrole_id, reaction, role_id, self.guild),
             )
         conn.commit()
         cursor.close()
@@ -100,13 +108,12 @@ class Database:
 
         self.reactionrole_creation = {}
 
-    def start_creation(self, user, channel):
-        tracker = ReactionRoleCreationTracker(user, channel, self.database)
+    def start_creation(self, user, channel, guild):
+        tracker = ReactionRoleCreationTracker(guild, self.database)
         if not f"{user}_{channel}" in self.reactionrole_creation:
             self.reactionrole_creation[f"{user}_{channel}"] = tracker
             return True
         return False
-
 
     def abort(self, user, channel):
         if f"{user}_{channel}" in self.reactionrole_creation:
@@ -114,34 +121,28 @@ class Database:
             return True
         return False
 
-
     def step(self, user, channel):
         if f"{user}_{channel}" in self.reactionrole_creation:
             tracker = self.reactionrole_creation[f"{user}_{channel}"]
             return tracker.step
         return None
 
-
     def get_targetchannel(self, user, channel):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         return tracker.target_channel
-
 
     def get_combos(self, user, channel):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         return tracker.combos
 
-
     def step0(self, user, channel):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         tracker.step += 1
-
 
     def step1(self, user, channel, target_channel):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         tracker.target_channel = target_channel
         tracker.step += 1
-
 
     def step2(self, user, channel, role=None, reaction=None, done=False):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
@@ -149,7 +150,6 @@ class Database:
             tracker.combos[reaction] = role
         else:
             tracker.step += 1
-
 
     def end_creation(self, user, channel, message_id):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
@@ -160,12 +160,13 @@ class Database:
             return e
         del self.reactionrole_creation[f"{user}_{channel}"]
 
-
     def exists(self, message_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM messages WHERE message_id = ?;", (message_id,))
+            cursor.execute(
+                "SELECT * FROM messages WHERE message_id = ?;", (message_id,)
+            )
             result = cursor.fetchall()
             cursor.close()
             conn.close()
@@ -173,17 +174,18 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-
     def get_reactions(self, message_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
+                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                (message_id,),
             )
             reactionrole_id = cursor.fetchall()[0][0]
             cursor.execute(
-                "SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;",
+                "SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id"
+                " = ?;",
                 (reactionrole_id,),
             )
             combos = {}
@@ -197,12 +199,13 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-
     def fetch_messages(self, channel):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT message_id FROM messages WHERE channel = ?;", (channel,))
+            cursor.execute(
+                "SELECT message_id FROM messages WHERE channel = ?;", (channel,)
+            )
             all_messages_in_channel = []
             for row in cursor:
                 message_id = int(row[0])
@@ -213,12 +216,11 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-
     def fetch_all_messages(self):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute(f"SELECT message_id, channel FROM messages;")
+            cursor.execute("SELECT message_id, channel FROM messages;")
             all_messages = {}
             for row in cursor:
                 message_id = int(row[0])
@@ -230,18 +232,13 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-
-    def delete(self, message_id):
+    def add_guild(self, channel_id, guild_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,)
-            )
-            reactionrole_id = cursor.fetchall()[0][0]
-            cursor.execute("DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,))
-            cursor.execute(
-                "DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,)
+                "UPDATE messages SET guild_id = ? WHERE channel = ?;",
+                (guild_id, channel_id),
             )
             conn.commit()
             cursor.close()
@@ -249,6 +246,27 @@ class Database:
         except sqlite3.Error as e:
             return e
 
+    def delete(self, message_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                (message_id,),
+            )
+            reactionrole_id = cursor.fetchall()[0][0]
+            cursor.execute(
+                "DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,)
+            )
+            cursor.execute(
+                "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
+                (reactionrole_id,),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except sqlite3.Error as e:
+            return e
 
     def add_admin(self, role):
         try:
@@ -261,7 +279,6 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-
     def remove_admin(self, role):
         try:
             conn = sqlite3.connect(self.database)
@@ -272,7 +289,6 @@ class Database:
             conn.close()
         except sqlite3.Error as e:
             return e
-
 
     def get_admins(self):
         try:
@@ -286,5 +302,47 @@ class Database:
             cursor.close()
             conn.close()
             return admins
+        except sqlite3.Error as e:
+            return e
+
+    def add_systemchannel(self, guild_id, channel_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "REPLACE INTO 'systemchannels' ('guild_id', 'channel_id')"
+                " values(?, ?);",
+                (guild_id, channel_id),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except sqlite3.Error as e:
+            return e
+
+    def remove_systemchannel(self, channel_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM systemchannels WHERE channel_id = ?;", (channel_id,)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except sqlite3.Error as e:
+            return e
+
+    def fetch_systemchannel(self, guild_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT channel_id FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+            )
+            result = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return result
         except sqlite3.Error as e:
             return e

@@ -1,5 +1,13 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.5.0
+- Add guild-only system channels to send error reports generated from messages of a certain guild in their own system channel
+- Add fallback to the `config.ini` (aka main) system channel if a guild system channel was not set
+- Modify `rl!systemchannel` to accept a new argument to define if the system channel being set is for a `server` or is the `main` one: `rl!systemchannel <main/server> #channelname`
+- Modify database cleaning to include system channel entries of deleted guilds
+- Add creation of database backups when `rl!update` is used
+- Add automated database schema updates
+
 ### 1.4.0
 - Add `rl!activity` command to add activities to show as bot status from within Discord.
 - Add `rl!rm-activity` command to remove a given activity.
