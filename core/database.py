@@ -45,6 +45,9 @@ def initialize(database):
         "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
         " INT);"
     )
+    cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
+    )
     conn.commit()
     cursor.close()
     conn.close()
@@ -234,7 +237,10 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("UPDATE messages SET guild_id = ? WHERE channel = ?;", (guild_id, channel_id))
+            cursor.execute(
+                "UPDATE messages SET guild_id = ? WHERE channel = ?;",
+                (guild_id, channel_id),
+            )
             conn.commit()
             cursor.close()
             conn.close()
@@ -297,5 +303,33 @@ class Database:
             cursor.close()
             conn.close()
             return admins
+        except sqlite3.Error as e:
+            return e
+
+    def add_systemchannel(self, guild_id, channel_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "REPLACE INTO 'systemchannels' ('guild_id', 'channel_id')"
+                " values(?, ?);",
+                (guild_id, channel_id),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except sqlite3.Error as e:
+            return e
+
+    def remove_systemchannel(self, channel_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM systemchannels WHERE channel_id = ?;", (channel_id,)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
         except sqlite3.Error as e:
             return e
