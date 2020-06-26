@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.5.1
+- Fix system channel fall back
+
 ### 1.5.0
 - Add guild-only system channels to send error reports generated from messages of a certain guild in their own system channel
 - Add fallback to the `config.ini` (aka main) system channel if a guild system channel was not set

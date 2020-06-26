@@ -111,6 +111,8 @@ async def system_notification(guild_id, text):
                 await target_channel.send(text)
             except discord.Forbidden:
                 await system_notification(None, text)
+        else:
+            await system_notification(None, text)
     elif system_channel:
         try:
             target_channel = bot.get_channel(system_channel)
