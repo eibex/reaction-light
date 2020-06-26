@@ -39,6 +39,7 @@ class SchemaHandler:
         if not version:
             self.set_version(0)
             self.version_check()
+            return
         cursor.close()
         conn.close()
         version = version[0][0]
@@ -61,6 +62,7 @@ class SchemaHandler:
         conn.commit()
         cursor.close()
         conn.close()
+        self.version = version
 
     def zero_to_one(self):
         conn = sqlite3.connect(self.database)
@@ -69,4 +71,4 @@ class SchemaHandler:
         conn.commit()
         cursor.close()
         conn.close()
-        self.version = 1
+        self.set_version(1)
