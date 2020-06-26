@@ -101,7 +101,7 @@ async def system_notification(guild_id, text):
             await system_notification(
                 None,
                 "Database error when fetching guild system"
-                f" channels:\n```\n{server_channel}\n```",
+                f" channels:\n```\n{server_channel}\n```\n\n{text}",
             )
             return
         if server_channel:
@@ -774,7 +774,7 @@ async def set_systemchannel(ctx):
                 " <main/server> #channelname\n```"
             )
         else:
-            system_channel = mentioned_channels[0].id
+            target_channel = mentioned_channels[0].id
             guild_id = ctx.message.guild.id
             server = bot.get_guild(guild_id)
             bot_user = server.get_member(bot.user.id)
@@ -787,11 +787,12 @@ async def set_systemchannel(ctx):
                 return
 
             if msg[1].lower() == "main":
+                system_channel = target_channel
                 config["server"]["system_channel"] = str(system_channel)
                 with open(f"{directory}/config.ini", "w") as configfile:
                     config.write(configfile)
             elif msg[1].lower() == "server":
-                add_channel = db.add_systemchannel(guild_id, system_channel)
+                add_channel = db.add_systemchannel(guild_id, target_channel)
                 if isinstance(add_channel, Exception):
                     await system_notification(guild_id,
                         "Database error when adding a new system"
@@ -804,6 +805,7 @@ async def set_systemchannel(ctx):
                     f" mention the target channel.\n```\n{prefix}systemchannel"
                     " <main/server> #channelname\n```"
                 )
+                return
             await ctx.send("System channel updated.")
     else:
         await ctx.send("You do not have an admin role.")
