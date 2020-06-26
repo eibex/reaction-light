@@ -245,14 +245,20 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def delete(self, message_id):
+    def delete(self, message_id, guild_id=None):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute(
-                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
-                (message_id,),
-            )
+            if guild_id:
+                cursor.execute(
+                    "SELECT reactionrole_id FROM messages WHERE guild_id = ?;",
+                    (guild_id,),
+                )
+            else:
+                cursor.execute(
+                    "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                    (message_id,),
+                )
             reactionrole_id = cursor.fetchall()[0][0]
             cursor.execute(
                 "DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,)
@@ -319,12 +325,12 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def remove_systemchannel(self, channel_id):
+    def remove_systemchannel(self, guild_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM systemchannels WHERE channel_id = ?;", (channel_id,)
+                "DELETE FROM systemchannels WHERE guild_id = ?;", (guild_id,)
             )
             conn.commit()
             cursor.close()
@@ -343,5 +349,20 @@ class Database:
             cursor.close()
             conn.close()
             return result
+        except sqlite3.Error as e:
+            return e
+
+    def fetch_all_guilds(self):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("SELECT guild_id FROM systemchannels;")
+            all_guilds = []
+            for row in cursor:
+                guild_id = int(row[0])
+                all_guilds.append(guild_id)
+            cursor.close()
+            conn.close()
+            return all_guilds
         except sqlite3.Error as e:
             return e

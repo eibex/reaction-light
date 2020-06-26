@@ -150,6 +150,7 @@ async def updates():
 async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = db.fetch_all_messages()
+    guilds = db.fetch_all_guilds()
     if isinstance(messages, Exception):
         await system_notification(
             None,
@@ -161,6 +162,8 @@ async def cleandb():
         try:
             channel_id = messages[message]
             channel = bot.get_channel(channel_id)
+            if channel is None:
+                channel = await bot.fetch_channel(channel_id)
             await channel.fetch_message(message)
         except discord.NotFound as e:
             # If unknown channel or unknown message
@@ -168,29 +171,13 @@ async def cleandb():
                 delete = db.delete(message)
                 if isinstance(delete, Exception):
                     await system_notification(
-                        None,
+                        channel.guild.id,
                         "Database error when deleting messages during database"
                         f" cleaning:\n```\n{delete}\n```",
                     )
                     return
                 await system_notification(
                     channel.guild.id,
-                    "I deleted the database entries of a message that was removed."
-                    f"\n\nID: {message} in {channel.mention}",
-                )
-            # If unknown guild
-            if e.code == 10004:
-                delete = db.delete(message)
-                delete = db.remove_systemchannel(channel_id)
-                if isinstance(delete, Exception):
-                    await system_notification(
-                        None,
-                        "Database error when deleting system channels during"
-                        f" database cleaning:\n```\n{delete}\n```",
-                    )
-                    return
-                await system_notification(
-                    None,
                     "I deleted the database entries of a message that was removed."
                     f"\n\nID: {message} in {channel.mention}",
                 )
@@ -201,6 +188,34 @@ async def cleandb():
                 "I cannot manage the roles of users reacting to it."
                 f"\n\nID: {message} in {channel.mention}",
             )
+    for guild_id in guilds:
+        try:
+            await bot.fetch_guild(guild_id)
+        except discord.NotFound as e:
+            # If unknown guild
+            if e.code == 10004:
+                delete = db.remove_systemchannel(guild_id)
+                if isinstance(delete, Exception):
+                    await system_notification(
+                        None,
+                        "Database error when deleting system channels during"
+                        f" database cleaning:\n```\n{delete}\n```",
+                    )
+                    return
+                delete = db.delete(message_id=None, guild_id=guild_id)
+                if isinstance(delete, Exception):
+                    await system_notification(
+                        None,
+                        "Database error when deleting messages during"
+                        f" database cleaning:\n```\n{delete}\n```",
+                    )
+                    return
+                await system_notification(
+                    None,
+                    "I deleted the database entries of a guild that was removed."
+                    f"\n\nID: {guild_id}",
+                )
+
 
 
 @bot.event
