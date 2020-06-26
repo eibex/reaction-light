@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 1.4.0](https://img.shields.io/badge/Reaction%20Light-1.4.0-yellow.svg)
+![Reaction Light 1.5.0](https://img.shields.io/badge/Reaction%20Light-1.5.0-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -58,7 +58,7 @@ pip install -U discord.py
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
   - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
-  - `https://discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=268445776`
+  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=8`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
