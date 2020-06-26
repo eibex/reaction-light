@@ -149,9 +149,10 @@ async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = db.fetch_all_messages()
     if isinstance(messages, Exception):
-        await system_notification(None,
+        await system_notification(
+            None,
             "Database error when fetching messages during database"
-            f" cleaning:\n```\n{messages}\n```"
+            f" cleaning:\n```\n{messages}\n```",
         )
         return
     for message in messages:
@@ -164,34 +165,39 @@ async def cleandb():
             if e.code == 10003 or e.code == 10008:
                 delete = db.delete(message)
                 if isinstance(delete, Exception):
-                    await system_notification(None,
+                    await system_notification(
+                        None,
                         "Database error when deleting messages during database"
-                        f" cleaning:\n```\n{delete}\n```"
+                        f" cleaning:\n```\n{delete}\n```",
                     )
                     return
-                await system_notification(channel.guild.id,
+                await system_notification(
+                    channel.guild.id,
                     "I deleted the database entries of a message that was removed."
-                    f"\n\nID: {message} in {channel.mention}"
+                    f"\n\nID: {message} in {channel.mention}",
                 )
             # If unknown guild
             if e.code == 10004:
                 delete = db.delete(message)
                 delete = db.remove_systemchannel(channel_id)
                 if isinstance(delete, Exception):
-                    await system_notification(None,
+                    await system_notification(
+                        None,
                         "Database error when deleting system channels during"
-                        f" database cleaning:\n```\n{delete}\n```"
+                        f" database cleaning:\n```\n{delete}\n```",
                     )
                     return
-                await system_notification(None,
+                await system_notification(
+                    None,
                     "I deleted the database entries of a message that was removed."
-                    f"\n\nID: {message} in {channel.mention}"
+                    f"\n\nID: {message} in {channel.mention}",
                 )
         except discord.Forbidden:
-            await system_notification(channel.guild.id,
+            await system_notification(
+                channel.guild.id,
                 "I do not have access to a message I have created anymore. "
                 "I cannot manage the roles of users reacting to it."
-                f"\n\nID: {message} in {channel.mention}"
+                f"\n\nID: {message} in {channel.mention}",
             )
 
 
@@ -199,15 +205,17 @@ async def cleandb():
 async def on_ready():
     print("Reaction Light ready!")
     if migrated:
-        await system_notification(None,
+        await system_notification(
+            None,
             "Your CSV files have been deleted and migrated to an SQLite"
-            " `reactionlight.db` file."
+            " `reactionlight.db` file.",
         )
     if config_migrated:
-        await system_notification(None,
+        await system_notification(
+            None,
             "Your `config.ini` has been edited and your admin IDs are now stored in"
             f" the database.\nYou can add or remove them with `{prefix}admin` and"
-            f" `{prefix}rm-admin`."
+            f" `{prefix}rm-admin`.",
         )
     database_updates()
     maintain_presence.start()
@@ -338,8 +346,9 @@ async def on_message(message):
                                 "I could not commit the changes to the database. Check"
                                 f" {system_channel.mention} for more information."
                             )
-                            await system_notification(message.channel.id,
-                                f"Database error:\n```\n{error}\n```"
+                            await system_notification(
+                                message.channel.id,
+                                f"Database error:\n```\n{error}\n```",
                             )
                         elif error:
                             await message.channel.send(
@@ -368,16 +377,18 @@ async def on_raw_reaction_add(payload):
     guild_id = payload.guild_id
     exists = db.exists(msg_id)
     if isinstance(exists, Exception):
-        await system_notification(guild_id,
-            f"Database error after a user added a reaction:\n```\n{exists}\n```"
+        await system_notification(
+            guild_id,
+            f"Database error after a user added a reaction:\n```\n{exists}\n```",
         )
         return
     elif exists:
         # Checks that the message that was reacted to is a reaction-role message managed by the bot
         reactions = db.get_reactions(msg_id)
         if isinstance(reactions, Exception):
-            await system_notification(guild_id,
-                f"Database error when getting reactions:\n```\n{reactions}\n```"
+            await system_notification(
+                guild_id,
+                f"Database error when getting reactions:\n```\n{reactions}\n```",
             )
             return
         ch = bot.get_channel(ch_id)
@@ -396,11 +407,12 @@ async def on_raw_reaction_add(payload):
                 try:
                     await member.add_roles(role)
                 except discord.Forbidden:
-                    await system_notification(guild_id,
+                    await system_notification(
+                        guild_id,
                         "Someone tried to add a role to themselves but I do not have"
                         " permissions to add it. Ensure that I have a role that is"
                         " hierarchically higher than the role I have to assign, and"
-                        " that I have the `Manage Roles` permission."
+                        " that I have the `Manage Roles` permission.",
                     )
 
 
@@ -412,16 +424,18 @@ async def on_raw_reaction_remove(payload):
     guild_id = payload.guild_id
     exists = db.exists(msg_id)
     if isinstance(exists, Exception):
-        await system_notification(guild_id,
-            f"Database error after a user removed a reaction:\n```\n{exists}\n```"
+        await system_notification(
+            guild_id,
+            f"Database error after a user removed a reaction:\n```\n{exists}\n```",
         )
         return
     elif exists:
         # Checks that the message that was unreacted to is a reaction-role message managed by the bot
         reactions = db.get_reactions(msg_id)
         if isinstance(reactions, Exception):
-            await system_notification(guild_id,
-                f"Database error when getting reactions:\n```\n{reactions}\n```"
+            await system_notification(
+                guild_id,
+                f"Database error when getting reactions:\n```\n{reactions}\n```",
             )
             return
         if reaction in reactions:
@@ -433,11 +447,12 @@ async def on_raw_reaction_remove(payload):
             try:
                 await member.remove_roles(role)
             except discord.Forbidden:
-                await system_notification(guild_id,
+                await system_notification(
+                    guild_id,
                     "Someone tried to remove a role from themselves but I do not have"
                     " permissions to remove it. Ensure that I have a role that is"
                     " hierarchically higher than the role I have to remove, and that I"
-                    " have the `Manage Roles` permission."
+                    " have the `Manage Roles` permission.",
                 )
 
 
@@ -500,8 +515,9 @@ async def edit_selector(ctx):
 
             all_messages = db.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
-                await system_notification(ctx.message.guild.id,
-                    f"Database error when fetching messages:\n```\n{all_messages}\n```"
+                await system_notification(
+                    ctx.message.guild.id,
+                    f"Database error when fetching messages:\n```\n{all_messages}\n```",
                 )
                 return
             channel = bot.get_channel(channel_id)
@@ -559,9 +575,10 @@ async def edit_selector(ctx):
                 selector_msg_number = msg_values[1]
                 all_messages = db.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
-                    await system_notification(ctx.message.guild.id,
+                    await system_notification(
+                        ctx.message.guild.id,
                         "Database error when fetching"
-                        f" messages:\n```\n{all_messages}\n```"
+                        f" messages:\n```\n{all_messages}\n```",
                     )
                     return
                 counter = 1
@@ -655,8 +672,9 @@ async def remove_selector_embed(ctx):
             channel = bot.get_channel(channel_id)
             all_messages = db.fetch_messages(channel_id)
             if isinstance(all_messages, Exception):
-                await system_notification(ctx.message.guild.id,
-                    f"Database error when fetching messages:\n```\n{all_messages}\n```"
+                await system_notification(
+                    ctx.message.guild.id,
+                    f"Database error when fetching messages:\n```\n{all_messages}\n```",
                 )
                 return
             if len(all_messages) == 1:
@@ -707,9 +725,10 @@ async def remove_selector_embed(ctx):
                 selector_msg_number = msg_values[1]
                 all_messages = db.fetch_messages(channel_id)
                 if isinstance(all_messages, Exception):
-                    await system_notification(ctx.message.guild.id,
+                    await system_notification(
+                        ctx.message.guild.id,
                         "Database error when fetching"
-                        f" messages:\n```\n{all_messages}\n```"
+                        f" messages:\n```\n{all_messages}\n```",
                     )
                     return
                 counter = 1
@@ -795,9 +814,10 @@ async def set_systemchannel(ctx):
             elif msg[1].lower() == "server":
                 add_channel = db.add_systemchannel(guild_id, target_channel)
                 if isinstance(add_channel, Exception):
-                    await system_notification(guild_id,
+                    await system_notification(
+                        guild_id,
                         "Database error when adding a new system"
-                        f" channel:\n```\n{add_channel}\n```"
+                        f" channel:\n```\n{add_channel}\n```",
                     )
                     return
             else:
@@ -883,8 +903,8 @@ async def hlp(ctx):
             " other servers by printing out the role IDs. You need to be a server"
             " administrator to use this command.\n"
             "**System**\n"
-            f"- `{prefix}systemchannel` updates the system channel where the bot"
-            " sends errors and update notifications.\n"
+            f"- `{prefix}systemchannel` updates the main or server system channel"
+            " where the bot sends errors and update notifications.\n"
             "**Bot Control**\n"
             f"- `{prefix}kill` shuts down the bot.\n"
             f"- `{prefix}restart` restarts the bot. Only works on installations"
@@ -971,8 +991,9 @@ async def add_admin(ctx):
             return
     add = db.add_admin(role)
     if isinstance(add, Exception):
-        await system_notification(ctx.message.guild.id,
-            f"Database error when adding a new admin:\n```\n{add}\n```"
+        await system_notification(
+            ctx.message.guild.id,
+            f"Database error when adding a new admin:\n```\n{add}\n```",
         )
         return
     await ctx.send("Added the role to my admin list.")
@@ -995,8 +1016,9 @@ async def remove_admin(ctx):
             return
     remove = db.remove_admin(role)
     if isinstance(remove, Exception):
-        await system_notification(ctx.message.guild.id,
-            f"Database error when removing an admin:\n```\n{remove}\n```"
+        await system_notification(
+            ctx.message.guild.id,
+            f"Database error when removing an admin:\n```\n{remove}\n```",
         )
         return
     await ctx.send("Removed the role from my admin list.")
@@ -1008,8 +1030,9 @@ async def list_admin(ctx):
     # Lists all admin IDs in the database, mentioning them if possible
     admin_ids = db.get_admins()
     if isinstance(admin_ids, Exception):
-        await system_notification(ctx.message.guild.id,
-            f"Database error when fetching admins:\n```\n{admin_ids}\n```"
+        await system_notification(
+            ctx.message.guild.id,
+            f"Database error when fetching admins:\n```\n{admin_ids}\n```",
         )
         return
     server = bot.get_guild(ctx.message.guild.id)
@@ -1089,6 +1112,7 @@ async def update(ctx):
             cmd.close()
             cmd = os.popen("git pull")
             cmd.close()
+            await ctx.send("Creating database backup...")
             copy(db_file, f"{db_file}.bak")
             restart()
             await ctx.send("Restarting...")
