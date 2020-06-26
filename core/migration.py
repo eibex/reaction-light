@@ -70,7 +70,7 @@ def migrate():
                             message_id = int(row[0])
                             break
                 tracker = database.ReactionRoleCreationTracker(
-                    user=None, channel=None, database=f"{folder}/reactionlight.db"
+                    guild=None, database=f"{folder}/reactionlight.db"
                 )
                 print(f"Getting target channel: {channel_id}")
                 tracker.target_channel = channel_id
