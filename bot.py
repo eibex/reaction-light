@@ -424,7 +424,9 @@ async def new(ctx):
     if isadmin(ctx.message.author):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
-        started = db.start_creation(ctx.message.author.id, ctx.message.channel.id)
+        started = db.start_creation(
+            ctx.message.author.id, ctx.message.channel.id, ctx.message.guild.id
+        )
         if started:
             await ctx.send("Mention the #channel where to send the auto-role message.")
         else:
