@@ -259,15 +259,17 @@ class Database:
                     "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
                     (message_id,),
                 )
-            reactionrole_id = cursor.fetchall()[0][0]
-            cursor.execute(
-                "DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,)
-            )
-            cursor.execute(
-                "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
-                (reactionrole_id,),
-            )
-            conn.commit()
+            result = cursor.fetchall()
+            if result:
+                reactionrole_id = result[0][0]
+                cursor.execute(
+                    "DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,)
+                )
+                cursor.execute(
+                    "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
+                    (reactionrole_id,),
+                )
+                conn.commit()
             cursor.close()
             conn.close()
         except sqlite3.Error as e:
