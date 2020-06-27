@@ -66,8 +66,12 @@ class SchemaHandler:
     def zero_to_one(self):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
-        cursor.execute("ALTER TABLE messages ADD COLUMN 'guild_id' INT;")
-        conn.commit()
+        cursor.execute("PRAGMA table_info(messages);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "guild_id" not in columns:
+            cursor.execute("ALTER TABLE messages ADD COLUMN 'guild_id' INT;")
+            conn.commit()
         cursor.close()
         conn.close()
         self.set_version(1)
