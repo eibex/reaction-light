@@ -40,8 +40,7 @@ class SchemaHandler:
         conn.close()
         if not version:
             self.set_version(0)
-            self.version_check()
-            return
+            return 0
         version = version[0][0]
         return version
 
