@@ -361,7 +361,7 @@ async def on_message(message):
                         if error and system_channel:
                             await message.channel.send(
                                 "I could not commit the changes to the database. Check"
-                                f" {system_channel.mention} for more information."
+                                f" the system channel for more information."
                             )
                             await system_notification(
                                 message.channel.id,
