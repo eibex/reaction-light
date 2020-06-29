@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.5.3
+- Fix database errors when creating new reaction-role messages
+
 ### 1.5.2
 - Fix migration for users directly migrating from 0.3.2 to 1.5.0+
 - Fix database cleaning 
