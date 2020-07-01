@@ -65,8 +65,10 @@ db = database.Database(db_file)
 def isadmin(user):
     # Checks if command author has an admin role that was added with rl!admin
     admins = db.get_admins()
+
     if isinstance(admins, Exception):
         return False
+
     try:
         user_roles = [role.id for role in user.roles]
         return [admin_role for admin_role in admins if admin_role in user_roles]
@@ -98,6 +100,7 @@ async def system_notification(guild_id, text):
     # Send a message to the system channel (if set)
     if guild_id:
         server_channel = db.fetch_systemchannel(guild_id)
+
         if isinstance(server_channel, Exception):
             await system_notification(
                 None,
@@ -105,6 +108,7 @@ async def system_notification(guild_id, text):
                 f" channels:\n```\n{server_channel}\n```\n\n{text}",
             )
             return
+
         if server_channel:
             try:
                 target_channel = bot.get_channel(server_channel[0][0])
@@ -113,6 +117,7 @@ async def system_notification(guild_id, text):
                 await system_notification(None, text)
         else:
             await system_notification(None, text)
+
     elif system_channel:
         try:
             target_channel = bot.get_channel(system_channel)
@@ -151,6 +156,7 @@ async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = db.fetch_all_messages()
     guilds = db.fetch_all_guilds()
+
     if isinstance(messages, Exception):
         await system_notification(
             None,
@@ -158,6 +164,7 @@ async def cleandb():
             f" cleaning:\n```\n{messages}\n```",
         )
         return
+
     for message in messages:
         try:
             channel_id = messages[message]
@@ -165,10 +172,12 @@ async def cleandb():
             if channel is None:
                 channel = await bot.fetch_channel(channel_id)
             await channel.fetch_message(message)
+
         except discord.NotFound as e:
             # If unknown channel or unknown message
             if e.code == 10003 or e.code == 10008:
                 delete = db.delete(message)
+
                 if isinstance(delete, Exception):
                     await system_notification(
                         channel.guild.id,
@@ -176,11 +185,13 @@ async def cleandb():
                         f" cleaning:\n```\n{delete}\n```",
                     )
                     return
+
                 await system_notification(
                     channel.guild.id,
                     "I deleted the database entries of a message that was removed."
                     f"\n\nID: {message} in {channel.mention}",
                 )
+
         except discord.Forbidden:
             await system_notification(
                 channel.guild.id,
@@ -188,6 +199,15 @@ async def cleandb():
                 "I cannot manage the roles of users reacting to it."
                 f"\n\nID: {message} in {channel.mention}",
             )
+
+    if isinstance(guilds, Exception):
+        await system_notification(
+            None,
+            "Database error when fetching messages during database"
+            f" cleaning:\n```\n{guilds}\n```",
+        )
+        return
+
     for guild_id in guilds:
         try:
             await bot.fetch_guild(guild_id)
@@ -195,6 +215,7 @@ async def cleandb():
             # If unknown guild
             if e.code == 10004:
                 delete = db.remove_systemchannel(guild_id)
+
                 if isinstance(delete, Exception):
                     await system_notification(
                         None,
@@ -202,7 +223,9 @@ async def cleandb():
                         f" database cleaning:\n```\n{delete}\n```",
                     )
                     return
+
                 delete = db.delete(message_id=None, guild_id=guild_id)
+
                 if isinstance(delete, Exception):
                     await system_notification(
                         None,
@@ -210,12 +233,12 @@ async def cleandb():
                         f" database cleaning:\n```\n{delete}\n```",
                     )
                     return
+
                 await system_notification(
                     None,
                     "I deleted the database entries of a guild that was removed."
                     f"\n\nID: {guild_id}",
                 )
-
 
 
 @bot.event
@@ -227,6 +250,7 @@ async def on_ready():
             "Your CSV files have been deleted and migrated to an SQLite"
             " `reactionlight.db` file.",
         )
+
     if config_migrated:
         await system_notification(
             None,
@@ -234,7 +258,9 @@ async def on_ready():
             f" the database.\nYou can add or remove them with `{prefix}admin` and"
             f" `{prefix}rm-admin`.",
         )
+
     database_updates()
+
     maintain_presence.start()
     cleandb.start()
     updates.start()
@@ -250,33 +276,35 @@ async def on_message(message):
         step = db.step(user, channel)
         msg = message.content.split()
 
+        # Checks if the setup process was started before.
+        # If it was not, it ignores the message.
         if step is not None:
-            # Checks if the setup process was started before.
-            # If it was not, it ignores the message.
             if step == 0:
                 db.step0(user, channel)
             elif step == 1:
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
-                try:
-                    server = bot.get_guild(message.guild.id)
-                    bot_user = server.get_member(bot.user.id)
+                if message.channel_mentions:
                     target_channel = message.channel_mentions[0].id
-                    bot_permissions = bot.get_channel(target_channel).permissions_for(
-                        bot_user
-                    )
-                    writable = bot_permissions.read_messages
-                    readable = bot_permissions.view_channel
-                    if not writable or not readable:
-                        await message.channel.send(
-                            "I cannot read or send messages in that channel."
-                        )
-                        return
-                except IndexError:
+                else:
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
 
+                server = bot.get_guild(message.guild.id)
+                bot_user = server.get_member(bot.user.id)
+                bot_permissions = bot.get_channel(target_channel).permissions_for(
+                    bot_user
+                )
+                writable = bot_permissions.read_messages
+                readable = bot_permissions.view_channel
+                if not writable or not readable:
+                    await message.channel.send(
+                        "I cannot read or send messages in that channel."
+                    )
+                    return
+
                 db.step1(user, channel, target_channel)
+
                 await message.channel.send(
                     "Attach roles and emojis separated by one space (one combination"
                     " per message). When you are done type `done`. Example:\n:smile:"
@@ -289,6 +317,7 @@ async def on_message(message):
                         reaction = msg[0]
                         role = message.role_mentions[0].id
                         await message.add_reaction(reaction)
+
                         db.step2(user, channel, role, reaction)
                     except IndexError:
                         await message.channel.send(
@@ -310,6 +339,7 @@ async def on_message(message):
                         colour=botcolour,
                     )
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
                     await message.channel.send(
                         "What would you like the message to say?\nFormatting is:"
                         " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
@@ -327,8 +357,8 @@ async def on_message(message):
                 )
                 selector_embed = discord.Embed(colour=botcolour)
                 selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-                if len(msg_values) > 1:
 
+                if len(msg_values) > 1:
                     if msg_values[1].lower() != "none":
                         selector_embed.title = msg_values[1]
                     if len(msg_values) > 2 and msg_values[2].lower() != "none":
@@ -355,22 +385,20 @@ async def on_message(message):
                             "I don't have permission to send selector_msg messages to"
                             f" the channel {target_channel.mention}."
                         )
+
                     if isinstance(selector_msg, discord.Message):
                         combos = db.get_combos(user, channel)
-                        error = db.end_creation(user, channel, selector_msg.id)
-                        if error and system_channel:
-                            await message.channel.send(
-                                "I could not commit the changes to the database. Check"
-                                f" the system channel for more information."
-                            )
-                            await system_notification(
-                                message.channel.id,
-                                f"Database error:\n```\n{error}\n```",
-                            )
-                        elif error:
+
+                        end = db.end_creation(user, channel, selector_msg.id)
+                        if isinstance(end, Exception):
                             await message.channel.send(
                                 "I could not commit the changes to the database."
                             )
+                            await system_notification(
+                                message.channel.id,
+                                f"Database error:\n```\n{end}\n```",
+                            )
+
                         for reaction in combos:
                             try:
                                 await selector_msg.add_reaction(reaction)
@@ -379,6 +407,7 @@ async def on_message(message):
                                     "I don't have permission to react to messages from"
                                     f" the channel {target_channel.mention}."
                                 )
+
                 else:
                     await message.channel.send(
                         "You can't use an empty message as a role-reaction message."
@@ -393,21 +422,24 @@ async def on_raw_reaction_add(payload):
     user_id = payload.user_id
     guild_id = payload.guild_id
     exists = db.exists(msg_id)
+
     if isinstance(exists, Exception):
         await system_notification(
             guild_id,
             f"Database error after a user added a reaction:\n```\n{exists}\n```",
         )
-        return
+
     elif exists:
         # Checks that the message that was reacted to is a reaction-role message managed by the bot
         reactions = db.get_reactions(msg_id)
+
         if isinstance(reactions, Exception):
             await system_notification(
                 guild_id,
                 f"Database error when getting reactions:\n```\n{reactions}\n```",
             )
             return
+
         ch = bot.get_channel(ch_id)
         msg = await ch.fetch_message(msg_id)
         user = bot.get_user(user_id)
@@ -440,22 +472,24 @@ async def on_raw_reaction_remove(payload):
     user_id = payload.user_id
     guild_id = payload.guild_id
     exists = db.exists(msg_id)
+
     if isinstance(exists, Exception):
         await system_notification(
             guild_id,
             f"Database error after a user removed a reaction:\n```\n{exists}\n```",
         )
-        return
+
     elif exists:
         # Checks that the message that was unreacted to is a reaction-role message managed by the bot
         reactions = db.get_reactions(msg_id)
+
         if isinstance(reactions, Exception):
             await system_notification(
                 guild_id,
                 f"Database error when getting reactions:\n```\n{reactions}\n```",
             )
-            return
-        if reaction in reactions:
+
+        elif reaction in reactions:
             role_id = reactions[reaction]
             # Removes role if it has permissions, else 403 error is raised
             server = bot.get_guild(guild_id)
@@ -531,12 +565,14 @@ async def edit_selector(ctx):
                 return
 
             all_messages = db.fetch_messages(channel_id)
+
             if isinstance(all_messages, Exception):
                 await system_notification(
                     ctx.message.guild.id,
                     f"Database error when fetching messages:\n```\n{all_messages}\n```",
                 )
                 return
+
             channel = bot.get_channel(channel_id)
             if len(all_messages) == 1:
                 await ctx.send(
@@ -591,6 +627,7 @@ async def edit_selector(ctx):
                 msg_values = ctx.message.content.split(" // ")
                 selector_msg_number = msg_values[1]
                 all_messages = db.fetch_messages(channel_id)
+
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         ctx.message.guild.id,
@@ -598,12 +635,12 @@ async def edit_selector(ctx):
                         f" messages:\n```\n{all_messages}\n```",
                     )
                     return
-                counter = 1
 
-                # Loop through all msg_ids and stops when the counter matches the user input
+                counter = 1
                 if all_messages:
                     message_to_edit_id = None
                     for msg_id in all_messages:
+                        # Loop through all msg_ids and stops when the counter matches the user input
                         if str(counter) == selector_msg_number:
                             message_to_edit_id = msg_id
                             break
@@ -688,12 +725,14 @@ async def remove_selector_embed(ctx):
 
             channel = bot.get_channel(channel_id)
             all_messages = db.fetch_messages(channel_id)
+
             if isinstance(all_messages, Exception):
                 await system_notification(
                     ctx.message.guild.id,
                     f"Database error when fetching messages:\n```\n{all_messages}\n```",
                 )
                 return
+
             if len(all_messages) == 1:
                 await ctx.send(
                     "There is only one reaction-role message in this channel. **Type**:"
@@ -741,6 +780,7 @@ async def remove_selector_embed(ctx):
                 msg_values = ctx.message.content.split(" // ")
                 selector_msg_number = msg_values[1]
                 all_messages = db.fetch_messages(channel_id)
+
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         ctx.message.guild.id,
@@ -748,12 +788,12 @@ async def remove_selector_embed(ctx):
                         f" messages:\n```\n{all_messages}\n```",
                     )
                     return
-                counter = 1
 
-                # Loop through all msg_ids and stops when the counter matches the user input
+                counter = 1
                 if all_messages:
                     message_to_edit_id = None
                     for msg_id in all_messages:
+                        # Loop through all msg_ids and stops when the counter matches the user input
                         if str(counter) == selector_msg_number:
                             message_to_edit_id = msg_id
                             break
@@ -813,12 +853,12 @@ async def set_systemchannel(ctx):
         else:
             target_channel = mentioned_channels[0].id
             guild_id = ctx.message.guild.id
+
             server = bot.get_guild(guild_id)
             bot_user = server.get_member(bot.user.id)
             bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
             writable = bot_permissions.read_messages
             readable = bot_permissions.view_channel
-
             if not writable or not readable:
                 await ctx.send("I cannot read or send messages in that channel.")
                 return
@@ -830,20 +870,21 @@ async def set_systemchannel(ctx):
                     config.write(configfile)
             elif msg[1].lower() == "server":
                 add_channel = db.add_systemchannel(guild_id, target_channel)
+
                 if isinstance(add_channel, Exception):
                     await system_notification(
                         guild_id,
                         "Database error when adding a new system"
                         f" channel:\n```\n{add_channel}\n```",
                     )
-                    return
+
             else:
                 await ctx.send(
                     "Define if you are setting up a server or main system channel and"
                     f" mention the target channel.\n```\n{prefix}systemchannel"
                     " <main/server> #channelname\n```"
                 )
-                return
+
             await ctx.send("System channel updated.")
     else:
         await ctx.send("You do not have an admin role.")
@@ -870,11 +911,13 @@ async def set_colour(ctx):
                     colour=botcolour,
                 )
                 await ctx.send("Colour changed.", embed=example)
+
             except ValueError:
                 await ctx.send(
                     "Please provide a valid hexadecimal value. Example:"
                     f" `{prefix}colour 0xffff00`"
                 )
+
         else:
             await ctx.send(
                 f"Please provide a hexadecimal value. Example: `{prefix}colour"
@@ -1006,13 +1049,16 @@ async def add_admin(ctx):
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
+
     add = db.add_admin(role)
+
     if isinstance(add, Exception):
         await system_notification(
             ctx.message.guild.id,
             f"Database error when adding a new admin:\n```\n{add}\n```",
         )
         return
+
     await ctx.send("Added the role to my admin list.")
 
 
@@ -1031,13 +1077,16 @@ async def remove_admin(ctx):
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
+
     remove = db.remove_admin(role)
+
     if isinstance(remove, Exception):
         await system_notification(
             ctx.message.guild.id,
             f"Database error when removing an admin:\n```\n{remove}\n```",
         )
         return
+
     await ctx.send("Removed the role from my admin list.")
 
 
@@ -1046,12 +1095,14 @@ async def remove_admin(ctx):
 async def list_admin(ctx):
     # Lists all admin IDs in the database, mentioning them if possible
     admin_ids = db.get_admins()
+
     if isinstance(admin_ids, Exception):
         await system_notification(
             ctx.message.guild.id,
             f"Database error when fetching admins:\n```\n{admin_ids}\n```",
         )
         return
+
     server = bot.get_guild(ctx.message.guild.id)
     local_admins = []
     foreign_admins = []

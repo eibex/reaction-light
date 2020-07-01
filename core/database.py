@@ -84,14 +84,15 @@ class ReactionRoleCreationTracker:
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id', 'guild_id')"
-            " values(?, ?, ?, ?);",
+            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id',"
+            " 'guild_id') values(?, ?, ?, ?);",
             (self.message_id, self.target_channel, self.reactionrole_id, self.guild),
         )
         for reaction in self.combos:
             role_id = self.combos[reaction]
             cursor.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);",
+                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id')"
+                " values(?, ?, ?);",
                 (self.reactionrole_id, reaction, role_id),
             )
         conn.commit()
@@ -262,7 +263,8 @@ class Database:
             if result:
                 reactionrole_id = result[0][0]
                 cursor.execute(
-                    "DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,)
+                    "DELETE FROM messages WHERE reactionrole_id = ?;",
+                    (reactionrole_id,),
                 )
                 cursor.execute(
                     "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
