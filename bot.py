@@ -203,7 +203,7 @@ async def cleandb():
     if isinstance(guilds, Exception):
         await system_notification(
             None,
-            "Database error when fetching messages during database"
+            "Database error when fetching guilds during database"
             f" cleaning:\n```\n{guilds}\n```",
         )
         return
