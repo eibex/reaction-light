@@ -8,8 +8,6 @@ Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org
 - Fix database cleaning 
 - Fix open database cursor and connection on schema updates
 
-Sorry for pushing out two patches to the 1.5.0 update in a single day. I noticed some old and new quirks that ought to be fixed and updated.
-
 ### 1.5.1
 - Fix system channel fall back
 
