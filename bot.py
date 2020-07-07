@@ -72,6 +72,7 @@ def isadmin(user):
     try:
         user_roles = [role.id for role in user.roles]
         return [admin_role for admin_role in admins if admin_role in user_roles]
+
     except AttributeError:
         # Error raised from 'fake' users, such as webhooks
         return False
@@ -113,8 +114,10 @@ async def system_notification(guild_id, text):
             try:
                 target_channel = bot.get_channel(server_channel[0][0])
                 await target_channel.send(text)
+
             except discord.Forbidden:
                 await system_notification(None, text)
+
         else:
             await system_notification(None, text)
 
@@ -122,10 +125,13 @@ async def system_notification(guild_id, text):
         try:
             target_channel = bot.get_channel(system_channel)
             await target_channel.send(text)
+
         except discord.NotFound:
             print("I cannot find the system channel.")
+
         except discord.Forbidden:
             print("I cannot send messages to the system channel.")
+
     else:
         print(text)
 
@@ -171,6 +177,7 @@ async def cleandb():
             channel = bot.get_channel(channel_id)
             if channel is None:
                 channel = await bot.fetch_channel(channel_id)
+
             await channel.fetch_message(message)
 
         except discord.NotFound as e:
@@ -211,6 +218,7 @@ async def cleandb():
     for guild_id in guilds:
         try:
             await bot.fetch_guild(guild_id)
+
         except discord.NotFound as e:
             # If unknown guild
             if e.code == 10004:
@@ -281,11 +289,13 @@ async def on_message(message):
         if step is not None:
             if step == 0:
                 db.step0(user, channel)
+
             elif step == 1:
                 # The channel the message needs to be sent to is stored
                 # Advances to step two
                 if message.channel_mentions:
                     target_channel = message.channel_mentions[0].id
+
                 else:
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
@@ -319,11 +329,13 @@ async def on_message(message):
                         await message.add_reaction(reaction)
 
                         db.step2(user, channel, role, reaction)
+
                     except IndexError:
                         await message.channel.send(
                             "Mention a role after the reaction. Example:\n:smile:"
                             " `@Role`"
                         )
+
                     except discord.HTTPException:
                         await message.channel.send(
                             "You can only use reactions uploaded to this server or"
@@ -348,6 +360,7 @@ async def on_message(message):
                         " bot ignore it.\n\n\nMessage",
                         embed=selector_embed,
                     )
+
             elif step == 3:
                 # Receives the title and description of the reaction-role message
                 # If the formatting is not correct it reminds the user of it
@@ -380,6 +393,7 @@ async def on_message(message):
                         selector_msg = await target_channel.send(
                             content=selector_msg_body, embed=selector_embed
                         )
+
                     except discord.Forbidden:
                         await message.channel.send(
                             "I don't have permission to send selector_msg messages to"
@@ -395,13 +409,13 @@ async def on_message(message):
                                 "I could not commit the changes to the database."
                             )
                             await system_notification(
-                                message.channel.id,
-                                f"Database error:\n```\n{end}\n```",
+                                message.channel.id, f"Database error:\n```\n{end}\n```",
                             )
 
                         for reaction in combos:
                             try:
                                 await selector_msg.add_reaction(reaction)
+
                             except discord.Forbidden:
                                 await message.channel.send(
                                     "I don't have permission to react to messages from"
@@ -446,6 +460,7 @@ async def on_raw_reaction_add(payload):
         if reaction not in reactions:
             # Removes reactions added to the reaction-role message that are not connected to any role
             await msg.remove_reaction(reaction, user)
+
         else:
             # Gives role if it has permissions, else 403 error is raised
             role_id = reactions[reaction]
@@ -455,6 +470,7 @@ async def on_raw_reaction_add(payload):
             if user_id != bot.user.id:
                 try:
                     await member.add_roles(role)
+
                 except discord.Forbidden:
                     await system_notification(
                         guild_id,
@@ -497,6 +513,7 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(server.roles, id=role_id)
             try:
                 await member.remove_roles(role)
+
             except discord.Forbidden:
                 await system_notification(
                     guild_id,
@@ -517,11 +534,13 @@ async def new(ctx):
         )
         if started:
             await ctx.send("Mention the #channel where to send the auto-role message.")
+
         else:
             await ctx.send(
                 "You are already creating a reaction-role message in this channel. "
                 f"Use another channel or run `{prefix}abort` first."
             )
+
     else:
         await ctx.send(
             f"You do not have an admin role. You might want to use `{prefix}admin`"
@@ -536,11 +555,13 @@ async def abort(ctx):
         aborted = db.abort(ctx.message.author.id, ctx.message.channel.id)
         if aborted:
             await ctx.send("Reaction-role message creation aborted.")
+
         else:
             await ctx.send(
                 "There are no reaction-role message creation processes started by you"
                 " in this channel."
             )
+
     else:
         await ctx.send(f"You do not have an admin role.")
 
@@ -557,9 +578,11 @@ async def edit_selector(ctx):
                 " wish to edit is located."
             )
             return
+
         elif len(msg_values) == 2:
             try:
                 channel_id = ctx.message.channel_mentions[0].id
+
             except IndexError:
                 await ctx.send("You need to mention a channel.")
                 return
@@ -583,6 +606,7 @@ async def edit_selector(ctx):
                     " `none` in any of the argument fields above (e.g. `New Message`)"
                     " to make the bot ignore it."
                 )
+
             elif len(all_messages) > 1:
                 selector_msgs = []
                 counter = 1
@@ -616,6 +640,7 @@ async def edit_selector(ctx):
                     " current reaction-role messages is:\n\n"
                     + "\n".join(selector_msgs)
                 )
+
             else:
                 await ctx.send("There are no reaction-role messages in that channel.")
         elif len(msg_values) > 2:
@@ -644,7 +669,9 @@ async def edit_selector(ctx):
                         if str(counter) == selector_msg_number:
                             message_to_edit_id = msg_id
                             break
+
                         counter += 1
+
                 else:
                     await ctx.send(
                         "You selected a reaction-role message that does not exist."
@@ -653,6 +680,7 @@ async def edit_selector(ctx):
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
+
                 else:
                     await ctx.send(
                         "Select a valid reaction-role message number (i.e. the number"
@@ -677,7 +705,9 @@ async def edit_selector(ctx):
 
                 try:
                     if selector_embed.title or selector_embed.description:
-                        await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
+                        await old_msg.edit(
+                            content=selector_msg_new_body, embed=selector_embed
+                        )
 
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
@@ -685,13 +715,14 @@ async def edit_selector(ctx):
                     await ctx.send("Message edited.")
 
                 except discord.HTTPException as e:
-                        if e.code == 50006:
-                            await ctx.send("You can't use an empty message as role-reaction message.")
+                    if e.code == 50006:
+                        await ctx.send(
+                            "You can't use an empty message as role-reaction message."
+                        )
 
-                        else:
-                            guild_id = ctx.message.guild.id
-                            await system_notification(guild_id, str(e))
-                    
+                    else:
+                        guild_id = ctx.message.guild.id
+                        await system_notification(guild_id, str(e))
 
             except IndexError:
                 await ctx.send("The channel you mentioned is invalid.")
@@ -715,6 +746,7 @@ async def set_systemchannel(ctx):
                 f" mention the target channel.\n```\n{prefix}systemchannel"
                 " <main/server> #channelname\n```"
             )
+
         else:
             target_channel = mentioned_channels[0].id
             guild_id = ctx.message.guild.id
@@ -733,6 +765,7 @@ async def set_systemchannel(ctx):
                 config["server"]["system_channel"] = str(system_channel)
                 with open(f"{directory}/config.ini", "w") as configfile:
                     config.write(configfile)
+
             elif msg[1].lower() == "server":
                 add_channel = db.add_systemchannel(guild_id, target_channel)
 
@@ -751,6 +784,7 @@ async def set_systemchannel(ctx):
                 )
 
             await ctx.send("System channel updated.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -839,6 +873,7 @@ async def hlp(ctx):
             " find more resources, submit feedback, and report bugs at: "
             "<https://github.com/eibex/reaction-light>"
         )
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -852,11 +887,14 @@ async def add_activity(ctx):
                 "Please provide the activity you would like to"
                 f" add.\n```\n{prefix}activity your activity text here\n```"
             )
+
         elif "," in activity:
             await ctx.send("Please do not use commas `,` in your activity.")
+
         else:
             activities.add(activity)
             await ctx.send(f"The activity `{activity}` was added succesfully.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -868,11 +906,14 @@ async def list_activities(ctx):
             formatted_list = []
             for activity in activities.activity_list:
                 formatted_list.append(f"`{activity}`")
+
             await ctx.send(
                 "The current activities are:\n- " + "\n- ".join(formatted_list)
             )
+
         else:
             await ctx.send("There are no activities to show.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -887,11 +928,14 @@ async def remove_activity(ctx):
                 f" remove.\n```\n{prefix}rm-activity your activity text here\n```"
             )
             return
+
         removed = activities.remove(activity)
         if removed:
             await ctx.send(f"The activity `{activity}` was removed.")
+
         else:
             await ctx.send("The activity you mentioned does not exist.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -902,12 +946,15 @@ async def add_admin(ctx):
     # Adds an admin role ID to the database
     try:
         role = ctx.message.role_mentions[0].id
+
     except IndexError:
         try:
             role = int(ctx.message.content.split()[1])
+
         except ValueError:
             await ctx.send("Please mention a valid @Role or role ID.")
             return
+
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
@@ -930,12 +977,15 @@ async def remove_admin(ctx):
     # Removes an admin role ID from the database
     try:
         role = ctx.message.role_mentions[0].id
+
     except IndexError:
         try:
             role = int(ctx.message.content.split()[1])
+
         except ValueError:
             await ctx.send("Please mention a valid @Role or role ID.")
             return
+
         except IndexError:
             await ctx.send("Please mention a @Role or role ID.")
             return
@@ -972,6 +1022,7 @@ async def list_admin(ctx):
         role = discord.utils.get(server.roles, id=admin_id)
         if role is not None:
             local_admins.append(role.mention)
+
         else:
             foreign_admins.append(f"`{admin_id}`")
 
@@ -982,18 +1033,21 @@ async def list_admin(ctx):
             + "\n\nThe bot admins from other servers are:\n- "
             + "\n- ".join(foreign_admins)
         )
+
     elif local_admins and not foreign_admins:
         await ctx.send(
             "The bot admins on this server are:\n- "
             + "\n- ".join(local_admins)
             + "\n\nThere are no bot admins from other servers."
         )
+
     elif not local_admins and foreign_admins:
         await ctx.send(
             "There are no bot admins on this server.\n\nThe bot admins from other"
             " servers are:\n- "
             + "\n- ".join(foreign_admins)
         )
+
     else:
         await ctx.send("There are no bot admins registered.")
 
@@ -1015,6 +1069,7 @@ async def kill(ctx):
     if isadmin(ctx.message.author):
         await ctx.send("Shutting down...")
         shutdown()  # sys.exit()
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -1026,8 +1081,10 @@ async def restart_cmd(ctx):
             restart()
             await ctx.send("Restarting...")
             shutdown()  # sys.exit()
+
         else:
             await ctx.send("I cannot do this on Windows.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
@@ -1047,8 +1104,10 @@ async def update(ctx):
             restart()
             await ctx.send("Restarting...")
             shutdown()  # sys.exit()
+
         else:
             await ctx.send("I cannot do this on Windows.")
+
     else:
         await ctx.send("You do not have an admin role.")
 
