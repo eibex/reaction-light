@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.5.4
+- Merge `rl!rm-embed` into `rl!edit` (`rl!rm-embed` removed)
+
 ### 1.5.3
 - Fix database errors when creating new reaction-role messages
 
