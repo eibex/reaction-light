@@ -80,7 +80,6 @@ All commands require an admin role which you can set by using `rl!admin` (requir
 - `rl!activity` adds an activity for the bot to loop through and show as status.
 - `rl!rm-activity` removes an activity from the bot's list.
 - `rl!activitylist` lists the current activities used by the bot as statuses.
-- `rl!rm-embed` suppresses the embed of an existing reaction-role message or provides instructions on how to do so if no arguments are passed.
 - `rl!admin` adds the mentioned role or role id to the admin list, allowing members with a certain role to use the bot commands. Requires administrator permissions on the server.
 - `rl!rm-admin` removes the mentioned role or role id from the admin list, preventing members with a certain role from using the bot commands. Requires administrator permissions on the server.
 - `rl!adminlist` lists the current admins on the server the command was run in by mentioning them and the current admins from other servers by printing out the role IDs. Requires administrator permissions on the server.
