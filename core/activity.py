@@ -41,12 +41,14 @@ class Activities:
             copy(
                 f"{self.file}.sample", self.file,
             )
+
         with open(self.file, "r") as f:
             # Get activities.csv contents
             reader = csv.reader(f, delimiter=",")
             for row in reader:
                 activity = row[0]
                 self.activity_list.append(activity)
+
         self.loop = cycle(self.activity_list)
 
     def get(self):
@@ -56,15 +58,18 @@ class Activities:
         with open(self.file, "a", encoding="utf-8") as f:
             w = csv.writer(f, delimiter=",", lineterminator="\n")
             w.writerow([activity])
+
         self.load()
 
     def remove(self, activity):
         if activity not in self.activity_list:
             return False
+
         self.activity_list.remove(activity)
         with open(self.file, "w", encoding="utf-8") as f:
             w = csv.writer(f, delimiter=",", lineterminator="\n")
             for row in self.activity_list:
                 w.writerow([row])
+
         self.load()
         return True
