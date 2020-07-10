@@ -50,6 +50,7 @@ print(
     " enter and leaving the field empty will accept the default value."
 )
 
+
 while True:
     token = input(
         "\nPaste the token of your bot user (you can create one at:"
@@ -60,24 +61,31 @@ while True:
             "\nThe bot token looks like this:"
             " NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
         )
+
     elif token == "":
         continue
+
     else:
         break
+
 
 prefix = input("\nInsert the prefix of the bot (help not available for this) [rl!]  ")
 if prefix == "":
     prefix = "rl!"
 
+
 while True:
     name = input("\nInsert the name you wish to give the bot [Reaction Light]  ")
     if name.lower() == "help":
         print("\nThe name will be shown in the embed footers created by the bot.")
+
     elif name == "":
         name = "Reaction Light"
         break
+
     else:
         break
+
 
 while True:
     logo = input(
@@ -86,11 +94,14 @@ while True:
     )
     if logo.lower() == "help":
         print("\nThe logo is the picture shown in the footer of the embeds.\n")
+
     elif logo == "":
         logo = "https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg"
         break
+
     else:
         break
+
 
 while True:
     system_channel = input(
@@ -104,8 +115,10 @@ while True:
             " per week. Leave blank if no updates or error notifications want to be"
             " received."
         )
+
     else:
         break
+
 
 while True:
     colour = input(
@@ -116,9 +129,11 @@ while True:
             "\nThe default is yellow. You can use a colour hex picker. You can change"
             " the colour later with a command\n"
         )
+
     elif colour.lower() == "":
         colour = "0xffff00"
         break
+
     else:
         break
 

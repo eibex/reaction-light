@@ -5,7 +5,7 @@
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
-Light yet powerful reaction role bot coded in discord.py (rewrite branch).
+Light yet powerful reaction role bot coded in discord.py.
 
 ## Features
 - Create multiple custom embedded messages with custom reactions and roles

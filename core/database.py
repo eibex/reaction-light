@@ -112,18 +112,21 @@ class Database:
         if not f"{user}_{channel}" in self.reactionrole_creation:
             self.reactionrole_creation[f"{user}_{channel}"] = tracker
             return True
+
         return False
 
     def abort(self, user, channel):
         if f"{user}_{channel}" in self.reactionrole_creation:
             del self.reactionrole_creation[f"{user}_{channel}"]
             return True
+
         return False
 
     def step(self, user, channel):
         if f"{user}_{channel}" in self.reactionrole_creation:
             tracker = self.reactionrole_creation[f"{user}_{channel}"]
             return tracker.step
+
         return None
 
     def get_targetchannel(self, user, channel):
@@ -147,6 +150,7 @@ class Database:
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         if not done:
             tracker.combos[reaction] = role
+
         else:
             tracker.step += 1
 
@@ -155,8 +159,10 @@ class Database:
         tracker.message_id = message_id
         try:
             tracker.commit()
+
         except sqlite3.Error as e:
             return e
+
         del self.reactionrole_creation[f"{user}_{channel}"]
 
     def exists(self, message_id):
@@ -170,6 +176,7 @@ class Database:
             cursor.close()
             conn.close()
             return result
+
         except sqlite3.Error as e:
             return e
 
@@ -192,9 +199,11 @@ class Database:
                 reaction = row[0]
                 role_id = row[1]
                 combos[reaction] = role_id
+
             cursor.close()
             conn.close()
             return combos
+
         except sqlite3.Error as e:
             return e
 
@@ -209,9 +218,11 @@ class Database:
             for row in cursor:
                 message_id = int(row[0])
                 all_messages_in_channel.append(message_id)
+
             cursor.close()
             conn.close()
             return all_messages_in_channel
+
         except sqlite3.Error as e:
             return e
 
@@ -225,9 +236,11 @@ class Database:
                 message_id = int(row[0])
                 channel_id = int(row[1])
                 all_messages[message_id] = channel_id
+
             cursor.close()
             conn.close()
             return all_messages
+
         except sqlite3.Error as e:
             return e
 
@@ -242,6 +255,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -254,11 +268,13 @@ class Database:
                     "SELECT reactionrole_id FROM messages WHERE guild_id = ?;",
                     (guild_id,),
                 )
+
             else:
                 cursor.execute(
                     "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
                     (message_id,),
                 )
+
             result = cursor.fetchall()
             if result:
                 reactionrole_id = result[0][0]
@@ -271,8 +287,10 @@ class Database:
                     (reactionrole_id,),
                 )
                 conn.commit()
+
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -284,6 +302,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -295,6 +314,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -307,9 +327,11 @@ class Database:
             for row in cursor:
                 role_id = row[0]
                 admins.append(role_id)
+
             cursor.close()
             conn.close()
             return admins
+
         except sqlite3.Error as e:
             return e
 
@@ -325,6 +347,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -338,6 +361,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
         except sqlite3.Error as e:
             return e
 
@@ -352,6 +376,7 @@ class Database:
             cursor.close()
             conn.close()
             return result
+
         except sqlite3.Error as e:
             return e
 
@@ -364,8 +389,10 @@ class Database:
             for row in cursor:
                 guild_id = int(row[0])
                 all_guilds.append(guild_id)
+
             cursor.close()
             conn.close()
             return all_guilds
+
         except sqlite3.Error as e:
             return e

@@ -41,6 +41,7 @@ class SchemaHandler:
         if not version:
             self.set_version(0)
             return 0
+
         version = version[0][0]
         return version
 
@@ -56,8 +57,10 @@ class SchemaHandler:
             cursor.execute(
                 "UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous)
             )
+
         else:
             cursor.execute("INSERT INTO dbinfo(version) values(?);", (version,))
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -72,6 +75,7 @@ class SchemaHandler:
         if "guild_id" not in columns:
             cursor.execute("ALTER TABLE messages ADD COLUMN 'guild_id' INT;")
             conn.commit()
+
         cursor.close()
         conn.close()
         self.set_version(1)

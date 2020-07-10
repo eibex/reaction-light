@@ -69,17 +69,23 @@ def migrate():
                             # reverse lookup of message_id via CSV embed_id
                             message_id = int(row[0])
                             break
+
                 tracker = database.ReactionRoleCreationTracker(
                     guild=None, database=f"{folder}/reactionlight.db"
                 )
+
                 print(f"Getting target channel: {channel_id}")
                 tracker.target_channel = channel_id
+
                 print(f"Getting reaction-roles:\n{reaction_role}")
                 tracker.combos = reaction_role
+
                 print(f"Getting message: {message_id}")
                 tracker.message_id = message_id
+
                 print("Committing to database")
                 tracker.commit()
+
                 print(f"Removing: {file}")
                 os.remove(filepath)
                 print(f"Removed: {file}\n\n")
@@ -99,11 +105,14 @@ def migrateconfig():
     config.read(configfile)
     try:
         config.get("server", "colour")
+
     except configparser.NoOptionError:
         config["server"]["colour"] = "0xffff00"
         with open(configfile, "w") as f:
             config.write(f)
+
         print("Migrated bot colour to config.ini")
+
     try:
         admins = [
             int(config.get("server_role", "admin_a")),
@@ -113,6 +122,7 @@ def migrateconfig():
         for admin in admins:
             if admin != 0:
                 database.add_admin(admin)
+
         print("\nAdmin migration completed.")
         config.remove_option("server_role", "admin_a")
         config.remove_option("server_role", "admin_b")
@@ -120,7 +130,9 @@ def migrateconfig():
         config.remove_section("server_role")
         with open(configfile, "w") as f:
             config.write(f)
+
         return True
+
     except configparser.NoSectionError:
         print("No admins to migrate in config.ini.")
         return False
