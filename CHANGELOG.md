@@ -1,10 +1,13 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+### 1.6.0
+- Add `rl!reaction` to add or remove reactions from existing reaction role messages ([#1](https://github.com/eibex/reaction-light/issues/1) closed by [#43](https://github.com/eibex/reaction-light/pull/43) by [eibex](https://github.com/eibex))
+
 ### 1.5.4
 - Merge `rl!rm-embed` into `rl!edit` (`rl!rm-embed` removed)
 
 ### 1.5.3
-- Fix database errors when creating new reaction-role messages
+- Fix database errors when creating new reaction-role messages ([#41](https://github.com/eibex/reaction-light/issues/41) closed by [#42](https://github.com/eibex/reaction-light/pull/42) by [eibex](https://github.com/eibex))
 
 ### 1.5.2
 - Fix migration for users directly migrating from 0.3.2 to 1.5.0+
@@ -15,7 +18,7 @@ Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org
 - Fix system channel fall back
 
 ### 1.5.0
-- Add guild-only system channels to send error reports generated from messages of a certain guild in their own system channel
+- Add guild-only system channels to send error reports generated from messages of a certain guild in their own system channel ([#39](https://github.com/eibex/reaction-light/issues/39) closed by [#40](https://github.com/eibex/reaction-light/pull/40) by [eibex](https://github.com/eibex))
 - Add fallback to the `config.ini` (aka main) system channel if a guild system channel was not set
 - Modify `rl!systemchannel` to accept a new argument to define if the system channel being set is for a `server` or is the `main` one: `rl!systemchannel <main/server> #channelname`
 - Modify database cleaning to include system channel entries of deleted guilds
@@ -26,7 +29,7 @@ Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org
 - Add `rl!activity` command to add activities to show as bot status from within Discord.
 - Add `rl!rm-activity` command to remove a given activity.
 - Add `rl!activitylist` command to show all activities.
-- Fix a crash (sorry!) ([#35](https://github.com/eibex/reaction-light/pull/35) by [eibex](https://github.com/eibex))
+- Fix a crash (sorry!) ([#34](https://github.com/eibex/reaction-light/issues/34) closed by [#35](https://github.com/eibex/reaction-light/pull/35) by [eibex](https://github.com/eibex))
 - Fix a wrong error description when failing to fetch admins
 
 ### 1.3.0

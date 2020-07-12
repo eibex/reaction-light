@@ -136,6 +136,44 @@ async def system_notification(guild_id, text):
         print(text)
 
 
+async def formatted_channel_list(channel):
+    all_messages = db.fetch_messages(channel.id)
+    if isinstance(all_messages, Exception):
+        await system_notification(
+            channel.guild.id,
+            f"Database error when fetching messages:\n```\n{all_messages}\n```",
+        )
+        return
+
+    formatted_list = []
+    counter = 1
+    for msg_id in all_messages:
+        try:
+            old_msg = await channel.fetch_message(int(msg_id))
+
+        except discord.NotFound:
+            # Skipping reaction-role messages that might have been deleted without updating CSVs
+            continue
+
+        except discord.Forbidden:
+            await system_notification(
+                channel.guild.id,
+                "I do not have permissions to edit a reaction-role message"
+                f" that I previously created.\n\nID: {msg_id} in"
+                f" {channel.mention}",
+            )
+            continue
+
+        entry = (
+            f"`{counter}`"
+            f" {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+        )
+        formatted_list.append(entry)
+        counter += 1
+
+    return formatted_list
+
+
 @tasks.loop(seconds=30)
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
@@ -338,9 +376,10 @@ async def on_message(message):
 
                     except discord.HTTPException:
                         await message.channel.send(
-                            "You can only use reactions uploaded to this server or"
-                            " standard emojis."
+                            "You can only use reactions uploaded to servers the bot has"
+                            " access to or standard emojis."
                         )
+
                 else:
                     # Advances to step three
                     db.step2(user, channel, done=True)
@@ -587,16 +626,8 @@ async def edit_selector(ctx):
                 await ctx.send("You need to mention a channel.")
                 return
 
-            all_messages = db.fetch_messages(channel_id)
-
-            if isinstance(all_messages, Exception):
-                await system_notification(
-                    ctx.message.guild.id,
-                    f"Database error when fetching messages:\n```\n{all_messages}\n```",
-                )
-                return
-
             channel = bot.get_channel(channel_id)
+            all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
                 await ctx.send(
                     "There is only one reaction-role message in this channel."
@@ -608,28 +639,6 @@ async def edit_selector(ctx):
                 )
 
             elif len(all_messages) > 1:
-                selector_msgs = []
-                counter = 1
-                for msg_id in all_messages:
-                    try:
-                        old_msg = await channel.fetch_message(int(msg_id))
-                    except discord.NotFound:
-                        # Skipping reaction-role messages that might have been deleted without updating CSVs
-                        continue
-                    except discord.Forbidden:
-                        ctx.send(
-                            "I do not have permissions to edit a reaction-role message"
-                            f" that I previously created.\n\nID: {msg_id} in"
-                            f" {channel.mention}"
-                        )
-                        continue
-                    entry = (
-                        f"`{counter}`"
-                        f" {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
-                    )
-                    selector_msgs.append(entry)
-                    counter += 1
-
                 await ctx.send(
                     f"There are **{len(all_messages)}** reaction-role messages in this"
                     f" channel. **Type**:\n```\n{prefix}edit #{channel.name} //"
@@ -638,11 +647,12 @@ async def edit_selector(ctx):
                     " You can type `none` in any of the argument fields above (e.g."
                     " `New Message`) to make the bot ignore it. The list of the"
                     " current reaction-role messages is:\n\n"
-                    + "\n".join(selector_msgs)
+                    + "\n".join(all_messages)
                 )
 
             else:
                 await ctx.send("There are no reaction-role messages in that channel.")
+
         elif len(msg_values) > 2:
             try:
                 # Tries to edit the reaction-role message
@@ -734,56 +744,183 @@ async def edit_selector(ctx):
         await ctx.send("You do not have an admin role.")
 
 
+@bot.command(name="reaction")
+async def edit_reaction(ctx):
+    if isadmin(ctx.message.author):
+        msg_values = ctx.message.content.split()
+        mentioned_roles = ctx.message.role_mentions
+        mentioned_channels = ctx.message.channel_mentions
+        if len(msg_values) < 4:
+            if not mentioned_channels:
+                await ctx.send(
+                    f" To get started, type:\n```\n{prefix}reaction add"
+                    f" #channelname\n```or\n```\n{prefix}reaction remove"
+                    " #channelname\n```"
+                )
+                return
+
+            channel = ctx.message.channel_mentions[0]
+            all_messages = await formatted_channel_list(channel)
+            if len(all_messages) == 1:
+                await ctx.send(
+                    "There is only one reaction-role messages in this channel."
+                    f" **Type**:\n```\n{prefix}reaction add #{channel.name} 1"
+                    f" :reaction: @rolename\n```or\n```\n{prefix}reaction remove"
+                    f" #{channel.name} 1 :reaction:\n```"
+                )
+                return
+
+            elif len(all_messages) > 1:
+                await ctx.send(
+                    f"There are **{len(all_messages)}** reaction-role messages in this"
+                    f" channel. **Type**:\n```\n{prefix}reaction add #{channel.name}"
+                    " MESSAGE_NUMBER :reaction:"
+                    f" @rolename\n```or\n```\n{prefix}reaction remove"
+                    f" #{channel.name} MESSAGE_NUMBER :reaction:\n```\nThe list of the"
+                    " current reaction-role messages is:\n\n"
+                    + "\n".join(all_messages)
+                )
+                return
+
+            else:
+                await ctx.send("There are no reaction-role messages in that channel.")
+                return
+
+        action = msg_values[1].lower()
+        channel = ctx.message.channel_mentions[0]
+        message_number = msg_values[3]
+        reaction = msg_values[4]
+        if action == "add":
+            if mentioned_roles:
+                role = mentioned_roles[0]
+            else:
+                await ctx.send("You need to mention a role to attach to the reaction.")
+                return
+
+        all_messages = db.fetch_messages(channel.id)
+        if isinstance(all_messages, Exception):
+            await system_notification(
+                ctx.message.guild.id,
+                f"Database error when fetching messages:\n```\n{all_messages}\n```",
+            )
+            return
+
+        counter = 1
+        if all_messages:
+            message_to_edit_id = None
+            for msg_id in all_messages:
+                # Loop through all msg_ids and stops when the counter matches the user input
+                if str(counter) == message_number:
+                    message_to_edit_id = msg_id
+                    break
+
+                counter += 1
+
+        else:
+            await ctx.send("You selected a reaction-role message that does not exist.")
+            return
+
+        if message_to_edit_id:
+            message_to_edit = await channel.fetch_message(int(message_to_edit_id))
+
+        else:
+            await ctx.send(
+                "Select a valid reaction-role message number (i.e. the number"
+                " to the left of the reaction-role message content in the list"
+                " above)."
+            )
+            return
+
+        if action == "add":
+            try:
+                # Check that the bot can actually use the emoji
+                await ctx.message.add_reaction(reaction)
+
+            except discord.HTTPException:
+                await ctx.send(
+                    "You can only use reactions uploaded to servers the bot has access"
+                    " to or standard emojis."
+                )
+                return
+
+            await message_to_edit.add_reaction(reaction)
+            react = db.add_reaction(message_to_edit.id, role.id, reaction)
+            if isinstance(react, Exception):
+                await system_notification(
+                    ctx.message.guild.id,
+                    "Database error when adding a reaction to a message in"
+                    f" {message_to_edit.channel.mention}:\n```\n{react}\n```",
+                )
+
+        elif action == "remove":
+            try:
+                await message_to_edit.clear_reaction(reaction)
+
+            except discord.HTTPException:
+                await ctx.send("Invalid reaction.")
+                return
+
+            react = db.remove_reaction(message_to_edit.id, reaction)
+            if isinstance(react, Exception):
+                await system_notification(
+                    ctx.message.guild.id,
+                    "Database error when adding a reaction to a message in"
+                    f" {message_to_edit.channel.mention}:\n```\n{react}\n```",
+                )
+
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
 @bot.command(name="systemchannel")
 async def set_systemchannel(ctx):
     if isadmin(ctx.message.author):
         global system_channel
         msg = ctx.message.content.split()
         mentioned_channels = ctx.message.channel_mentions
-        if len(msg) < 3 or not mentioned_channels:
+        channel_type = None if len(msg) < 2 else msg[1].lower()
+        if (
+            len(msg) < 3
+            or not mentioned_channels
+            or channel_type not in ["main", "server"]
+        ):
             await ctx.send(
                 "Define if you are setting up a server or main system channel and"
                 f" mention the target channel.\n```\n{prefix}systemchannel"
                 " <main/server> #channelname\n```"
             )
+            return
 
-        else:
-            target_channel = mentioned_channels[0].id
-            guild_id = ctx.message.guild.id
+        target_channel = mentioned_channels[0].id
+        guild_id = ctx.message.guild.id
 
-            server = bot.get_guild(guild_id)
-            bot_user = server.get_member(bot.user.id)
-            bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
-            writable = bot_permissions.read_messages
-            readable = bot_permissions.view_channel
-            if not writable or not readable:
-                await ctx.send("I cannot read or send messages in that channel.")
+        server = bot.get_guild(guild_id)
+        bot_user = server.get_member(bot.user.id)
+        bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
+        writable = bot_permissions.read_messages
+        readable = bot_permissions.view_channel
+        if not writable or not readable:
+            await ctx.send("I cannot read or send messages in that channel.")
+            return
+
+        if channel_type == "main":
+            system_channel = target_channel
+            config["server"]["system_channel"] = str(system_channel)
+            with open(f"{directory}/config.ini", "w") as configfile:
+                config.write(configfile)
+
+        elif channel_type == "server":
+            add_channel = db.add_systemchannel(guild_id, target_channel)
+
+            if isinstance(add_channel, Exception):
+                await system_notification(
+                    guild_id,
+                    "Database error when adding a new system"
+                    f" channel:\n```\n{add_channel}\n```",
+                )
                 return
 
-            if msg[1].lower() == "main":
-                system_channel = target_channel
-                config["server"]["system_channel"] = str(system_channel)
-                with open(f"{directory}/config.ini", "w") as configfile:
-                    config.write(configfile)
-
-            elif msg[1].lower() == "server":
-                add_channel = db.add_systemchannel(guild_id, target_channel)
-
-                if isinstance(add_channel, Exception):
-                    await system_notification(
-                        guild_id,
-                        "Database error when adding a new system"
-                        f" channel:\n```\n{add_channel}\n```",
-                    )
-
-            else:
-                await ctx.send(
-                    "Define if you are setting up a server or main system channel and"
-                    f" mention the target channel.\n```\n{prefix}systemchannel"
-                    " <main/server> #channelname\n```"
-                )
-
-            await ctx.send("System channel updated.")
+        await ctx.send(f"System channel updated.")
 
     else:
         await ctx.send("You do not have an admin role.")
@@ -822,60 +959,6 @@ async def set_colour(ctx):
                 f"Please provide a hexadecimal value. Example: `{prefix}colour"
                 " 0xffff00`"
             )
-
-
-@bot.command(name="help")
-async def hlp(ctx):
-    if isadmin(ctx.message.author):
-        await ctx.send(
-            "**Reaction Role Messages**\n"
-            f"- `{prefix}new` starts the creation process for a new"
-            " reaction role message.\n"
-            f"- `{prefix}abort` aborts the creation process"
-            " for a new reaction role message started by the command user in that"
-            " channel.\n"
-            f"- `{prefix}edit` edits an existing reaction-role message or"
-            " provides instructions on how to do so if no arguments are passed.\n"
-            f"- `{prefix}colour` changes the colour of the embeds of new and newly"
-            " edited reaction role messages.\n"
-            "**Activities**\n"
-            f"- `{prefix}activity` adds an activity for the bot to loop through and"
-            " show as status.\n"
-            f"- `{prefix}rm-activity` removes an activity from the bot's list.\n"
-            f"- `{prefix}activitylist` lists the current activities used by the"
-            " bot as statuses.\n"
-        )
-        await ctx.send(
-            "**Admins**\n"
-            f"- `{prefix}admin` adds the mentioned role to the list of {botname}"
-            " admins, allowing them to create and edit reaction-role messages."
-            " You need to be a server administrator to use this command.\n"
-            f"- `{prefix}rm-admin` removes the mentioned role from the list of"
-            f" {botname} admins, preventing them from creating and editing"
-            " reaction-role messages. You need to be a server administrator to"
-            " use this command.\n"
-            f"- `{prefix}adminlist` lists the current admins on the server the"
-            " command was run in by mentioning them and the current admins from"
-            " other servers by printing out the role IDs. You need to be a server"
-            " administrator to use this command.\n"
-            "**System**\n"
-            f"- `{prefix}systemchannel` updates the main or server system channel"
-            " where the bot sends errors and update notifications.\n"
-            "**Bot Control**\n"
-            f"- `{prefix}kill` shuts down the bot.\n"
-            f"- `{prefix}restart` restarts the bot. Only works on installations"
-            " running on GNU/Linux.\n"
-            f"- `{prefix}update` updates the bot and restarts it. Only works on"
-            " `git clone` installations running on GNU/Linux.\n"
-            f"- `{prefix}version` reports the bot's current version and the latest"
-            " available one from GitHub.\n\n"
-            f"{botname} is running version {__version__} of Reaction Light. You can"
-            " find more resources, submit feedback, and report bugs at: "
-            "<https://github.com/eibex/reaction-light>"
-        )
-
-    else:
-        await ctx.send("You do not have an admin role.")
 
 
 @bot.command(name="activity")
@@ -935,6 +1018,62 @@ async def remove_activity(ctx):
 
         else:
             await ctx.send("The activity you mentioned does not exist.")
+
+    else:
+        await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="help")
+async def hlp(ctx):
+    if isadmin(ctx.message.author):
+        await ctx.send(
+            "**Reaction Role Messages**\n"
+            f"- `{prefix}new` starts the creation process for a new"
+            " reaction role message.\n"
+            f"- `{prefix}abort` aborts the creation process"
+            " for a new reaction role message started by the command user in that"
+            " channel.\n"
+            f"- `{prefix}edit` edits the text and embed of an existing reaction"
+            " role message.\n"
+            f"- `{prefix}reaction` adds or removes a reaction from an existing"
+            " reaction role message.\n"
+            f"- `{prefix}colour` changes the colour of the embeds of new and newly"
+            " edited reaction role messages.\n"
+            "**Activities**\n"
+            f"- `{prefix}activity` adds an activity for the bot to loop through and"
+            " show as status.\n"
+            f"- `{prefix}rm-activity` removes an activity from the bot's list.\n"
+            f"- `{prefix}activitylist` lists the current activities used by the"
+            " bot as statuses.\n"
+        )
+        await ctx.send(
+            "**Admins**\n"
+            f"- `{prefix}admin` adds the mentioned role to the list of {botname}"
+            " admins, allowing them to create and edit reaction-role messages."
+            " You need to be a server administrator to use this command.\n"
+            f"- `{prefix}rm-admin` removes the mentioned role from the list of"
+            f" {botname} admins, preventing them from creating and editing"
+            " reaction-role messages. You need to be a server administrator to"
+            " use this command.\n"
+            f"- `{prefix}adminlist` lists the current admins on the server the"
+            " command was run in by mentioning them and the current admins from"
+            " other servers by printing out the role IDs. You need to be a server"
+            " administrator to use this command.\n"
+            "**System**\n"
+            f"- `{prefix}systemchannel` updates the main or server system channel"
+            " where the bot sends errors and update notifications.\n"
+            "**Bot Control**\n"
+            f"- `{prefix}kill` shuts down the bot.\n"
+            f"- `{prefix}restart` restarts the bot. Only works on installations"
+            " running on GNU/Linux.\n"
+            f"- `{prefix}update` updates the bot and restarts it. Only works on"
+            " `git clone` installations running on GNU/Linux.\n"
+            f"- `{prefix}version` reports the bot's current version and the latest"
+            " available one from GitHub.\n\n"
+            f"{botname} is running version {__version__} of Reaction Light. You can"
+            " find more resources, submit feedback, and report bugs at: "
+            "<https://github.com/eibex/reaction-light>"
+        )
 
     else:
         await ctx.send("You do not have an admin role.")
@@ -1057,9 +1196,10 @@ async def print_version(ctx):
     if isadmin(ctx.message.author):
         latest = github.get_latest()
         await ctx.send(
-            f"I am currently running v{__version__}. The latest available version is"
-            f" v{latest}."
+            f"I am currently running Reaction Light v{__version__}. The latest"
+            f" available version is v{latest}."
         )
+
     else:
         await ctx.send("You do not have an admin role.")
 
