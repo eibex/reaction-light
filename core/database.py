@@ -396,3 +396,44 @@ class Database:
 
         except sqlite3.Error as e:
             return e
+
+    def add_reaction(self, message_id, role_id, reaction):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                (message_id,),
+            )
+            reactionrole_id = cursor.fetchall()[0][0]
+            cursor.execute(
+                "INSERT INTO reactionroles ('reactionrole_id', 'reaction', 'role_id')"
+                " values(?, ?, ?);",
+                (reactionrole_id, reaction, role_id),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+        except sqlite3.Error as e:
+            return e
+
+    def remove_reaction(self, message_id, reaction):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                (message_id,),
+            )
+            reactionrole_id = cursor.fetchall()[0][0]
+            cursor.execute(
+                "DELETE FROM reactionroles WHERE reactionrole_id = ? AND reaction = ?;",
+                (reactionrole_id, reaction),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+        except sqlite3.Error as e:
+            return e
