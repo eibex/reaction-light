@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-![Reaction Light 1.5.4](https://img.shields.io/badge/Reaction%20Light-1.5.4-yellow.svg)
+![Reaction Light 1.6.0](https://img.shields.io/badge/Reaction%20Light-1.6.0-yellow.svg)
 ![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)
 ![discord.py rewrite](https://img.shields.io/badge/discord.py-1.2.5+-blue.svg)
 
@@ -70,12 +70,13 @@ nohup python3 bot.py &
 ```
 
 ## Commands
-All commands require an admin role which you can set by using `rl!admin` (requires administrator permissions on the server). The bot will reply with missing permissions otherwise. In the following list the default prefix `rl!` is used, but it can be freely changed in the `config.ini` file.
+All commands require an admin role which you can set by using `rl!admin` (requires administrator permissions on the server). The bot will reply with missing permissions otherwise. Executing a command without any argument will prompt the bot to provide you with instructions on how to use the command effectively. In the following list the default prefix `rl!` is used, but it can be freely changed in the `config.ini` file.
 
 - `rl!help` shows this set of commands along with a link to the repository.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
 - `rl!abort` aborts the creation process for a new reaction role message started by the command user in that channel.
-- `rl!edit` edits an existing reaction role message or provides instructions on how to do so if no arguments are passed.
+- `rl!edit` edits the text and embed of an existing reaction role message.
+- `rl!reaction` adds or removes a reaction from an existing reaction role message.
 - `rl!colour` changes the colour of the embeds of new and newly edited reaction role messages.
 - `rl!activity` adds an activity for the bot to loop through and show as status.
 - `rl!rm-activity` removes an activity from the bot's list.
@@ -103,7 +104,7 @@ Bot: Please mention the #channel where to send the auto-role message.
 User: #get-roles
 ```
 
-Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on your server (i.e. the Bot is not a Nitro user and cannot use emojis from other servers). Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
+Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on servers the bot has access to. Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
 ```
 Bot: Attach roles and emojis separated by a space (one combination per message).
 When you are done type `done`. Example:
