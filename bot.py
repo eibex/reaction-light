@@ -834,7 +834,7 @@ async def edit_reaction(ctx):
         if action == "add":
             try:
                 # Check that the bot can actually use the emoji
-                await ctx.message.add_reaction(reaction)
+                await message_to_edit.add_reaction(reaction)
 
             except discord.HTTPException:
                 await ctx.send(
@@ -843,7 +843,6 @@ async def edit_reaction(ctx):
                 )
                 return
 
-            await message_to_edit.add_reaction(reaction)
             react = db.add_reaction(message_to_edit.id, role.id, reaction)
             if isinstance(react, Exception):
                 await system_notification(
@@ -851,6 +850,9 @@ async def edit_reaction(ctx):
                     "Database error when adding a reaction to a message in"
                     f" {message_to_edit.channel.mention}:\n```\n{react}\n```",
                 )
+                return
+
+            await ctx.send("Reaction added.")
 
         elif action == "remove":
             try:
@@ -867,6 +869,9 @@ async def edit_reaction(ctx):
                     "Database error when adding a reaction to a message in"
                     f" {message_to_edit.channel.mention}:\n```\n{react}\n```",
                 )
+                return
+
+            await ctx.send("Reaction removed.")
 
     else:
         await ctx.send("You do not have an admin role.")
