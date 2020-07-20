@@ -1,7 +1,11 @@
 # Reaction Light - Changelog
 Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+
+### 1.6.1
+- Prevent adding an already existing reaction to new or existing reaction-role messages.
+
 ### 1.6.0
-- Add `rl!reaction` to add or remove reactions from existing reaction role messages ([#1](https://github.com/eibex/reaction-light/issues/1) closed by [#43](https://github.com/eibex/reaction-light/pull/43) by [eibex](https://github.com/eibex))
+- Add `rl!reaction` to add or remove reactions from existing reaction-role messages ([#1](https://github.com/eibex/reaction-light/issues/1) closed by [#43](https://github.com/eibex/reaction-light/pull/43) by [eibex](https://github.com/eibex))
 
 ### 1.5.4
 - Merge `rl!rm-embed` into `rl!edit` (`rl!rm-embed` removed)
