@@ -429,6 +429,7 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+            return True
 
         except sqlite3.Error as e:
             return e
