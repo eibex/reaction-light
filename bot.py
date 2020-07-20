@@ -364,9 +364,12 @@ async def on_message(message):
                     try:
                         reaction = msg[0]
                         role = message.role_mentions[0].id
-                        await message.add_reaction(reaction)
+                        exists = db.step2(user, channel, role, reaction)
+                        if exists:
+                            await ctx.send("You already used that reaction for another role.")
+                            return
 
-                        db.step2(user, channel, role, reaction)
+                        await message.add_reaction(reaction)
 
                     except IndexError:
                         await message.channel.send(
@@ -850,6 +853,11 @@ async def edit_reaction(ctx):
                     "Database error when adding a reaction to a message in"
                     f" {message_to_edit.channel.mention}:\n```\n{react}\n```",
                 )
+                return
+
+            if not react:
+                await ctx.send("That message already has a reactionrole combination with"
+                " that reaction.")
                 return
 
             await ctx.send("Reaction added.")

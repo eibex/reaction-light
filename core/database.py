@@ -149,7 +149,12 @@ class Database:
     def step2(self, user, channel, role=None, reaction=None, done=False):
         tracker = self.reactionrole_creation[f"{user}_{channel}"]
         if not done:
+            if reaction in tracker.combos:
+                exists = True
+                return exists
             tracker.combos[reaction] = role
+            exists = False
+            return exists
 
         else:
             tracker.step += 1
@@ -406,6 +411,16 @@ class Database:
                 (message_id,),
             )
             reactionrole_id = cursor.fetchall()[0][0]
+            cursor.execute(
+                "SELECT * FROM reactionroles WHERE reactionrole_id = ? AND reaction = ?;",
+                (reactionrole_id, reaction)
+            )
+            exists = cursor.fetchall()
+            if exists:
+                cursor.close()
+                conn.close()
+                return False
+
             cursor.execute(
                 "INSERT INTO reactionroles ('reactionrole_id', 'reaction', 'role_id')"
                 " values(?, ?, ?);",
