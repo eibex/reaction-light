@@ -366,7 +366,7 @@ async def on_message(message):
                         role = message.role_mentions[0].id
                         exists = db.step2(user, channel, role, reaction)
                         if exists:
-                            await ctx.send("You already used that reaction for another role.")
+                            await message.channel.send("You already used that reaction for another role.")
                             return
 
                         await message.add_reaction(reaction)
