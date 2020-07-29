@@ -43,7 +43,7 @@ python3 -m pip install -U discord.py
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
-  - Insert the token of your bot (found at: https://discordapp.com/developers/applications/)
+  - Insert the token of your bot (found at: https://discord.com/developers/applications/)
   - Choose a prefix of your liking (default: `rl!`)
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
