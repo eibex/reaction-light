@@ -67,6 +67,7 @@ def isadmin(user):
     admins = db.get_admins()
 
     if isinstance(admins, Exception):
+        print(f"Error when checking if the user is an admin:\n{admins}")
         return False
 
     try:
