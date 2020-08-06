@@ -1,5 +1,5 @@
 # Reaction Light - Changelog
-Since 0.1.0 this project will adhere to [semantic versioning](https://semver.org/).
+This project adheres to [semantic versioning](https://semver.org/).
 
 ### 1.6.1
 - Prevent adding an already existing reaction to new or existing reaction-role messages.
