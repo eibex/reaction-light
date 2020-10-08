@@ -56,8 +56,13 @@ system_channel = (
     else None
 )
 
-Client = discord.Client()
-bot = commands.Bot(command_prefix=prefix)
+intents = discord.Intents.default()
+intents.members = True
+intents.reactions = True
+intents.messages = True
+intents.emojis = True
+bot = commands.Bot(command_prefix=prefix, intents=intents)
+
 bot.remove_command("help")
 
 activities_file = f"{directory}/files/activities.csv"
@@ -1271,5 +1276,8 @@ async def update(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
+try:
+    bot.run(TOKEN)
 
-bot.run(TOKEN)
+except discord.PrivilegedIntentsRequired:
+    print("You need to enable the server members intent on the Discord Developers Portal.")
