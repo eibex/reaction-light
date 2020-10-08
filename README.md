@@ -1,7 +1,7 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light 1.6.1](https://img.shields.io/badge/Reaction%20Light-1.6.1-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Reaction Light 2.0.0](https://img.shields.io/badge/Reaction%20Light-2.0.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)](#)
-[![discord.py 1.3.4+](https://img.shields.io/badge/discord.py-1.3.4+-blue.svg)](#)
+[![discord.py 1.5.0+](https://img.shields.io/badge/discord.py-1.5.0+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
@@ -34,7 +34,7 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [License](#license)
 
 ## Requirements
-This bot requires discord.py 1.3.4+, which requires Python 3.5.3+.
+This bot requires discord.py 1.5.0+, which requires Python 3.5.3+.
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
@@ -46,6 +46,7 @@ python3 -m pip install -U discord.py
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
+    - Make sure you enabled the **server members intent** on your bot developer page
   - Choose a prefix of your liking (default: `rl!`)
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
