@@ -2,7 +2,7 @@
 This project adheres to [semantic versioning](https://semver.org/).
 
 ### 2.0.0
-- Added support for discord.py 1.5.0 and dropped support for any older version (the new Discord API is replacing the older one) ([[#47](https://github.com/eibex/reaction-light/issues/47) closed by [#48](https://github.com/eibex/reaction-light/pull/48) by [eibex](https://github.com/eibex))
+- Added support for discord.py 1.5.0 and dropped support for any older version (the new Discord API is replacing the older one) ([#47](https://github.com/eibex/reaction-light/issues/47) closed by [#48](https://github.com/eibex/reaction-light/pull/48) by [eibex](https://github.com/eibex))
 - **What you NEED to do**
   - Add the server members priviliged intent to your bot on the [Discord Developer Portal](https://discord.com/developers/applications)
   - You might have to re-clone the bot because of git history conflicts (copy the `config.ini` file and the `files` folder to the new installation and all your reaction-role messages will keep working as expected)
