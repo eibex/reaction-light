@@ -1280,4 +1280,7 @@ try:
     bot.run(TOKEN)
 
 except discord.PrivilegedIntentsRequired:
-    print("You need to enable the server members intent on the Discord Developers Portal.")
+    print("[Login Failure] You need to enable the server members intent on the Discord Developers Portal.")
+
+except discord.errors.LoginFailure:
+    print("[Login Failure] The token inserted in config.ini is invalid.")
