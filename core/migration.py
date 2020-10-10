@@ -34,7 +34,6 @@ def migrate():
     folder = f"{directory}/files"
     files = os.listdir(folder)
     if "id.csv" not in files:
-        print("No files to migrate.")
         return False
     else:
         for file in os.listdir(folder):
@@ -134,5 +133,4 @@ def migrateconfig():
         return True
 
     except configparser.NoSectionError:
-        print("No admins to migrate in config.ini.")
         return False
