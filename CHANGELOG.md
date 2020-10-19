@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
-This project adheres to [semantic versioning](https://semver.org/).
+
+### 2.0.1
+- Fix footers being deleted upon embed edit ([#49](https://github.com/eibex/reaction-light/pull/49) by [Edwinexd](https://github.com/Edwinexd))
+- Remove start up messages informing that no migration was needed
 
 ### 2.0.0
 - Added support for discord.py 1.5.0 and dropped support for any older version (the new Discord API is replacing the older one) ([#47](https://github.com/eibex/reaction-light/issues/47) closed by [#48](https://github.com/eibex/reaction-light/pull/48) by [eibex](https://github.com/eibex))
