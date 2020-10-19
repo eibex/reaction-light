@@ -723,10 +723,12 @@ async def edit_selector(ctx):
                 if len(msg_values) > 3 and msg_values[3].lower() != "none":
                     selector_embed.title = msg_values[3]
                     selector_embed.colour = botcolour
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
                 if len(msg_values) > 4 and msg_values[4].lower() != "none":
                     selector_embed.description = msg_values[4]
                     selector_embed.colour = botcolour
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
                 try:
                     if selector_embed.title or selector_embed.description:
