@@ -321,6 +321,9 @@ async def on_ready():
     cleandb.start()
     updates.start()
 
+@bot.event
+async def on_guild_remove(guild):
+    db.remove_guild(guild.id)
 
 @bot.event
 async def on_message(message):
