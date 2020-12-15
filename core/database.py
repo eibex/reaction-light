@@ -264,6 +264,40 @@ class Database:
         except sqlite3.Error as e:
             return e
 
+    def remove_guild(self, guild_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            # Deleting the guilds reaction-role database entries
+            cursor.execute(
+                "SELECT reactionrole_id FROM messages WHERE guild_id = ?;",
+                (guild_id),
+            )
+            results = cursor.fetchall()
+            if results:
+                for result in results:
+                    reactionrole_id = result[0]
+                    cursor.execute(
+                        "DELETE FROM messages WHERE reactionrole_id = ?;",
+                        (reactionrole_id,),
+                    )
+                    cursor.execute(
+                        "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
+                        (reactionrole_id,),
+                    )
+            # Deleting the guilds systemchannels database entries
+            cursor.execute(
+                "DELETE FROM systemchannels WHERE guild_id = ?;",
+                (guild_id,),
+            )
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+        except sqlite3.Error as e:
+            return e
+        
     def delete(self, message_id, guild_id=None):
         try:
             conn = sqlite3.connect(self.database)
