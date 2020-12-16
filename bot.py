@@ -24,6 +24,7 @@ SOFTWARE.
 
 
 import os
+import datetime
 import configparser
 from shutil import copy
 from sys import platform, exit as shutdown
@@ -210,6 +211,8 @@ async def cleandb():
     # Cleans the database by deleting rows of reaction role messages that don't exist anymore
     messages = db.fetch_all_messages()
     guilds = db.fetch_all_guilds()
+    # Get the cleanup queued guilds
+    cleanup_guild_ids = db.fetch_cleanup_guilds(guild_ids_only=True)
 
     if isinstance(messages, Exception):
         await system_notification(
@@ -266,36 +269,61 @@ async def cleandb():
     for guild_id in guilds:
         try:
             await bot.fetch_guild(guild_id)
+            if guild_id in cleanup_guild_ids:
+                db.remove_cleanup_guild(guild_id)
 
-        except discord.NotFound as e:
+        except discord.Forbidden:
             # If unknown guild
-            if e.code == 10004:
-                delete = db.remove_systemchannel(guild_id)
+            if guild_id in cleanup_guild_ids:
+                continue
+            else:
+                db.add_cleanup_guild(guild_id, round(datetime.datetime.utcnow().timestamp()))
 
+    cleanup_guilds = db.fetch_cleanup_guilds()
+
+    if isinstance(cleanup_guilds, Exception):
+        await system_notification(
+            None,
+            "Database error when fetching cleanup guilds during"
+            f" cleaning:\n```\n{cleanup_guilds}\n```",
+        )
+        return
+    
+    current_timestamp = round(datetime.datetime.utcnow().timestamp())
+    for guild in cleanup_guilds:
+        if int(guild[1]) - current_timestamp <= -86400:
+            # The guild has been invalid / unreachable for more than 24 hrs, try one more fetch then give up and purge the guilds database entries
+            try:
+                await bot.fetch_guild(guild[0])
+                db.remove_cleanup_guild(guild[0])
+                continue
+            except discord.Forbidden:
+                delete = db.remove_guild(guild[0])
+                delete2 = db.remove_cleanup_guild(guild[0])
                 if isinstance(delete, Exception):
                     await system_notification(
                         None,
-                        "Database error when deleting system channels during"
+                        "Database error when deleting a guilds datebase entries during"
                         f" database cleaning:\n```\n{delete}\n```",
                     )
                     return
-
-                delete = db.delete(message_id=None, guild_id=guild_id)
-
-                if isinstance(delete, Exception):
+                elif isinstance(delete2, Exception):
                     await system_notification(
                         None,
-                        "Database error when deleting messages during"
-                        f" database cleaning:\n```\n{delete}\n```",
+                        "Database error when deleting a guilds datebase entries during"
+                        f" database cleaning:\n```\n{delete2}\n```",
                     )
                     return
 
-                await system_notification(
-                    None,
-                    "I deleted the database entries of a guild that was removed."
-                    f"\n\nID: {guild_id}",
-                )
-
+@tasks.loop(hours=6)
+async def check_cleanup_queued_guilds():
+    cleanup_guild_ids = db.fetch_cleanup_guilds(guild_ids_only=True)
+    for guild_id in cleanup_guild_ids:
+        try:
+            await bot.fetch_guild(guild_id)
+            db.remove_cleanup_guild(guild_id)
+        except discord.Forbidden:
+            continue
 
 @bot.event
 async def on_ready():
@@ -319,7 +347,9 @@ async def on_ready():
 
     maintain_presence.start()
     cleandb.start()
+    check_cleanup_queued_guilds.start()
     updates.start()
+
 
 @bot.event
 async def on_guild_remove(guild):
