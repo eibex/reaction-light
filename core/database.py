@@ -436,15 +436,20 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            cursor.execute("SELECT guild_id FROM messages;")
+            message_guilds = cursor.fetchall()
+
             cursor.execute("SELECT guild_id FROM systemchannels;")
-            all_guilds = []
-            for row in cursor:
-                guild_id = int(row[0])
-                all_guilds.append(guild_id)
+            systemchannel_guilds = cursor.fetchall()
+
+            guilds = message_guilds + systemchannel_guilds
+
+            # Removes any duplicate guilds from the list
+            guilds = list(dict.fromkeys(guilds))
 
             cursor.close()
             conn.close()
-            return all_guilds
+            return guilds
 
         except sqlite3.Error as e:
             return e
@@ -497,6 +502,48 @@ class Database:
             conn.commit()
             cursor.close()
             conn.close()
+
+        except sqlite3.Error as e:
+            return e
+
+    def add_cleanup_guild(self, guild_id: int, unix_timestamp: int):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO 'cleanup_queue_guilds' ('guild_id', 'unix_timestamp') values(?,?);", (guild_id, unix_timestamp,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return True
+
+        except sqlite3.Error as e:
+            return e
+
+    def remove_cleanup_guild(self, guild_id: int):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return True
+
+        except sqlite3.Error as e:
+            return e
+
+    def fetch_cleanup_guilds(self, guild_ids_only=False):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            if guild_ids_only:
+                cursor.execute("SELECT guild_id FROM cleanup_queue_guilds;")
+            else:
+                cursor.execute("SELECT * FROM cleanup_queue_guilds;")
+            guilds = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return guilds
 
         except sqlite3.Error as e:
             return e
