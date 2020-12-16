@@ -38,7 +38,9 @@ def initialize(database):
         "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction'"
         " NVCARCHAR, 'role_id' INT);"
     )
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_reactionmessage' ('reactionrole_id' INT, 'guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
@@ -46,6 +48,12 @@ def initialize(database):
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
+    )
+    cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON cleanup_queue_guilds (guild_id);"
+    )
+    cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_id_idx ON cleanup_queue_reactionmessage (reactionrole_id);"
     )
     conn.commit()
     cursor.close()
@@ -290,6 +298,11 @@ class Database:
                 "DELETE FROM systemchannels WHERE guild_id = ?;",
                 (guild_id,),
             )
+            # Delete the guilds admin roles
+            cursor.execute(
+                "DELETE FROM admins WHERE guild_id = ?;",
+                (guild_id,),
+            )
             conn.commit()
 
             cursor.close()
@@ -333,11 +346,11 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def add_admin(self, role):
+    def add_admin(self, role_id: int, guild_id: int):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO 'admins' ('role_id') values(?);", (role,))
+            cursor.execute("INSERT INTO 'admins' ('role_id', 'guild_id') values(?,?);", (role_id, guild_id,))
             conn.commit()
             cursor.close()
             conn.close()
@@ -345,11 +358,11 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def remove_admin(self, role):
+    def remove_admin(self, role_id: int, guild_id: int):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM admins WHERE role_id = ?;", (role,))
+            cursor.execute("DELETE FROM admins WHERE role_id = ? AND guild_id = ?;", (role_id, guild_id))
             conn.commit()
             cursor.close()
             conn.close()
@@ -357,11 +370,11 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def get_admins(self):
+    def get_admins(self, guild_id: int):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM admins;")
+            cursor.execute("SELECT * FROM admins WHERE guild_id = ?;", (guild_id, ))
             admins = []
             for row in cursor:
                 role_id = row[0]
