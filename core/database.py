@@ -40,7 +40,6 @@ def initialize(database):
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_reactionmessage' ('reactionrole_id' INT, 'guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
@@ -50,10 +49,7 @@ def initialize(database):
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
     )
     cursor.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON cleanup_queue_guilds (guild_id);"
-    )
-    cursor.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_id_idx ON cleanup_queue_reactionmessage (reactionrole_id);"
+        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);"
     )
     conn.commit()
     cursor.close()
