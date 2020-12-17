@@ -40,6 +40,7 @@ def initialize(database):
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_reactionmessage' ('reactionrole_id' INT, 'guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
@@ -113,6 +114,40 @@ class Database:
         initialize(self.database)
 
         self.reactionrole_creation = {}
+
+    def migrate_admins(self, client):
+        import discord
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(admins);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "guild_id" not in columns:
+            cursor.execute("SELECT role_id FROM admins")
+            admins = cursor.fetchall()
+            admins2 = []
+            for admin in admins:
+                admins2.append(admin[0])
+            admins = admins2
+            guilds = {}
+            for guild in client.guilds:
+                guilds[guild.id] = []
+                for admin_id in admins:
+                    role = discord.utils.get(guild.roles, id=admin_id)
+                    if role is not None:
+                        guilds[guild.id].append(role.id)
+
+            cursor.execute("ALTER TABLE admins ADD COLUMN 'guild_id' INT;")
+            conn.commit()
+            for guild in guilds:
+                for admin_id in guilds[guild]:
+                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id,))
+            conn.commit()
+            print("Successfully migrated admins.")
+        else:
+            print("No admin migration needed.")
+        cursor.close()
+        conn.close()
 
     def start_creation(self, user, channel, guild):
         tracker = ReactionRoleCreationTracker(guild, self.database)
@@ -446,10 +481,10 @@ class Database:
 
             # Removes any duplicate guilds from the list
             guilds = list(dict.fromkeys(guilds))
-
             guild_ids = []
             for guild in guilds:
-                guild_ids.append(guild[0])
+                if guild[0] is not None:
+                    guild_ids.append(guild[0])
             
             cursor.close()
             conn.close()
