@@ -229,7 +229,7 @@ async def cleandb():
             if channel is None:
                 channel = await bot.fetch_channel(channel_id)
 
-            await channel.fetch_message(message)
+            await channel.fetch_message(message[0])
 
         except discord.NotFound as e:
             # If unknown channel or unknown message
@@ -251,12 +251,13 @@ async def cleandb():
                 )
 
         except discord.Forbidden:
-            await system_notification(
-                channel.guild.id,
-                "I do not have access to a message I have created anymore. "
-                "I cannot manage the roles of users reacting to it."
-                f"\n\nID: {message} in {channel.mention}",
-            )
+            # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
+                await system_notification(
+                    message[3],
+                    "I do not have access to a message I have created anymore. "
+                    "I cannot manage the roles of users reacting to it."
+                    f"\n\nID: {message[0]} in channel {message[1]}",
+                )
 
     if isinstance(guilds, Exception):
         await system_notification(
@@ -344,7 +345,7 @@ async def on_ready():
         )
 
     database_updates()
-
+    db.migrate_admins(bot)
     maintain_presence.start()
     cleandb.start()
     check_cleanup_queued_guilds.start()
