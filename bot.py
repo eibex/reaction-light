@@ -72,17 +72,17 @@ db_file = f"{directory}/files/reactionlight.db"
 db = database.Database(db_file)
 
 
-def isadmin(user):
+def isadmin(member, guild_id):
     # Checks if command author has an admin role that was added with rl!admin
-    admins = db.get_admins()
+    admins = db.get_admins(guild_id)
 
     if isinstance(admins, Exception):
-        print(f"Error when checking if the user is an admin:\n{admins}")
+        print(f"Error when checking if the member is an admin:\n{admins}")
         return False
 
     try:
-        user_roles = [role.id for role in user.roles]
-        return [admin_role for admin_role in admins if admin_role in user_roles]
+        member_roles = [role.id for role in member.roles]
+        return [admin_role for admin_role in admins if admin_role in member_roles]
 
     except AttributeError:
         # Error raised from 'fake' users, such as webhooks
@@ -103,7 +103,7 @@ def database_updates():
         handler.update()
         messages = db.fetch_all_messages()
         for message in messages:
-            channel_id = messages[message]
+            channel_id = message[1]
             channel = bot.get_channel(channel_id)
             db.add_guild(channel.id, channel.guild.id)
 
@@ -221,10 +221,10 @@ async def cleandb():
             f" cleaning:\n```\n{messages}\n```",
         )
         return
-
+    
     for message in messages:
         try:
-            channel_id = messages[message]
+            channel_id = message[1]
             channel = bot.get_channel(channel_id)
             if channel is None:
                 channel = await bot.fetch_channel(channel_id)
@@ -234,7 +234,7 @@ async def cleandb():
         except discord.NotFound as e:
             # If unknown channel or unknown message
             if e.code == 10003 or e.code == 10008:
-                delete = db.delete(message)
+                delete = db.delete(message[0], message[3])
 
                 if isinstance(delete, Exception):
                     await system_notification(
@@ -359,7 +359,7 @@ async def on_guild_remove(guild):
 async def on_message(message):
     await bot.process_commands(message)
 
-    if isadmin(message.author):
+    if isadmin(message.author, message.guild.id):
         user = str(message.author.id)
         channel = str(message.channel.id)
         step = db.step(user, channel)
@@ -613,7 +613,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.command(name="new")
 async def new(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         # Starts setup process and the bot starts to listen to the user in that channel
         # For future prompts (see: "async def on_message(message)")
         started = db.start_creation(
@@ -637,7 +637,7 @@ async def new(ctx):
 
 @bot.command(name="abort")
 async def abort(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         # Aborts setup process
         aborted = db.abort(ctx.message.author.id, ctx.message.channel.id)
         if aborted:
@@ -655,7 +655,7 @@ async def abort(ctx):
 
 @bot.command(name="edit")
 async def edit_selector(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         # Reminds user of formatting if it is wrong
         msg_values = ctx.message.content.split()
         if len(msg_values) < 2:
@@ -796,7 +796,7 @@ async def edit_selector(ctx):
 
 @bot.command(name="reaction")
 async def edit_reaction(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         msg_values = ctx.message.content.split()
         mentioned_roles = ctx.message.role_mentions
         mentioned_channels = ctx.message.channel_mentions
@@ -934,7 +934,7 @@ async def edit_reaction(ctx):
 
 @bot.command(name="systemchannel")
 async def set_systemchannel(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         global system_channel
         msg = ctx.message.content.split()
         mentioned_channels = ctx.message.channel_mentions
@@ -988,7 +988,7 @@ async def set_systemchannel(ctx):
 
 @bot.command(name="colour")
 async def set_colour(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         msg = ctx.message.content.split()
         args = len(msg) - 1
         if args:
@@ -1023,7 +1023,7 @@ async def set_colour(ctx):
 
 @bot.command(name="activity")
 async def add_activity(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         activity = ctx.message.content[(len(prefix) + len("activity")) :].strip()
         if not activity:
             await ctx.send(
@@ -1044,7 +1044,7 @@ async def add_activity(ctx):
 
 @bot.command(name="activitylist")
 async def list_activities(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         if activities.activity_list:
             formatted_list = []
             for activity in activities.activity_list:
@@ -1063,7 +1063,7 @@ async def list_activities(ctx):
 
 @bot.command(name="rm-activity")
 async def remove_activity(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         activity = ctx.message.content[(len(prefix) + len("rm-activity")) :].strip()
         if not activity:
             await ctx.send(
@@ -1085,7 +1085,7 @@ async def remove_activity(ctx):
 
 @bot.command(name="help")
 async def hlp(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         await ctx.send(
             "**Reaction Role Messages**\n"
             f"- `{prefix}new` starts the creation process for a new"
@@ -1139,26 +1139,11 @@ async def hlp(ctx):
         await ctx.send("You do not have an admin role.")
 
 
-@bot.command(name="admin")
+@bot.command(pass_context=True, name="admin")
 @commands.has_permissions(administrator=True)
-async def add_admin(ctx):
+async def add_admin(ctx, role: discord.Role):
     # Adds an admin role ID to the database
-    try:
-        role = ctx.message.role_mentions[0].id
-
-    except IndexError:
-        try:
-            role = int(ctx.message.content.split()[1])
-
-        except ValueError:
-            await ctx.send("Please mention a valid @Role or role ID.")
-            return
-
-        except IndexError:
-            await ctx.send("Please mention a @Role or role ID.")
-            return
-
-    add = db.add_admin(role)
+    add = db.add_admin(role.id, ctx.guild.id)
 
     if isinstance(add, Exception):
         await system_notification(
@@ -1169,27 +1154,16 @@ async def add_admin(ctx):
 
     await ctx.send("Added the role to my admin list.")
 
+@add_admin.error
+async def add_admin_error(ctx, error):
+    if isinstance(error, commands.RoleNotFound):
+        await ctx.send("Please mention a valid @Role or role ID.")
 
 @bot.command(name="rm-admin")
 @commands.has_permissions(administrator=True)
-async def remove_admin(ctx):
+async def remove_admin(ctx, role: discord.Role):
     # Removes an admin role ID from the database
-    try:
-        role = ctx.message.role_mentions[0].id
-
-    except IndexError:
-        try:
-            role = int(ctx.message.content.split()[1])
-
-        except ValueError:
-            await ctx.send("Please mention a valid @Role or role ID.")
-            return
-
-        except IndexError:
-            await ctx.send("Please mention a @Role or role ID.")
-            return
-
-    remove = db.remove_admin(role)
+    remove = db.remove_admin(role.id, ctx.guild.id)
 
     if isinstance(remove, Exception):
         await system_notification(
@@ -1200,12 +1174,17 @@ async def remove_admin(ctx):
 
     await ctx.send("Removed the role from my admin list.")
 
+@remove_admin.error
+async def remove_admin_error(ctx, error):
+    if isinstance(error, commands.RoleNotFound):
+        await ctx.send("Please mention a valid @Role or role ID.")
+
 
 @bot.command(name="adminlist")
 @commands.has_permissions(administrator=True)
 async def list_admin(ctx):
     # Lists all admin IDs in the database, mentioning them if possible
-    admin_ids = db.get_admins()
+    admin_ids = db.get_admins(ctx.guild.id)
 
     if isinstance(admin_ids, Exception):
         await system_notification(
@@ -1213,47 +1192,23 @@ async def list_admin(ctx):
             f"Database error when fetching admins:\n```\n{admin_ids}\n```",
         )
         return
-
-    server = bot.get_guild(ctx.message.guild.id)
-    local_admins = []
-    foreign_admins = []
+    
+    adminrole_objects = []
     for admin_id in admin_ids:
-        role = discord.utils.get(server.roles, id=admin_id)
-        if role is not None:
-            local_admins.append(role.mention)
+        adminrole_objects.append(discord.utils.get(ctx.guild.roles, id=admin_id).mention)
 
-        else:
-            foreign_admins.append(f"`{admin_id}`")
-
-    if local_admins and foreign_admins:
+    if adminrole_objects:
         await ctx.send(
             "The bot admins on this server are:\n- "
-            + "\n- ".join(local_admins)
-            + "\n\nThe bot admins from other servers are:\n- "
-            + "\n- ".join(foreign_admins)
+            + "\n- ".join(adminrole_objects)
         )
-
-    elif local_admins and not foreign_admins:
-        await ctx.send(
-            "The bot admins on this server are:\n- "
-            + "\n- ".join(local_admins)
-            + "\n\nThere are no bot admins from other servers."
-        )
-
-    elif not local_admins and foreign_admins:
-        await ctx.send(
-            "There are no bot admins on this server.\n\nThe bot admins from other"
-            " servers are:\n- "
-            + "\n- ".join(foreign_admins)
-        )
-
     else:
-        await ctx.send("There are no bot admins registered.")
+        await ctx.send("There are no bot admins registered in this server.")
 
 
 @bot.command(name="version")
 async def print_version(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         latest = github.get_latest()
         await ctx.send(
             f"I am currently running Reaction Light v{__version__}. The latest"
@@ -1266,7 +1221,7 @@ async def print_version(ctx):
 
 @bot.command(name="kill")
 async def kill(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         await ctx.send("Shutting down...")
         shutdown()  # sys.exit()
 
@@ -1276,7 +1231,7 @@ async def kill(ctx):
 
 @bot.command(name="restart")
 async def restart_cmd(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         if platform != "win32":
             restart()
             await ctx.send("Restarting...")
@@ -1291,7 +1246,7 @@ async def restart_cmd(ctx):
 
 @bot.command(name="update")
 async def update(ctx):
-    if isadmin(ctx.message.author):
+    if isadmin(ctx.message.author, ctx.guild.id):
         if platform != "win32":
             await ctx.send("Attempting update...")
             os.chdir(directory)
