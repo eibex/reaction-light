@@ -40,7 +40,6 @@ def initialize(database):
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_reactionmessage' ('reactionrole_id' INT, 'guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
@@ -243,12 +242,8 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT message_id, channel FROM messages;")
-            all_messages = {}
-            for row in cursor:
-                message_id = int(row[0])
-                channel_id = int(row[1])
-                all_messages[message_id] = channel_id
+            cursor.execute("SELECT * FROM messages;")
+            all_messages = cursor.fetchall()
 
             cursor.close()
             conn.close()
@@ -303,6 +298,8 @@ class Database:
                 "DELETE FROM admins WHERE guild_id = ?;",
                 (guild_id,),
             )
+            # Delete the guilds potencial cleanup_queue entries
+            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id))
             conn.commit()
 
             cursor.close()
@@ -442,14 +439,21 @@ class Database:
             cursor.execute("SELECT guild_id FROM systemchannels;")
             systemchannel_guilds = cursor.fetchall()
 
-            guilds = message_guilds + systemchannel_guilds
+            cursor.execute("SELECT guild_id FROM admins;")
+            admin_guilds = cursor.fetchall()
+
+            guilds = message_guilds + systemchannel_guilds + admin_guilds
 
             # Removes any duplicate guilds from the list
             guilds = list(dict.fromkeys(guilds))
 
+            guild_ids = []
+            for guild in guilds:
+                guild_ids.append(guild[0])
+            
             cursor.close()
             conn.close()
-            return guilds
+            return guild_ids
 
         except sqlite3.Error as e:
             return e
@@ -538,9 +542,14 @@ class Database:
             cursor = conn.cursor()
             if guild_ids_only:
                 cursor.execute("SELECT guild_id FROM cleanup_queue_guilds;")
+                guilds = cursor.fetchall()
+                guild_ids = []
+                for guild in guilds:
+                    guild_ids.append(guild[0])
+                guilds = guild_ids
             else:
                 cursor.execute("SELECT * FROM cleanup_queue_guilds;")
-            guilds = cursor.fetchall()
+                guilds = cursor.fetchall()
             cursor.close()
             conn.close()
             return guilds
