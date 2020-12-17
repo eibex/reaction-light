@@ -986,102 +986,89 @@ async def set_systemchannel(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
-
+@commands.is_owner()
 @bot.command(name="colour")
 async def set_colour(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        msg = ctx.message.content.split()
-        args = len(msg) - 1
-        if args:
-            global botcolour
-            colour = msg[1]
-            try:
-                botcolour = discord.Colour(int(colour, 16))
+    msg = ctx.message.content.split()
+    args = len(msg) - 1
+    if args:
+        global botcolour
+        colour = msg[1]
+        try:
+            botcolour = discord.Colour(int(colour, 16))
 
-                config["server"]["colour"] = colour
-                with open(f"{directory}/config.ini", "w") as configfile:
-                    config.write(configfile)
+            config["server"]["colour"] = colour
+            with open(f"{directory}/config.ini", "w") as configfile:
+                config.write(configfile)
 
-                example = discord.Embed(
-                    title="Example embed",
-                    description="This embed has a new colour!",
-                    colour=botcolour,
-                )
-                await ctx.send("Colour changed.", embed=example)
+            example = discord.Embed(
+                title="Example embed",
+                description="This embed has a new colour!",
+                colour=botcolour,
+            )
+            await ctx.send("Colour changed.", embed=example)
 
-            except ValueError:
-                await ctx.send(
-                    "Please provide a valid hexadecimal value. Example:"
-                    f" `{prefix}colour 0xffff00`"
-                )
-
-        else:
+        except ValueError:
             await ctx.send(
-                f"Please provide a hexadecimal value. Example: `{prefix}colour"
-                " 0xffff00`"
+                "Please provide a valid hexadecimal value. Example:"
+                f" `{prefix}colour 0xffff00`"
             )
 
+    else:
+        await ctx.send(
+            f"Please provide a hexadecimal value. Example: `{prefix}colour"
+            " 0xffff00`"
+        )
 
+@commands.is_owner()
 @bot.command(name="activity")
 async def add_activity(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        activity = ctx.message.content[(len(prefix) + len("activity")) :].strip()
-        if not activity:
-            await ctx.send(
-                "Please provide the activity you would like to"
-                f" add.\n```\n{prefix}activity your activity text here\n```"
-            )
+    activity = ctx.message.content[(len(prefix) + len("activity")) :].strip()
+    if not activity:
+        await ctx.send(
+            "Please provide the activity you would like to"
+            f" add.\n```\n{prefix}activity your activity text here\n```"
+        )
 
-        elif "," in activity:
-            await ctx.send("Please do not use commas `,` in your activity.")
-
-        else:
-            activities.add(activity)
-            await ctx.send(f"The activity `{activity}` was added succesfully.")
+    elif "," in activity:
+        await ctx.send("Please do not use commas `,` in your activity.")
 
     else:
-        await ctx.send("You do not have an admin role.")
+        activities.add(activity)
+        await ctx.send(f"The activity `{activity}` was added succesfully.")
 
-
+@commands.is_owner()
 @bot.command(name="activitylist")
 async def list_activities(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        if activities.activity_list:
-            formatted_list = []
-            for activity in activities.activity_list:
-                formatted_list.append(f"`{activity}`")
+    if activities.activity_list:
+        formatted_list = []
+        for activity in activities.activity_list:
+            formatted_list.append(f"`{activity}`")
 
-            await ctx.send(
-                "The current activities are:\n- " + "\n- ".join(formatted_list)
-            )
-
-        else:
-            await ctx.send("There are no activities to show.")
+        await ctx.send(
+            "The current activities are:\n- " + "\n- ".join(formatted_list)
+        )
 
     else:
-        await ctx.send("You do not have an admin role.")
+        await ctx.send("There are no activities to show.")
 
-
+@commands.is_owner()
 @bot.command(name="rm-activity")
 async def remove_activity(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        activity = ctx.message.content[(len(prefix) + len("rm-activity")) :].strip()
-        if not activity:
-            await ctx.send(
-                "Please paste the activity you would like to"
-                f" remove.\n```\n{prefix}rm-activity your activity text here\n```"
-            )
-            return
+    activity = ctx.message.content[(len(prefix) + len("rm-activity")) :].strip()
+    if not activity:
+        await ctx.send(
+            "Please paste the activity you would like to"
+            f" remove.\n```\n{prefix}rm-activity your activity text here\n```"
+        )
+        return
 
-        removed = activities.remove(activity)
-        if removed:
-            await ctx.send(f"The activity `{activity}` was removed.")
-
-        else:
-            await ctx.send("The activity you mentioned does not exist.")
+    removed = activities.remove(activity)
+    if removed:
+        await ctx.send(f"The activity `{activity}` was removed.")
 
     else:
-        await ctx.send("You do not have an admin role.")
+        await ctx.send("The activity you mentioned does not exist.")
 
 
 @bot.command(name="help")
@@ -1219,53 +1206,46 @@ async def print_version(ctx):
     else:
         await ctx.send("You do not have an admin role.")
 
-
+@commands.is_owner()
 @bot.command(name="kill")
 async def kill(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        await ctx.send("Shutting down...")
+    await ctx.send("Shutting down...")
+    shutdown()  # sys.exit()
+
+@commands.is_owner()
+@bot.command(name="restart")
+async def restart_cmd(ctx):
+    if platform != "win32":
+        restart()
+        await ctx.send("Restarting...")
         shutdown()  # sys.exit()
 
     else:
-        await ctx.send("You do not have an admin role.")
+        await ctx.send("I cannot do this on Windows.")
 
-
-@bot.command(name="restart")
-async def restart_cmd(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        if platform != "win32":
-            restart()
-            await ctx.send("Restarting...")
-            shutdown()  # sys.exit()
-
-        else:
-            await ctx.send("I cannot do this on Windows.")
-
-    else:
-        await ctx.send("You do not have an admin role.")
-
-
+@commands.is_owner()
 @bot.command(name="update")
 async def update(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        if platform != "win32":
-            await ctx.send("Attempting update...")
-            os.chdir(directory)
-            cmd = os.popen("git fetch")
-            cmd.close()
-            cmd = os.popen("git pull")
-            cmd.close()
-            await ctx.send("Creating database backup...")
-            copy(db_file, f"{db_file}.bak")
-            restart()
-            await ctx.send("Restarting...")
-            shutdown()  # sys.exit()
-
-        else:
-            await ctx.send("I cannot do this on Windows.")
+    if platform != "win32":
+        await ctx.send("Attempting update...")
+        os.chdir(directory)
+        cmd = os.popen("git fetch")
+        cmd.close()
+        cmd = os.popen("git pull")
+        cmd.close()
+        await ctx.send("Creating database backup...")
+        copy(db_file, f"{db_file}.bak")
+        restart()
+        await ctx.send("Restarting...")
+        shutdown()  # sys.exit()
 
     else:
-        await ctx.send("You do not have an admin role.")
+        await ctx.send("I cannot do this on Windows.")
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.NotOwner):
+        await ctx.send("Only the bot owner may execute this command.")
 
 try:
     bot.run(TOKEN)
