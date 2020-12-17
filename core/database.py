@@ -139,6 +139,8 @@ class Database:
                 for admin_id in guilds[guild]:
                     cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id,))
             conn.commit()
+            cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
+            conn.commit()
             print("Successfully migrated admins.")
         else:
             print("No admin migration needed.")
