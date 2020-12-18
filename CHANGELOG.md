@@ -1,4 +1,11 @@
 # Reaction Light - Changelog
+### 2.1.0
+- Fix guild clean ([#52](https://github.com/eibex/reaction-light/issues/52) closed by [#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
+- Message clean-up reworked ([#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
+- Admin system reworked ([#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
+- Removed access to `kill`, `restart`, `update`, `color`, `activity` (and related) commands from non-bot owners ([#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
+- **What you NEED to do**
+  - You might have to re-add your admins by running the `rl!admin` command
 
 ### 2.0.1
 - Fix footers being deleted upon embed edit ([#49](https://github.com/eibex/reaction-light/pull/49) by [Edwinexd](https://github.com/Edwinexd))
