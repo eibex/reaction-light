@@ -307,7 +307,7 @@ class Database:
             # Deleting the guilds reaction-role database entries
             cursor.execute(
                 "SELECT reactionrole_id FROM messages WHERE guild_id = ?;",
-                (guild_id),
+                (guild_id,),
             )
             results = cursor.fetchall()
             if results:
