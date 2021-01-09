@@ -142,8 +142,7 @@ class Database:
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
             print("Successfully migrated admins.")
-        else:
-            print("No admin migration needed.")
+
         cursor.close()
         conn.close()
 

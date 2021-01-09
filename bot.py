@@ -248,7 +248,7 @@ async def cleandb():
             f" cleaning:\n```\n{messages}\n```",
         )
         return
-    
+
     for message in messages:
         try:
             channel_id = message[1]
@@ -314,15 +314,16 @@ async def cleandb():
             f" cleaning:\n```\n{cleanup_guilds}\n```",
         )
         return
-    
+
     current_timestamp = round(datetime.datetime.utcnow().timestamp())
     for guild in cleanup_guilds:
         if int(guild[1]) - current_timestamp <= -86400:
             # The guild has been invalid / unreachable for more than 24 hrs, try one more fetch then give up and purge the guilds database entries
             try:
-                await getguild(guild[0])
+                await bot.fetch_guild(guild[0])
                 db.remove_cleanup_guild(guild[0])
                 continue
+
             except discord.Forbidden:
                 delete = db.remove_guild(guild[0])
                 delete2 = db.remove_cleanup_guild(guild[0])
@@ -333,6 +334,7 @@ async def cleandb():
                         f" database cleaning:\n```\n{delete}\n```",
                     )
                     return
+
                 elif isinstance(delete2, Exception):
                     await system_notification(
                         None,
@@ -346,8 +348,9 @@ async def check_cleanup_queued_guilds():
     cleanup_guild_ids = db.fetch_cleanup_guilds(guild_ids_only=True)
     for guild_id in cleanup_guild_ids:
         try:
-            await getguild(guild_id)
+            await bot.fetch_guild(guild_id)
             db.remove_cleanup_guild(guild_id)
+
         except discord.Forbidden:
             continue
 
