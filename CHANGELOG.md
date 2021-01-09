@@ -1,4 +1,7 @@
 # Reaction Light - Changelog
+### 2.1.1
+- Fix errors related to missing elements in the bot cache
+
 ### 2.1.0
 - Fix guild clean-up ([#52](https://github.com/eibex/reaction-light/issues/52) closed by [#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
 - Message clean-up reworked ([#53](https://github.com/eibex/reaction-light/pull/53) by [Edwinexd](https://github.com/Edwinexd))
@@ -16,7 +19,7 @@
   - You might have to re-clone the bot because of git history conflicts (copy the `config.ini` file and the `files` folder to the new installation and all your reaction-role messages will keep working as expected)
 
 ### 1.6.1
-- Prevent adding an already existing reaction to new or existing reaction-role messages.
+- Prevent adding an already existing reaction to new or existing reaction-role messages
 
 ### 1.6.0
 - Add `rl!reaction` to add or remove reactions from existing reaction-role messages ([#1](https://github.com/eibex/reaction-light/issues/1) closed by [#43](https://github.com/eibex/reaction-light/pull/43) by [eibex](https://github.com/eibex))
