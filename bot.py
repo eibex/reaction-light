@@ -62,6 +62,7 @@ intents.members = True
 intents.reactions = True
 intents.messages = True
 intents.emojis = True
+
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
 bot.remove_command("help")
@@ -89,6 +90,32 @@ def isadmin(member, guild_id):
         return False
 
 
+async def getchannel(id):
+    channel = bot.get_channel(id)
+
+    if not channel:
+        channel = await bot.fetch_channel(id)
+
+    return channel
+
+
+async def getguild(id):
+    guild = bot.get_guild(id)
+
+    if not guild:
+        guild = await bot.fetch_guild(id)
+
+    return guild
+
+
+async def getuser(id):
+    user = bot.get_user(id)
+
+    if not user:
+        user = await bot.fetch_user(id)
+
+    return user
+
 def restart():
     # Create a new python process of bot.py and stops the current one
     os.chdir(directory)
@@ -97,14 +124,14 @@ def restart():
     cmd.close()
 
 
-def database_updates():
+async def database_updates():
     handler = schema.SchemaHandler(db_file)
     if handler.version == 0:
         handler.update()
         messages = db.fetch_all_messages()
         for message in messages:
             channel_id = message[1]
-            channel = bot.get_channel(channel_id)
+            channel = await getchannel(channel_id)
             db.add_guild(channel.id, channel.guild.id)
 
 
@@ -123,7 +150,7 @@ async def system_notification(guild_id, text):
 
         if server_channel:
             try:
-                target_channel = bot.get_channel(server_channel[0][0])
+                target_channel = await getchannel(server_channel[0][0])
                 await target_channel.send(text)
 
             except discord.Forbidden:
@@ -134,7 +161,7 @@ async def system_notification(guild_id, text):
 
     elif system_channel:
         try:
-            target_channel = bot.get_channel(system_channel)
+            target_channel = await getchannel(system_channel)
             await target_channel.send(text)
 
         except discord.NotFound:
@@ -225,9 +252,7 @@ async def cleandb():
     for message in messages:
         try:
             channel_id = message[1]
-            channel = bot.get_channel(channel_id)
-            if channel is None:
-                channel = await bot.fetch_channel(channel_id)
+            channel = await bot.fetch_channel(channel_id)
 
             await channel.fetch_message(message[0])
 
@@ -252,12 +277,12 @@ async def cleandb():
 
         except discord.Forbidden:
             # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
-                await system_notification(
-                    message[3],
-                    "I do not have access to a message I have created anymore. "
-                    "I cannot manage the roles of users reacting to it."
-                    f"\n\nID: {message[0]} in channel {message[1]}",
-                )
+            await system_notification(
+                message[3],
+                "I do not have access to a message I have created anymore. "
+                "I cannot manage the roles of users reacting to it."
+                f"\n\nID: {message[0]} in channel {message[1]}",
+            )
 
     if isinstance(guilds, Exception):
         await system_notification(
@@ -295,7 +320,7 @@ async def cleandb():
         if int(guild[1]) - current_timestamp <= -86400:
             # The guild has been invalid / unreachable for more than 24 hrs, try one more fetch then give up and purge the guilds database entries
             try:
-                await bot.fetch_guild(guild[0])
+                await getguild(guild[0])
                 db.remove_cleanup_guild(guild[0])
                 continue
             except discord.Forbidden:
@@ -321,7 +346,7 @@ async def check_cleanup_queued_guilds():
     cleanup_guild_ids = db.fetch_cleanup_guilds(guild_ids_only=True)
     for guild_id in cleanup_guild_ids:
         try:
-            await bot.fetch_guild(guild_id)
+            await getguild(guild_id)
             db.remove_cleanup_guild(guild_id)
         except discord.Forbidden:
             continue
@@ -344,7 +369,7 @@ async def on_ready():
             f" `{prefix}rm-admin`.",
         )
 
-    database_updates()
+    await database_updates()
     db.migrate_admins(bot)
     maintain_presence.start()
     cleandb.start()
@@ -382,9 +407,9 @@ async def on_message(message):
                     await message.channel.send("The channel you mentioned is invalid.")
                     return
 
-                server = bot.get_guild(message.guild.id)
+                server = await getguild(message.guild.id)
                 bot_user = server.get_member(bot.user.id)
-                bot_permissions = bot.get_channel(target_channel).permissions_for(
+                bot_permissions = await getchannel(target_channel).permissions_for(
                     bot_user
                 )
                 writable = bot_permissions.read_messages
@@ -473,7 +498,7 @@ async def on_message(message):
                 )
 
                 if selector_msg_body or selector_embed:
-                    target_channel = bot.get_channel(
+                    target_channel = await getchannel(
                         db.get_targetchannel(user, channel)
                     )
                     selector_msg = None
@@ -542,9 +567,9 @@ async def on_raw_reaction_add(payload):
             )
             return
 
-        ch = bot.get_channel(ch_id)
+        ch = await getchannel(ch_id)
         msg = await ch.fetch_message(msg_id)
-        user = bot.get_user(user_id)
+        user = await getuser(user_id)
         if reaction not in reactions:
             # Removes reactions added to the reaction-role message that are not connected to any role
             await msg.remove_reaction(reaction, user)
@@ -552,7 +577,7 @@ async def on_raw_reaction_add(payload):
         else:
             # Gives role if it has permissions, else 403 error is raised
             role_id = reactions[reaction]
-            server = bot.get_guild(guild_id)
+            server = await getguild(guild_id)
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=role_id)
             if user_id != bot.user.id:
@@ -596,8 +621,12 @@ async def on_raw_reaction_remove(payload):
         elif reaction in reactions:
             role_id = reactions[reaction]
             # Removes role if it has permissions, else 403 error is raised
-            server = bot.get_guild(guild_id)
+            server = await getguild(guild_id)
             member = server.get_member(user_id)
+
+            if not member:
+                member = await server.fetch_member(user_id)
+
             role = discord.utils.get(server.roles, id=role_id)
             try:
                 await member.remove_roles(role)
@@ -675,7 +704,7 @@ async def edit_selector(ctx):
                 await ctx.send("You need to mention a channel.")
                 return
 
-            channel = bot.get_channel(channel_id)
+            channel = await getchannel(channel_id)
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
                 await ctx.send(
@@ -707,7 +736,7 @@ async def edit_selector(ctx):
                 # Tries to edit the reaction-role message
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
                 channel_id = ctx.message.channel_mentions[0].id
-                channel = bot.get_channel(channel_id)
+                channel = await getchannel(channel_id)
                 msg_values = ctx.message.content.split(" // ")
                 selector_msg_number = msg_values[1]
                 all_messages = db.fetch_messages(channel_id)
@@ -955,9 +984,9 @@ async def set_systemchannel(ctx):
         target_channel = mentioned_channels[0].id
         guild_id = ctx.message.guild.id
 
-        server = bot.get_guild(guild_id)
+        server = await getguild(guild_id)
         bot_user = server.get_member(bot.user.id)
-        bot_permissions = bot.get_channel(system_channel).permissions_for(bot_user)
+        bot_permissions = await getchannel(system_channel).permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
