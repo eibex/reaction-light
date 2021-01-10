@@ -1,4 +1,7 @@
 # Reaction Light - Changelog
+### 2.1.2
+- Fix database errors resulting in guilds not being cleaned up
+
 ### 2.1.1
 - Fix errors related to missing elements in the bot cache
 
