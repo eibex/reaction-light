@@ -137,7 +137,7 @@ class Database:
             conn.commit()
             for guild in guilds:
                 for admin_id in guilds[guild]:
-                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id,))
+                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
             conn.commit()
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
@@ -331,7 +331,7 @@ class Database:
                 (guild_id,),
             )
             # Delete the guilds potencial cleanup_queue entries
-            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id))
+            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id,))
             conn.commit()
 
             cursor.close()
@@ -379,7 +379,7 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO 'admins' ('role_id', 'guild_id') values(?,?);", (role_id, guild_id,))
+            cursor.execute("INSERT INTO 'admins' ('role_id', 'guild_id') values(?,?);", (role_id, guild_id))
             conn.commit()
             cursor.close()
             conn.close()
@@ -403,7 +403,7 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM admins WHERE guild_id = ?;", (guild_id, ))
+            cursor.execute("SELECT * FROM admins WHERE guild_id = ?;", (guild_id,))
             admins = []
             for row in cursor:
                 role_id = row[0]
@@ -546,7 +546,7 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO 'cleanup_queue_guilds' ('guild_id', 'unix_timestamp') values(?,?);", (guild_id, unix_timestamp,))
+            cursor.execute("INSERT INTO 'cleanup_queue_guilds' ('guild_id', 'unix_timestamp') values(?,?);", (guild_id, unix_timestamp))
             conn.commit()
             cursor.close()
             conn.close()
@@ -559,7 +559,7 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id))
+            cursor.execute("DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id,))
             conn.commit()
             cursor.close()
             conn.close()
