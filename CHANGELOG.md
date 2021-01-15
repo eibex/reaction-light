@@ -1,4 +1,7 @@
 # Reaction Light - Changelog
+### 2.1.3
+- Fix errors occuring during reaction-role message creation/editing ([#54](https://github.com/eibex/reaction-light/issues/54) closed by [#55](https://github.com/eibex/reaction-light/pull/55) by [Edwinexd](https://github.com/Edwinexd))
+
 ### 2.1.2
 - Fix database errors resulting in guilds not being cleaned up
 
