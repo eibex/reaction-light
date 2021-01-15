@@ -412,7 +412,7 @@ async def on_message(message):
 
                 server = await getguild(message.guild.id)
                 bot_user = server.get_member(bot.user.id)
-                bot_permissions = await getchannel(target_channel).permissions_for(
+                bot_permissions = (await getchannel(target_channel)).permissions_for(
                     bot_user
                 )
                 writable = bot_permissions.read_messages
@@ -989,7 +989,7 @@ async def set_systemchannel(ctx):
 
         server = await getguild(guild_id)
         bot_user = server.get_member(bot.user.id)
-        bot_permissions = await getchannel(system_channel).permissions_for(bot_user)
+        bot_permissions = (await getchannel(system_channel)).permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
