@@ -26,6 +26,7 @@ SOFTWARE.
 import os
 import datetime
 import configparser
+import asyncio
 from shutil import copy
 from sys import platform, exit as shutdown
 
@@ -94,7 +95,12 @@ async def getchannel(id):
     channel = bot.get_channel(id)
 
     if not channel:
-        channel = await bot.fetch_channel(id)
+        try:
+            channel = await bot.fetch_channel(id)
+        except discord.InvalidData:
+            channel = None
+        except discord.HTTPException:
+            channel = None
 
     return channel
 
@@ -644,7 +650,7 @@ async def on_raw_reaction_remove(payload):
                 )
 
 
-@bot.command(name="new")
+@bot.command(name="new", aliases=['create'])
 async def new(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         # Starts setup process and the bot starts to listen to the user in that channel
@@ -667,8 +673,148 @@ async def new(ctx):
             " first."
         )
 
+@bot.command(name="rnew")
+async def rnew(ctx):
+    if isadmin(ctx.message.author, ctx.guild.id):
+        sent_initial_message = await ctx.send("Welcome to the Reaction Light creation program. Please provide the required information once requested.")
+        rl_object = {}
+        cancelled = False
 
-@bot.command(name="abort")
+        def check(message):
+            return message.author.id == ctx.message.author.id and message.content != ""
+        
+        if cancelled == False:
+            error_messages = []
+            user_messages = []
+            sent_reactions_message = await ctx.send(
+                    "Attach roles and emojis separated by one space (one combination"
+                    " per message). When you are done type `done`. Example:\n:smile:"
+                    " `@Role`"
+            )
+            rl_object["reactions"] = {}
+            try:
+                while True:
+                    reactions_message = await bot.wait_for('message', timeout=120, check=check)
+                    user_messages.append(reactions_message)
+                    if reactions_message.content.lower() != "done":
+                        reaction = (reactions_message.content.split())[0]
+                        try:
+                            role = reactions_message.role_mentions[0].id
+                        except IndexError:
+                            error_messages.append((await ctx.send(
+                                "Mention a role after the reaction. Example:\n:smile:"
+                                " `@Role`"
+                            )))
+                            continue
+
+                        if reaction in rl_object["reactions"]:
+                            error_messages.append((await ctx.send(
+                                "You have already used that reaction for another role. Please choose another reaction"
+                            )))
+                            continue
+                        else:
+                            try:
+                                await reactions_message.add_reaction(reaction)
+                                rl_object["reactions"][reaction] = role
+                            except discord.HTTPException:
+                                error_messages.append((await ctx.send(
+                                    "You can only use reactions uploaded to servers the bot has"
+                                    " access to or standard emojis."
+                                )))
+                                continue
+                    else:
+                        break
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_reactions_message.delete()
+                for message in error_messages + user_messages:
+                    await message.delete()
+    
+        if cancelled == False:
+            sent_oldmessagequestion_message = await ctx.send(f"Would you like to use an existing message or create one using {bot.user.mention}? Please react with a 🗨️ to use an existing message or a 🤖 to create one.")
+            def reaction_check(payload):
+                return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
+            try:
+                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
+                
+                if str(oldmessagequestion_response_payload.emoji) == "🗨️":
+                    rl_object["old_message"] = True
+                else:
+                    rl_object["old_message"] = False
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_oldmessagequestion_message.delete()
+                await sent_oldmessagequestion_message.delete()
+        if cancelled == False:
+            error_messages = []
+            user_messages = []
+            if rl_object["old_message"] == True:
+                sent_oldmessage_message = await ctx.send(f"Which message would you like to use? Please react with a 🔧 on the message you would like to use.")
+                def reaction_check2(payload):
+                    return payload.member.id == ctx.message.author.id and payload.guild_id == sent_oldmessage_message.guild.id and str(payload.emoji) == "🔧"
+                try:
+                    while True:
+                        oldmessage_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check2)
+                        try:
+                            channel = await getchannel(oldmessage_response_payload.channel_id)
+                            if channel is None:
+                                raise discord.NotFound
+                            try:
+                                message = await channel.fetch_message(oldmessage_response_payload.message_id)
+                            except discord.HTTPException:
+                                raise discord.NotFound
+                            try:
+                                await message.add_reaction("👌")
+                            except discord.HTTPException:
+                                raise discord.NotFound
+
+                            rl_object["message"] = dict(message_id=message.id, channel_id=message.channel.id, guild_id=message.guild.id)
+                            break
+                        except discord.NotFound:
+                            error_messages.append((await ctx.send("I can not access or add reactions to the requested message. Do I have sufficent permissions?")))
+                except asyncio.TimeoutError:
+                    await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                    await sent_oldmessage_message.delete()
+                    cancelled = True
+                finally:
+                    for message in error_messages:
+                        await message.delete()
+            else:
+                selector_embed = discord.Embed(
+                    title="Embed_title",
+                    description="Embed_content",
+                    colour=botcolour,
+                )
+                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+                sent_message_message = await message.channel.send(
+                    "What would you like the message to say?\nFormatting is:"
+                    " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
+                    " and `Embed_content` are optional. You can type `none` in any"
+                    " of the argument fields above (e.g. `Embed_title`) to make the"
+                    " bot ignore it.\n\n\nMessage",
+                    embed=selector_embed,
+                )
+                try:
+                    while True:
+                        message_message = await bot.wait_for('message', timeout=120, check=check)
+                except asyncio.TimeoutError:
+                    await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                    cancelled = True
+                finally:
+                    await sent_message_message.delete()
+    else:
+        await ctx.send(
+            f"You do not have an admin role. You might want to use `{prefix}admin`"
+            " first."
+        )
+
+
+@bot.command(name="abort", aliases=['cancel'])
 async def abort(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         # Aborts setup process
