@@ -769,6 +769,7 @@ async def rnew(ctx):
                                 raise discord.NotFound
                             try:
                                 await message.add_reaction("👌")
+                                await message.remove_reaction("👌", message.guild.me)
                             except discord.HTTPException:
                                 raise discord.NotFound
 
@@ -778,35 +779,96 @@ async def rnew(ctx):
                             error_messages.append((await ctx.send("I can not access or add reactions to the requested message. Do I have sufficent permissions?")))
                 except asyncio.TimeoutError:
                     await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
-                    await sent_oldmessage_message.delete()
                     cancelled = True
                 finally:
+                    await sent_oldmessage_message.delete()
                     for message in error_messages:
                         await message.delete()
             else:
-                selector_embed = discord.Embed(
-                    title="Embed_title",
-                    description="Embed_content",
-                    colour=botcolour,
-                )
-                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-
-                sent_message_message = await message.channel.send(
-                    "What would you like the message to say?\nFormatting is:"
-                    " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
-                    " and `Embed_content` are optional. You can type `none` in any"
-                    " of the argument fields above (e.g. `Embed_title`) to make the"
-                    " bot ignore it.\n\n\nMessage",
-                    embed=selector_embed,
-                )
+                sent_channel_message = await ctx.send("Mention the #channel where to send the auto-role message.")
                 try:
                     while True:
-                        message_message = await bot.wait_for('message', timeout=120, check=check)
-                except asyncio.TimeoutError:
+                        channel_message = await bot.wait_for('message', timeout=120, check=check)
+                        if channel_message.channel_mentions:
+                            rl_object["target_channel"] = message.channel_mentions[0]
+                        else:
+                            error_messages.append((await message.channel.send("The channel you mentioned is invalid.")))
+                except asyncio.TimeoutError: 
                     await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
                     cancelled = True
                 finally:
-                    await sent_message_message.delete()
+                    await sent_channel_message.delete()
+                    for message in error_messages:
+                        await message.delete()
+        if cancelled == False and 'target_channel' in rl_object:
+            error_messages = []
+            selector_embed = discord.Embed(
+                title="Embed_title",
+                description="Embed_content",
+                colour=botcolour,
+            )
+            selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+            sent_message_message = await message.channel.send(
+                "What would you like the message to say?\nFormatting is:"
+                " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
+                " and `Embed_content` are optional. You can type `none` in any"
+                " of the argument fields above (e.g. `Embed_title`) to make the"
+                " bot ignore it.\n\n\nMessage",
+                embed=selector_embed,
+            )
+            try:
+                while True:
+                    message_message = await bot.wait_for('message', timeout=120, check=check)
+                    # I would usually end up deleting message_message in the end but users usually want to be able to access the 
+                    # format they once used incase they want to make any minor changes
+                    msg_values = message_message.content.split(" // ")
+                    # This whole system could also be re-done using wait_for to make the syntax easier for the user
+                    # But it would be a breaking change that would be annoying for thoose who have saved their message commands
+                    # for editing.
+                    selector_msg_body = (
+                        msg_values[0] if msg_values[0].lower() != "none" else None
+                    )
+                    selector_embed = discord.Embed(colour=botcolour)
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+                    if len(msg_values) > 1:
+                        if msg_values[1].lower() != "none":
+                            selector_embed.title = msg_values[1]
+                        if len(msg_values) > 2 and msg_values[2].lower() != "none":
+                            selector_embed.description = msg_values[2]
+
+                    # Prevent sending an empty embed instead of removing it
+                    selector_embed = (
+                        selector_embed
+                        if selector_embed.title or selector_embed.description
+                        else None
+                    )
+
+                    if selector_msg_body or selector_embed:
+                        target_channel = rl_object["target_channel"]
+                        sent_final_message = None
+                        try:
+                            sent_final_message = await target_channel.send(
+                                content=selector_msg_body, embed=selector_embed
+                            )
+                            rl_object["message"] = dict(message_id=sent_final_message.id, channel_id=sent_final_message.channel.id, guild_id=sent_final_message.guild.id)
+                        except discord.Forbidden:
+                            error_messages.append((await message.channel.send(
+                                "I don't have permission to send messages to"
+                                f" the channel {target_channel.mention}. Please check my permissions and try again."
+                            )))
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_message_message.delete()
+                for message in error_messages:
+                    await message.delete()
+        if cancelled == False:
+            # Ait we are (almost) all done, now we just need to clean this dictionary, insert that into the database and add the reactions
+            pass
+        await sent_initial_message.delete()
     else:
         await ctx.send(
             f"You do not have an admin role. You might want to use `{prefix}admin`"
