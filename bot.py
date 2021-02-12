@@ -395,162 +395,6 @@ async def on_guild_remove(guild):
 async def on_message(message):
     await bot.process_commands(message)
 
-    if isadmin(message.author, message.guild.id):
-        user = str(message.author.id)
-        channel = str(message.channel.id)
-        step = db.step(user, channel)
-        msg = message.content.split()
-
-        # Checks if the setup process was started before.
-        # If it was not, it ignores the message.
-        if step is not None:
-            if step == 0:
-                db.step0(user, channel)
-
-            elif step == 1:
-                # The channel the message needs to be sent to is stored
-                # Advances to step two
-                if message.channel_mentions:
-                    target_channel = message.channel_mentions[0].id
-
-                else:
-                    await message.channel.send("The channel you mentioned is invalid.")
-                    return
-
-                server = await getguild(message.guild.id)
-                bot_user = server.get_member(bot.user.id)
-                bot_permissions = (await getchannel(target_channel)).permissions_for(
-                    bot_user
-                )
-                writable = bot_permissions.read_messages
-                readable = bot_permissions.view_channel
-                if not writable or not readable:
-                    await message.channel.send(
-                        "I cannot read or send messages in that channel."
-                    )
-                    return
-
-                db.step1(user, channel, target_channel)
-
-                await message.channel.send(
-                    "Attach roles and emojis separated by one space (one combination"
-                    " per message). When you are done type `done`. Example:\n:smile:"
-                    " `@Role`"
-                )
-            elif step == 2:
-                if msg[0].lower() != "done":
-                    # Stores reaction-role combinations until "done" is received
-                    try:
-                        reaction = msg[0]
-                        role = message.role_mentions[0].id
-                        exists = db.step2(user, channel, role, reaction)
-                        if exists:
-                            await message.channel.send(
-                                "You have already used that reaction for another role."
-                            )
-                            return
-
-                        await message.add_reaction(reaction)
-
-                    except IndexError:
-                        await message.channel.send(
-                            "Mention a role after the reaction. Example:\n:smile:"
-                            " `@Role`"
-                        )
-
-                    except discord.HTTPException:
-                        await message.channel.send(
-                            "You can only use reactions uploaded to servers the bot has"
-                            " access to or standard emojis."
-                        )
-
-                else:
-                    # Advances to step three
-                    db.step2(user, channel, done=True)
-
-                    selector_embed = discord.Embed(
-                        title="Embed_title",
-                        description="Embed_content",
-                        colour=botcolour,
-                    )
-                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-
-                    await message.channel.send(
-                        "What would you like the message to say?\nFormatting is:"
-                        " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
-                        " and `Embed_content` are optional. You can type `none` in any"
-                        " of the argument fields above (e.g. `Embed_title`) to make the"
-                        " bot ignore it.\n\n\nMessage",
-                        embed=selector_embed,
-                    )
-
-            elif step == 3:
-                # Receives the title and description of the reaction-role message
-                # If the formatting is not correct it reminds the user of it
-                msg_values = message.content.split(" // ")
-                selector_msg_body = (
-                    msg_values[0] if msg_values[0].lower() != "none" else None
-                )
-                selector_embed = discord.Embed(colour=botcolour)
-                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-
-                if len(msg_values) > 1:
-                    if msg_values[1].lower() != "none":
-                        selector_embed.title = msg_values[1]
-                    if len(msg_values) > 2 and msg_values[2].lower() != "none":
-                        selector_embed.description = msg_values[2]
-
-                # Prevent sending an empty embed instead of removing it
-                selector_embed = (
-                    selector_embed
-                    if selector_embed.title or selector_embed.description
-                    else None
-                )
-
-                if selector_msg_body or selector_embed:
-                    target_channel = await getchannel(
-                        db.get_targetchannel(user, channel)
-                    )
-                    selector_msg = None
-                    try:
-                        selector_msg = await target_channel.send(
-                            content=selector_msg_body, embed=selector_embed
-                        )
-
-                    except discord.Forbidden:
-                        await message.channel.send(
-                            "I don't have permission to send selector_msg messages to"
-                            f" the channel {target_channel.mention}."
-                        )
-
-                    if isinstance(selector_msg, discord.Message):
-                        combos = db.get_combos(user, channel)
-
-                        end = db.end_creation(user, channel, selector_msg.id)
-                        if isinstance(end, Exception):
-                            await message.channel.send(
-                                "I could not commit the changes to the database."
-                            )
-                            await system_notification(
-                                message.channel.id, f"Database error:\n```\n{end}\n```",
-                            )
-
-                        for reaction in combos:
-                            try:
-                                await selector_msg.add_reaction(reaction)
-
-                            except discord.Forbidden:
-                                await message.channel.send(
-                                    "I don't have permission to react to messages from"
-                                    f" the channel {target_channel.mention}."
-                                )
-
-                else:
-                    await message.channel.send(
-                        "You can't use an empty message as a role-reaction message."
-                    )
-
-
 @bot.event
 async def on_raw_reaction_add(payload):
     reaction = str(payload.emoji)
@@ -653,32 +497,9 @@ async def on_raw_reaction_remove(payload):
 
 @bot.command(name="new", aliases=['create'])
 async def new(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        # Starts setup process and the bot starts to listen to the user in that channel
-        # For future prompts (see: "async def on_message(message)")
-        started = db.start_creation(
-            ctx.message.author.id, ctx.message.channel.id, ctx.message.guild.id
-        )
-        if started:
-            await ctx.send("Mention the #channel where to send the auto-role message.")
-
-        else:
-            await ctx.send(
-                "You are already creating a reaction-role message in this channel. "
-                f"Use another channel or run `{prefix}abort` first."
-            )
-
-    else:
-        await ctx.send(
-            f"You do not have an admin role. You might want to use `{prefix}admin`"
-            " first."
-        )
-
-@bot.command(name="rnew")
-async def rnew(ctx):
     try:
         if isadmin(ctx.message.author, ctx.guild.id):
-            sent_initial_message = await ctx.send("Welcome to the Reaction Light creation program. Please provide the required information once requested.")
+            sent_initial_message = await ctx.send("Welcome to the Reaction Light creation program. Please provide the required information once requested. If you would like to abort the creation, do not respond and the program will time out.")
             rl_object = {}
             cancelled = False
 
@@ -904,24 +725,6 @@ async def rnew(ctx):
     except Exception as e:
         traceback.print_tb(e.__traceback__)
         print(e)
-
-
-@bot.command(name="abort", aliases=['cancel'])
-async def abort(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        # Aborts setup process
-        aborted = db.abort(ctx.message.author.id, ctx.message.channel.id)
-        if aborted:
-            await ctx.send("Reaction-role message creation aborted.")
-
-        else:
-            await ctx.send(
-                "There are no reaction-role message creation processes started by you"
-                " in this channel."
-            )
-
-    else:
-        await ctx.send(f"You do not have an admin role.")
 
 
 @bot.command(name="edit")
