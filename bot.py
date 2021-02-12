@@ -820,7 +820,6 @@ async def edit_selector(ctx):
                         " above)."
                     )
                     return
-
                 await old_msg.edit(suppress=False)
                 selector_msg_new_body = (
                     msg_values[2] if msg_values[2].lower() != "none" else None
@@ -847,7 +846,9 @@ async def edit_selector(ctx):
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
                     await ctx.send("Message edited.")
-
+                except discord.Forbidden:
+                    await ctx.send("I can only edit messages that are created by me, please edit the message in some other way.")
+                    return
                 except discord.HTTPException as e:
                     if e.code == 50006:
                         await ctx.send(
