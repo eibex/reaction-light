@@ -77,7 +77,6 @@ All commands require an admin role which you can set by using `rl!admin` (requir
 
 - `rl!help` shows this set of commands along with a link to the repository.
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
-- `rl!abort` aborts the creation process for a new reaction role message started by the command user in that channel.
 - `rl!edit` edits the text and embed of an existing reaction role message.
 - `rl!reaction` adds or removes a reaction from an existing reaction role message.
 - `rl!colour` changes the colour of the embeds of new and newly edited reaction role messages.
