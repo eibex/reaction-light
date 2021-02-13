@@ -100,12 +100,6 @@ Initiate the message creation process with `rl!new`.
 User: rl!new
 ```
 
-Next, you will be asked to mention the channel you want to send the message in.
-```
-Bot: Please mention the #channel where to send the auto-role message.
-User: #get-roles
-```
-
 Next, you will be asked to attach emojis to roles. Only use standard emojis or those that are hosted on servers the bot has access to. Send a single message for each single combination and then type `done` when you have finished attaching emojis to their respective roles. Ensure that the roles are mentionable when you are doing this step. You can disable mentions after finishing this step.
 ```
 Bot: Attach roles and emojis separated by a space (one combination per message).
@@ -118,7 +112,9 @@ User: :joy: @HappyRole
 User: done
 ```
 
-Next, you will be asked to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
+Next, you will be asked to either create a new message or use an existing one. Using an existing message will prevent you from using `rl!edit` if the target message wasn't created by the bot. If you choose to use an already existing message simply react to it with 🔧, the bot will remove the 🔧 reaction and add the ones you chose.
+
+Otherwise, you will have to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
 ```
 Bot: What would you like the message to say? Formatting is: `Message // Embed_title // Embed_content`. `Embed_title` and `Embed_content` are optional. You can type `none` in any of the argument fields above (e.g. `Embed_title`) to make the bot ignore it.
 User: none // Select your roles // Click on the buttons below to give yourself some roles!
