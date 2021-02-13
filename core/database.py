@@ -46,7 +46,7 @@ def initialize(database):
         " INT);"
     )
     cursor.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON reactionroles (reactionrole_id);"
+        "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON messages (reactionrole_id);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
