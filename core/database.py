@@ -46,6 +46,9 @@ def initialize(database):
         " INT);"
     )
     cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON messages (reactionrole_id);"
+    )
+    cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
     )
     cursor.execute(
@@ -54,54 +57,6 @@ def initialize(database):
     conn.commit()
     cursor.close()
     conn.close()
-
-
-class ReactionRoleCreationTracker:
-    def __init__(self, guild, database):
-        self.database = database
-        initialize(self.database)
-
-        self.guild = guild
-        self.step = 0
-        self.target_channel = None
-        self.combos = {}
-        self.message_id = None
-        self._generate_reactionrole_id()
-
-    def _generate_reactionrole_id(self):
-        conn = sqlite3.connect(self.database)
-        while True:
-            self.reactionrole_id = randint(0, 100000)
-            cursor = conn.cursor()
-            cursor.execute(
-                "SELECT * FROM messages WHERE reactionrole_id = ?;",
-                (self.reactionrole_id,),
-            )
-            already_exists = cursor.fetchall()
-            if already_exists:
-                continue
-            cursor.close()
-            conn.close()
-            break
-
-    def commit(self):
-        conn = sqlite3.connect(self.database)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id',"
-            " 'guild_id') values(?, ?, ?, ?);",
-            (self.message_id, self.target_channel, self.reactionrole_id, self.guild),
-        )
-        for reaction in self.combos:
-            role_id = self.combos[reaction]
-            cursor.execute(
-                "INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id')"
-                " values(?, ?, ?);",
-                (self.reactionrole_id, reaction, role_id),
-            )
-        conn.commit()
-        cursor.close()
-        conn.close()
 
 
 class Database:
@@ -146,69 +101,31 @@ class Database:
         cursor.close()
         conn.close()
 
-    def start_creation(self, user, channel, guild):
-        tracker = ReactionRoleCreationTracker(guild, self.database)
-        if not f"{user}_{channel}" in self.reactionrole_creation:
-            self.reactionrole_creation[f"{user}_{channel}"] = tracker
-            return True
-
-        return False
-
-    def abort(self, user, channel):
-        if f"{user}_{channel}" in self.reactionrole_creation:
-            del self.reactionrole_creation[f"{user}_{channel}"]
-            return True
-
-        return False
-
-    def step(self, user, channel):
-        if f"{user}_{channel}" in self.reactionrole_creation:
-            tracker = self.reactionrole_creation[f"{user}_{channel}"]
-            return tracker.step
-
-        return None
-
-    def get_targetchannel(self, user, channel):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        return tracker.target_channel
-
-    def get_combos(self, user, channel):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        return tracker.combos
-
-    def step0(self, user, channel):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        tracker.step += 1
-
-    def step1(self, user, channel, target_channel):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        tracker.target_channel = target_channel
-        tracker.step += 1
-
-    def step2(self, user, channel, role=None, reaction=None, done=False):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        if not done:
-            if reaction in tracker.combos:
-                exists = True
-                return exists
-            tracker.combos[reaction] = role
-            exists = False
-            return exists
-
-        else:
-            tracker.step += 1
-
-    def end_creation(self, user, channel, message_id):
-        tracker = self.reactionrole_creation[f"{user}_{channel}"]
-        tracker.message_id = message_id
+    def add_reaction_role(self, rl_dict: dict):
         try:
-            tracker.commit()
-
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            if self.exists(rl_dict["message"]["message_id"]):
+                raise Exception("The message id is already in use!")
+            while True:
+                try:
+                    reactionrole_id = randint(0, 100000)
+                    cursor.execute(
+                        "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id',"
+                        " 'guild_id') values(?, ?, ?, ?);",
+                        (rl_dict["message"]["message_id"], rl_dict["message"]["channel_id"], reactionrole_id, rl_dict["message"]["guild_id"]),
+                    )
+                    break
+                except sqlite3.IntegrityError:
+                    continue
+            combos = [(reactionrole_id, reaction, role_id) for reaction, role_id in rl_dict["reactions"].items()]
+            cursor.executemany("INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);", combos)
+            conn.commit()
+            cursor.close()
+            conn.close()
         except sqlite3.Error as e:
             return e
-
-        del self.reactionrole_creation[f"{user}_{channel}"]
-
+    
     def exists(self, message_id):
         try:
             conn = sqlite3.connect(self.database)

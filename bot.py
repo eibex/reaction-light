@@ -26,6 +26,7 @@ SOFTWARE.
 import os
 import datetime
 import configparser
+import asyncio
 from shutil import copy
 from sys import platform, exit as shutdown
 
@@ -94,7 +95,12 @@ async def getchannel(id):
     channel = bot.get_channel(id)
 
     if not channel:
-        channel = await bot.fetch_channel(id)
+        try:
+            channel = await bot.fetch_channel(id)
+        except discord.InvalidData:
+            channel = None
+        except discord.HTTPException:
+            channel = None
 
     return channel
 
@@ -388,162 +394,6 @@ async def on_guild_remove(guild):
 async def on_message(message):
     await bot.process_commands(message)
 
-    if isadmin(message.author, message.guild.id):
-        user = str(message.author.id)
-        channel = str(message.channel.id)
-        step = db.step(user, channel)
-        msg = message.content.split()
-
-        # Checks if the setup process was started before.
-        # If it was not, it ignores the message.
-        if step is not None:
-            if step == 0:
-                db.step0(user, channel)
-
-            elif step == 1:
-                # The channel the message needs to be sent to is stored
-                # Advances to step two
-                if message.channel_mentions:
-                    target_channel = message.channel_mentions[0].id
-
-                else:
-                    await message.channel.send("The channel you mentioned is invalid.")
-                    return
-
-                server = await getguild(message.guild.id)
-                bot_user = server.get_member(bot.user.id)
-                bot_permissions = (await getchannel(target_channel)).permissions_for(
-                    bot_user
-                )
-                writable = bot_permissions.read_messages
-                readable = bot_permissions.view_channel
-                if not writable or not readable:
-                    await message.channel.send(
-                        "I cannot read or send messages in that channel."
-                    )
-                    return
-
-                db.step1(user, channel, target_channel)
-
-                await message.channel.send(
-                    "Attach roles and emojis separated by one space (one combination"
-                    " per message). When you are done type `done`. Example:\n:smile:"
-                    " `@Role`"
-                )
-            elif step == 2:
-                if msg[0].lower() != "done":
-                    # Stores reaction-role combinations until "done" is received
-                    try:
-                        reaction = msg[0]
-                        role = message.role_mentions[0].id
-                        exists = db.step2(user, channel, role, reaction)
-                        if exists:
-                            await message.channel.send(
-                                "You have already used that reaction for another role."
-                            )
-                            return
-
-                        await message.add_reaction(reaction)
-
-                    except IndexError:
-                        await message.channel.send(
-                            "Mention a role after the reaction. Example:\n:smile:"
-                            " `@Role`"
-                        )
-
-                    except discord.HTTPException:
-                        await message.channel.send(
-                            "You can only use reactions uploaded to servers the bot has"
-                            " access to or standard emojis."
-                        )
-
-                else:
-                    # Advances to step three
-                    db.step2(user, channel, done=True)
-
-                    selector_embed = discord.Embed(
-                        title="Embed_title",
-                        description="Embed_content",
-                        colour=botcolour,
-                    )
-                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-
-                    await message.channel.send(
-                        "What would you like the message to say?\nFormatting is:"
-                        " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
-                        " and `Embed_content` are optional. You can type `none` in any"
-                        " of the argument fields above (e.g. `Embed_title`) to make the"
-                        " bot ignore it.\n\n\nMessage",
-                        embed=selector_embed,
-                    )
-
-            elif step == 3:
-                # Receives the title and description of the reaction-role message
-                # If the formatting is not correct it reminds the user of it
-                msg_values = message.content.split(" // ")
-                selector_msg_body = (
-                    msg_values[0] if msg_values[0].lower() != "none" else None
-                )
-                selector_embed = discord.Embed(colour=botcolour)
-                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
-
-                if len(msg_values) > 1:
-                    if msg_values[1].lower() != "none":
-                        selector_embed.title = msg_values[1]
-                    if len(msg_values) > 2 and msg_values[2].lower() != "none":
-                        selector_embed.description = msg_values[2]
-
-                # Prevent sending an empty embed instead of removing it
-                selector_embed = (
-                    selector_embed
-                    if selector_embed.title or selector_embed.description
-                    else None
-                )
-
-                if selector_msg_body or selector_embed:
-                    target_channel = await getchannel(
-                        db.get_targetchannel(user, channel)
-                    )
-                    selector_msg = None
-                    try:
-                        selector_msg = await target_channel.send(
-                            content=selector_msg_body, embed=selector_embed
-                        )
-
-                    except discord.Forbidden:
-                        await message.channel.send(
-                            "I don't have permission to send selector_msg messages to"
-                            f" the channel {target_channel.mention}."
-                        )
-
-                    if isinstance(selector_msg, discord.Message):
-                        combos = db.get_combos(user, channel)
-
-                        end = db.end_creation(user, channel, selector_msg.id)
-                        if isinstance(end, Exception):
-                            await message.channel.send(
-                                "I could not commit the changes to the database."
-                            )
-                            await system_notification(
-                                message.channel.id, f"Database error:\n```\n{end}\n```",
-                            )
-
-                        for reaction in combos:
-                            try:
-                                await selector_msg.add_reaction(reaction)
-
-                            except discord.Forbidden:
-                                await message.channel.send(
-                                    "I don't have permission to react to messages from"
-                                    f" the channel {target_channel.mention}."
-                                )
-
-                else:
-                    await message.channel.send(
-                        "You can't use an empty message as a role-reaction message."
-                    )
-
-
 @bot.event
 async def on_raw_reaction_add(payload):
     reaction = str(payload.emoji)
@@ -644,47 +494,232 @@ async def on_raw_reaction_remove(payload):
                 )
 
 
-@bot.command(name="new")
+@bot.command(name="new", aliases=['create'])
 async def new(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
-        # Starts setup process and the bot starts to listen to the user in that channel
-        # For future prompts (see: "async def on_message(message)")
-        started = db.start_creation(
-            ctx.message.author.id, ctx.message.channel.id, ctx.message.guild.id
-        )
-        if started:
-            await ctx.send("Mention the #channel where to send the auto-role message.")
+        sent_initial_message = await ctx.send("Welcome to the Reaction Light creation program. Please provide the required information once requested. If you would like to abort the creation, do not respond and the program will time out.")
+        rl_object = {}
+        cancelled = False
 
-        else:
-            await ctx.send(
-                "You are already creating a reaction-role message in this channel. "
-                f"Use another channel or run `{prefix}abort` first."
+        def check(message):
+            return message.author.id == ctx.message.author.id and message.content != ""
+        
+        if cancelled == False:
+            error_messages = []
+            user_messages = []
+            sent_reactions_message = await ctx.send(
+                    "Attach roles and emojis separated by one space (one combination"
+                    " per message). When you are done type `done`. Example:\n:smile:"
+                    " `@Role`"
             )
+            rl_object["reactions"] = {}
+            try:
+                while True:
+                    reactions_message = await bot.wait_for('message', timeout=120, check=check)
+                    user_messages.append(reactions_message)
+                    if reactions_message.content.lower() != "done":
+                        reaction = (reactions_message.content.split())[0]
+                        try:
+                            role = reactions_message.role_mentions[0].id
+                        except IndexError:
+                            error_messages.append((await ctx.send(
+                                "Mention a role after the reaction. Example:\n:smile:"
+                                " `@Role`"
+                            )))
+                            continue
 
+                        if reaction in rl_object["reactions"]:
+                            error_messages.append((await ctx.send(
+                                "You have already used that reaction for another role. Please choose another reaction"
+                            )))
+                            continue
+                        else:
+                            try:
+                                await reactions_message.add_reaction(reaction)
+                                rl_object["reactions"][reaction] = role
+                            except discord.HTTPException:
+                                error_messages.append((await ctx.send(
+                                    "You can only use reactions uploaded to servers the bot has"
+                                    " access to or standard emojis."
+                                )))
+                                continue
+                    else:
+                        break
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_reactions_message.delete()
+                for message in error_messages + user_messages:
+                    await message.delete()
+    
+        if cancelled == False:
+            sent_oldmessagequestion_message = await ctx.send(f"Would you like to use an existing message or create one using {bot.user.mention}? Please react with a 🗨️ to use an existing message or a 🤖 to create one.")
+            def reaction_check(payload):
+                return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
+            try:
+                await sent_oldmessagequestion_message.add_reaction("🗨️")
+                await sent_oldmessagequestion_message.add_reaction("🤖")
+                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
+                
+                if str(oldmessagequestion_response_payload.emoji) == "🗨️":
+                    rl_object["old_message"] = True
+                else:
+                    rl_object["old_message"] = False
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_oldmessagequestion_message.delete()
+        if cancelled == False:
+            error_messages = []
+            user_messages = []
+            if rl_object["old_message"] == True:
+                sent_oldmessage_message = await ctx.send(f"Which message would you like to use? Please react with a 🔧 on the message you would like to use.")
+                def reaction_check2(payload):
+                    return payload.member.id == ctx.message.author.id and payload.guild_id == sent_oldmessage_message.guild.id and str(payload.emoji) == "🔧"
+                try:
+                    while True:
+                        oldmessage_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check2)
+                        try:
+                            channel = await getchannel(oldmessage_response_payload.channel_id)
+                            if channel is None:
+                                raise discord.NotFound
+                            try:
+                                message = await channel.fetch_message(oldmessage_response_payload.message_id)
+                            except discord.HTTPException:
+                                raise discord.NotFound
+                            try:
+                                await message.add_reaction("👌")
+                                await message.remove_reaction("👌", message.guild.me)
+                                await message.remove_reaction("🔧", ctx.author)
+                            except discord.HTTPException:
+                                raise discord.NotFound
+                            if db.exists(message.id):
+                                raise ValueError
+                            rl_object["message"] = dict(message_id=message.id, channel_id=message.channel.id, guild_id=message.guild.id)
+                            final_message = message
+                            break
+                        except discord.NotFound:
+                            error_messages.append((await ctx.send("I can not access or add reactions to the requested message. Do I have sufficent permissions?")))
+                        except ValueError:
+                            error_messages.append((await ctx.send(f"This message already got a reaction light instance attached to it, consider running `{prefix}edit` instead.")))
+                except asyncio.TimeoutError:
+                    await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                    cancelled = True
+                finally:
+                    await sent_oldmessage_message.delete()
+                    for message in error_messages:
+                        await message.delete()
+            else:
+                sent_channel_message = await ctx.send("Mention the #channel where to send the auto-role message.")
+                try:
+                    while True:
+                        channel_message = await bot.wait_for('message', timeout=120, check=check)
+                        if channel_message.channel_mentions:
+                            rl_object["target_channel"] = channel_message.channel_mentions[0]
+                            break
+                        else:
+                            error_messages.append((await message.channel.send("The channel you mentioned is invalid.")))
+                except asyncio.TimeoutError: 
+                    await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                    cancelled = True
+                finally:
+                    await sent_channel_message.delete()
+                    for message in error_messages:
+                        await message.delete()
+        if cancelled == False and 'target_channel' in rl_object:
+            error_messages = []
+            selector_embed = discord.Embed(
+                title="Embed_title",
+                description="Embed_content",
+                colour=botcolour,
+            )
+            selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+            sent_message_message = await message.channel.send(
+                "What would you like the message to say?\nFormatting is:"
+                " `Message // Embed_title // Embed_content`.\n\n`Embed_title`"
+                " and `Embed_content` are optional. You can type `none` in any"
+                " of the argument fields above (e.g. `Embed_title`) to make the"
+                " bot ignore it.\n\n\nMessage",
+                embed=selector_embed,
+            )
+            try:
+                while True:
+                    message_message = await bot.wait_for('message', timeout=120, check=check)
+                    # I would usually end up deleting message_message in the end but users usually want to be able to access the 
+                    # format they once used incase they want to make any minor changes
+                    msg_values = message_message.content.split(" // ")
+                    # This whole system could also be re-done using wait_for to make the syntax easier for the user
+                    # But it would be a breaking change that would be annoying for thoose who have saved their message commands
+                    # for editing.
+                    selector_msg_body = (
+                        msg_values[0] if msg_values[0].lower() != "none" else None
+                    )
+                    selector_embed = discord.Embed(colour=botcolour)
+                    selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+
+                    if len(msg_values) > 1:
+                        if msg_values[1].lower() != "none":
+                            selector_embed.title = msg_values[1]
+                        if len(msg_values) > 2 and msg_values[2].lower() != "none":
+                            selector_embed.description = msg_values[2]
+
+                    # Prevent sending an empty embed instead of removing it
+                    selector_embed = (
+                        selector_embed
+                        if selector_embed.title or selector_embed.description
+                        else None
+                    )
+
+                    if selector_msg_body or selector_embed:
+                        target_channel = rl_object["target_channel"]
+                        sent_final_message = None
+                        try:
+                            sent_final_message = await target_channel.send(
+                                content=selector_msg_body, embed=selector_embed
+                            )
+                            rl_object["message"] = dict(message_id=sent_final_message.id, channel_id=sent_final_message.channel.id, guild_id=sent_final_message.guild.id)
+                            final_message = sent_final_message
+                            break
+                        except discord.Forbidden:
+                            error_messages.append((await message.channel.send(
+                                "I don't have permission to send messages to"
+                                f" the channel {target_channel.mention}. Please check my permissions and try again."
+                            )))
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_message_message.delete()
+                for message in error_messages:
+                    await message.delete()
+        if cancelled == False:
+            # Ait we are (almost) all done, now we just need to insert that into the database and add the reactions 💪
+            try:
+                r = db.add_reaction_role(rl_object)
+            except Exception:
+                await ctx.send(f"The requested message already got a reaction light instance attached to it, consider running `{prefix}edit` instead.")
+                return
+            
+            if isinstance(r, Exception):
+                await system_notification(
+                    ctx.message.guild.id,
+                    f"Database error when creating reaction-light instance:\n```\n{r}\n```",
+                )
+                return
+            for reaction, _ in rl_object["reactions"].items():
+                await final_message.add_reaction(reaction)
+            await ctx.message.add_reaction("✅")
+        await sent_initial_message.delete()
+        if cancelled == True:
+            await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
             f"You do not have an admin role. You might want to use `{prefix}admin`"
             " first."
         )
-
-
-@bot.command(name="abort")
-async def abort(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        # Aborts setup process
-        aborted = db.abort(ctx.message.author.id, ctx.message.channel.id)
-        if aborted:
-            await ctx.send("Reaction-role message creation aborted.")
-
-        else:
-            await ctx.send(
-                "There are no reaction-role message creation processes started by you"
-                " in this channel."
-            )
-
-    else:
-        await ctx.send(f"You do not have an admin role.")
-
 
 @bot.command(name="edit")
 async def edit_selector(ctx):
@@ -779,7 +814,6 @@ async def edit_selector(ctx):
                         " above)."
                     )
                     return
-
                 await old_msg.edit(suppress=False)
                 selector_msg_new_body = (
                     msg_values[2] if msg_values[2].lower() != "none" else None
@@ -806,7 +840,9 @@ async def edit_selector(ctx):
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
                     await ctx.send("Message edited.")
-
+                except discord.Forbidden:
+                    await ctx.send("I can only edit messages that are created by me, please edit the message in some other way.")
+                    return
                 except discord.HTTPException as e:
                     if e.code == 50006:
                         await ctx.send(

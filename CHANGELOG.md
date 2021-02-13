@@ -1,4 +1,9 @@
 # Reaction Light - Changelog
+### 2.2.0
+- Added support for custom messages & reworked creation process ([#56](https://github.com/eibex/reaction-light/issues/56) closed by [#57](https://github.com/eibex/reaction-light/pull/57) by [Edwinexd](https://github.com/Edwinexd))
+- Reworked ReactionRole ID generation ([#30](https://github.com/eibex/reaction-light/issues/30) closed by [#57](https://github.com/eibex/reaction-light/pull/57) by [Edwinexd](https://github.com/Edwinexd))
+- Removed the `rl!abort` command. ([#57](https://github.com/eibex/reaction-light/pull/57) by [Edwinexd](https://github.com/Edwinexd))
+
 ### 2.1.3
 - Fix errors occuring during reaction-role message creation/editing ([#54](https://github.com/eibex/reaction-light/issues/54) closed by [#55](https://github.com/eibex/reaction-light/pull/55) by [Edwinexd](https://github.com/Edwinexd))
 
