@@ -682,6 +682,7 @@ async def new(ctx):
                             )
                             rl_object["message"] = dict(message_id=sent_final_message.id, channel_id=sent_final_message.channel.id, guild_id=sent_final_message.guild.id)
                             final_message = sent_final_message
+                            break
                         except discord.Forbidden:
                             error_messages.append((await message.channel.send(
                                 "I don't have permission to send messages to"
