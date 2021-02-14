@@ -24,11 +24,13 @@ SOFTWARE.
 
 
 import sqlite3
+import discord
 
 
 class SchemaHandler:
-    def __init__(self, database):
+    def __init__(self, database, client):
         self.database = database
+        self.client = client
         self.version = self.version_check()
 
     def version_check(self):
@@ -44,10 +46,6 @@ class SchemaHandler:
 
         version = version[0][0]
         return version
-
-    def update(self):
-        if self.version == 0:
-            self.zero_to_one()
 
     def set_version(self, version):
         conn = sqlite3.connect(self.database)
@@ -79,3 +77,36 @@ class SchemaHandler:
         cursor.close()
         conn.close()
         self.set_version(1)
+
+    def one_to_two(self):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(admins);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "guild_id" not in columns:
+            cursor.execute("SELECT role_id FROM admins")
+            admins = cursor.fetchall()
+            admins2 = []
+            for admin in admins:
+                admins2.append(admin[0])
+            admins = admins2
+            guilds = {}
+            for guild in self.client.guilds:
+                guilds[guild.id] = []
+                for admin_id in admins:
+                    role = discord.utils.get(guild.roles, id=admin_id)
+                    if role is not None:
+                        guilds[guild.id].append(role.id)
+
+            cursor.execute("ALTER TABLE admins ADD COLUMN 'guild_id' INT;")
+            conn.commit()
+            for guild in guilds:
+                for admin_id in guilds[guild]:
+                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
+            cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+        self.set_version(2)
