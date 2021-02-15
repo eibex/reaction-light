@@ -439,7 +439,7 @@ async def on_raw_reaction_add(payload):
                 try:
                     await member.add_roles(role)
                     if db.notify(guild_id):
-                        await user.send(f"You now have the following role: {role.mention}")
+                        await user.send(f"You now have the following role: **{role.name}**")
 
                 except discord.Forbidden:
                     await system_notification(
@@ -488,7 +488,7 @@ async def on_raw_reaction_remove(payload):
             try:
                 await member.remove_roles(role)
                 if db.notify(guild_id):
-                    await user.send(f"You do not have the following role anymore: {role.mention}")
+                    await user.send(f"You do not have the following role anymore: **{role.name}**")
 
             except discord.Forbidden:
                 await system_notification(
