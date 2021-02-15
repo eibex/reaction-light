@@ -107,6 +107,19 @@ class SchemaHandler:
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
 
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';")
+        systemchannels_table = cursor.fetchall()
+        if systemchannels_table:
+            cursor.execute("SELECT * FROM systemchannels;")
+            entries = cursor.fetchall()
+            for entry in entries:
+                guild_id = entry[0]
+                channel_id = entry[1]
+                notify = 0 # Set default to not notify
+                cursor.execute("INSERT INTO guild_settings ('guild_id', 'notify', 'systemchannel') values(?, ?, ?);", (guild_id, notify, channel_id))
+            cursor.execute("DROP TABLE systemchannels;")
+            conn.commit()
+
         cursor.close()
         conn.close()
         self.set_version(2)

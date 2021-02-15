@@ -42,20 +42,13 @@ def initialize(database):
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
-        " INT);"
-    )
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT);"
+        "CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON guild_settings (guild_id);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON messages (reactionrole_id);"
-    )
-    cursor.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);"
@@ -208,9 +201,9 @@ class Database:
                         "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
                         (reactionrole_id,),
                     )
-            # Deleting the guilds systemchannels database entries
+            # Deleting the guilds guild_settings database entries
             cursor.execute(
-                "DELETE FROM systemchannels WHERE guild_id = ?;",
+                "DELETE FROM guild_settings WHERE guild_id = ?;",
                 (guild_id,),
             )
             # Delete the guilds admin roles
@@ -309,7 +302,7 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "REPLACE INTO 'systemchannels' ('guild_id', 'channel_id')"
+                "REPLACE INTO 'guild_settings' ('guild_id', 'systemchannel')"
                 " values(?, ?);",
                 (guild_id, channel_id),
             )
@@ -324,8 +317,11 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            channel_id = 0 # Set to false
             cursor.execute(
-                "DELETE FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+                "REPLACE INTO guild_settings ('guild_id', 'systemchannel')"
+                " values(?, ?);",
+                (guild_id, channel_id),
             )
             conn.commit()
             cursor.close()
@@ -339,7 +335,7 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT channel_id FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+                "SELECT systemchannel FROM guild_settings WHERE guild_id = ?;", (guild_id,)
             )
             result = cursor.fetchall()
             cursor.close()
@@ -356,7 +352,7 @@ class Database:
             cursor.execute("SELECT guild_id FROM messages;")
             message_guilds = cursor.fetchall()
 
-            cursor.execute("SELECT guild_id FROM systemchannels;")
+            cursor.execute("SELECT guild_id FROM guild_settings;")
             systemchannel_guilds = cursor.fetchall()
 
             cursor.execute("SELECT guild_id FROM admins;")
