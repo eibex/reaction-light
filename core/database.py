@@ -301,10 +301,15 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            notify = 0
             cursor.execute(
-                "REPLACE INTO 'guild_settings' ('guild_id', 'systemchannel')"
+                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
                 " values(?, ?);",
-                (guild_id, channel_id),
+                (guild_id, notify, channel_id),
+            )
+            cursor.execute(
+                "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
+                (channel_id, guild_id),
             )
             conn.commit()
             cursor.close()
@@ -318,10 +323,15 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             channel_id = 0 # Set to false
+            notify = 0
             cursor.execute(
-                "REPLACE INTO guild_settings ('guild_id', 'systemchannel')"
+                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
                 " values(?, ?);",
-                (guild_id, channel_id),
+                (guild_id, notify, channel_id),
+            )
+            cursor.execute(
+                "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
+                (channel_id, guild_id),
             )
             conn.commit()
             cursor.close()
@@ -484,7 +494,8 @@ class Database:
             if not results:
                 # If the guild was not in the table because the command was never used before
                 notify = 1
-                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', 'notify') values(?,?);", (guild_id, notify))
+                systemchannel = 0
+                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', 'notify') values(?, ?, ?);", (guild_id, systemchannel, notify))
             else:
                 notify = results[0][0]
                 if notify:
@@ -513,7 +524,8 @@ class Database:
             if not results:
                 # If the guild was not in the table because the command was never used before
                 notify = 0
-                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', 'notify') values(?,?);", (guild_id, notify))
+                systemchannel = 0
+                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', `systemchannel`, 'notify') values(?, ?, ?);", (guild_id, systemchannel, notify))
             else:
                 notify = results[0][0]
             cursor.close()
