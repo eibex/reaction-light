@@ -1070,12 +1070,12 @@ async def toggle_notify(ctx):
         notify = db.toggle_notify(ctx.guild.id)
         if notify:
             await ctx.send(
-                "Notifications have been set to ON for this server.\n"
+                "Notifications have been set to **ON** for this server.\n"
                 "Use this command again to turn them off."
             )
         else:
             await ctx.send(
-                "Notifications have been set to OFF for this server.\n"
+                "Notifications have been set to **OFF** for this server.\n"
                 "Use this command again to turn them on."
             )
 
