@@ -123,3 +123,18 @@ class SchemaHandler:
         cursor.close()
         conn.close()
         self.set_version(2)
+
+    def two_to_three(self):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(messages);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "unique" not in columns:
+            cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
+            cursor.execute("UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;")
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+        self.set_version(3)

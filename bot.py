@@ -143,6 +143,9 @@ async def database_updates():
     if handler.version == 1:
         handler.one_to_two()
 
+    if handler.version == 2:
+        handler.two_to_three()
+
 
 async def system_notification(guild_id, text):
     # Send a message to the system channel (if set)
@@ -439,6 +442,17 @@ async def on_raw_reaction_add(payload):
             member = server.get_member(user_id)
             role = discord.utils.get(server.roles, id=role_id)
             if user_id != bot.user.id:
+                unique = db.isunique(msg_id)
+                if unique:
+                    for existing_reaction in msg.reactions:
+                        if str(existing_reaction.emoji) == reaction:
+                            continue
+                        async for reaction_user in existing_reaction.users():
+                            if reaction_user.id == user_id:
+                                await msg.remove_reaction(existing_reaction, user)
+                                # We can safely break since a user can only have one reaction at once
+                                break
+
                 try:
                     await member.add_roles(role)
                     if db.notify(guild_id):
@@ -561,7 +575,24 @@ async def new(ctx):
                 await sent_reactions_message.delete()
                 for message in error_messages + user_messages:
                     await message.delete()
-    
+        if cancelled == False:
+            sent_oldmessagequestion_message = await ctx.send(f"Would you like to limit users to select only have one of the roles at a given time? Please react with a 🔒 to limit users or with a ♾️ to allow users to select multiple roles.")
+            def reaction_check(payload):
+                return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
+            try:
+                await sent_oldmessagequestion_message.add_reaction("🔒")
+                await sent_oldmessagequestion_message.add_reaction("♾️")
+                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
+                
+                if str(oldmessagequestion_response_payload.emoji) == "🔒":
+                    rl_object["limit_to_one"] = 1
+                else:
+                    rl_object["limit_to_one"] = 0
+            except asyncio.TimeoutError:
+                await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
+                cancelled = True
+            finally:
+                await sent_oldmessagequestion_message.delete()
         if cancelled == False:
             sent_oldmessagequestion_message = await ctx.send(f"Would you like to use an existing message or create one using {bot.user.mention}? Please react with a 🗨️ to use an existing message or a 🤖 to create one.")
             def reaction_check(payload):

@@ -32,7 +32,7 @@ def initialize(database):
     cursor = conn.cursor()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
-        " 'reactionrole_id' INT, 'guild_id' INT);"
+        " 'reactionrole_id' INT, 'guild_id' INT, 'limit_to_one' INT);"
     )
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction'"
@@ -76,8 +76,8 @@ class Database:
                     reactionrole_id = randint(0, 100000)
                     cursor.execute(
                         "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id',"
-                        " 'guild_id') values(?, ?, ?, ?);",
-                        (rl_dict["message"]["message_id"], rl_dict["message"]["channel_id"], reactionrole_id, rl_dict["message"]["guild_id"]),
+                        " 'guild_id', 'limit_to_one') values(?, ?, ?, ?, ?);",
+                        (rl_dict["message"]["message_id"], rl_dict["message"]["channel_id"], reactionrole_id, rl_dict["message"]["guild_id"], rl_dict["limit_to_one"]),
                     )
                     break
                 except sqlite3.IntegrityError:
@@ -131,6 +131,21 @@ class Database:
 
         except sqlite3.Error as e:
             return e
+
+    def isunique(self, message_id):
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT limit_to_one FROM messages WHERE message_id = ?;",
+                (message_id,),
+            )
+            unique = cursor.fetchall()[0][0]
+            cursor.close()
+            conn.close()
+            return unique
+        except sqlite3.Error as e:
+            return e            
 
     def fetch_messages(self, channel):
         try:
