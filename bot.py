@@ -158,12 +158,6 @@ async def system_notification(guild_id, text):
             return
 
         if server_channel:
-            server_channel = server_channel[0][0]
-
-        else:
-            await system_notification(None, text)
-
-        if server_channel:
             try:
                 target_channel = await getchannel(server_channel[0][0])
                 await target_channel.send(text)
