@@ -42,14 +42,13 @@ def initialize(database):
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS 'systemchannels' ('guild_id' INT, 'channel_id'"
-        " INT);"
+        "CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT);"
+    )
+    cursor.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON guild_settings (guild_id);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON messages (reactionrole_id);"
-    )
-    cursor.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON systemchannels (guild_id);"
     )
     cursor.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);"
@@ -65,41 +64,6 @@ class Database:
         initialize(self.database)
 
         self.reactionrole_creation = {}
-
-    def migrate_admins(self, client):
-        import discord
-        conn = sqlite3.connect(self.database)
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(admins);")
-        result = cursor.fetchall()
-        columns = [value[1] for value in result]
-        if "guild_id" not in columns:
-            cursor.execute("SELECT role_id FROM admins")
-            admins = cursor.fetchall()
-            admins2 = []
-            for admin in admins:
-                admins2.append(admin[0])
-            admins = admins2
-            guilds = {}
-            for guild in client.guilds:
-                guilds[guild.id] = []
-                for admin_id in admins:
-                    role = discord.utils.get(guild.roles, id=admin_id)
-                    if role is not None:
-                        guilds[guild.id].append(role.id)
-
-            cursor.execute("ALTER TABLE admins ADD COLUMN 'guild_id' INT;")
-            conn.commit()
-            for guild in guilds:
-                for admin_id in guilds[guild]:
-                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
-            conn.commit()
-            cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
-            conn.commit()
-            print("Successfully migrated admins.")
-
-        cursor.close()
-        conn.close()
 
     def add_reaction_role(self, rl_dict: dict):
         try:
@@ -237,9 +201,9 @@ class Database:
                         "DELETE FROM reactionroles WHERE reactionrole_id = ?;",
                         (reactionrole_id,),
                     )
-            # Deleting the guilds systemchannels database entries
+            # Deleting the guilds guild_settings database entries
             cursor.execute(
-                "DELETE FROM systemchannels WHERE guild_id = ?;",
+                "DELETE FROM guild_settings WHERE guild_id = ?;",
                 (guild_id,),
             )
             # Delete the guilds admin roles
@@ -337,10 +301,15 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            notify = 0
             cursor.execute(
-                "REPLACE INTO 'systemchannels' ('guild_id', 'channel_id')"
+                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
                 " values(?, ?);",
-                (guild_id, channel_id),
+                (guild_id, notify, channel_id),
+            )
+            cursor.execute(
+                "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
+                (channel_id, guild_id),
             )
             conn.commit()
             cursor.close()
@@ -353,8 +322,16 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            channel_id = 0 # Set to false
+            notify = 0
             cursor.execute(
-                "DELETE FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
+                " values(?, ?);",
+                (guild_id, notify, channel_id),
+            )
+            cursor.execute(
+                "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
+                (channel_id, guild_id),
             )
             conn.commit()
             cursor.close()
@@ -368,7 +345,7 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT channel_id FROM systemchannels WHERE guild_id = ?;", (guild_id,)
+                "SELECT systemchannel FROM guild_settings WHERE guild_id = ?;", (guild_id,)
             )
             result = cursor.fetchall()
             cursor.close()
@@ -385,7 +362,7 @@ class Database:
             cursor.execute("SELECT guild_id FROM messages;")
             message_guilds = cursor.fetchall()
 
-            cursor.execute("SELECT guild_id FROM systemchannels;")
+            cursor.execute("SELECT guild_id FROM guild_settings;")
             systemchannel_guilds = cursor.fetchall()
 
             cursor.execute("SELECT guild_id FROM admins;")
@@ -502,6 +479,58 @@ class Database:
             cursor.close()
             conn.close()
             return guilds
+
+        except sqlite3.Error as e:
+            return e
+
+    def toggle_notify(self, guild_id: int):
+        # SQLite doesn't support booleans
+        # INTs are used: 1 = True, 0 = False
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,))
+            results = cursor.fetchall()
+            if not results:
+                # If the guild was not in the table because the command was never used before
+                notify = 1
+                systemchannel = 0
+                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', 'notify') values(?, ?, ?);", (guild_id, systemchannel, notify))
+            else:
+                notify = results[0][0]
+                if notify:
+                    notify = 0
+                    cursor.execute("UPDATE guild_settings SET notify = ? WHERE guild_id = ?", (notify, guild_id))
+
+                else:
+                    notify = 1
+                    cursor.execute("UPDATE guild_settings SET notify = ? WHERE guild_id = ?", (notify, guild_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return notify
+
+        except sqlite3.Error as e:
+            return e
+
+    def notify(self, guild_id: int):
+        # SQLite doesn't support booleans
+        # INTs are used: 1 = True, 0 = False
+        try:
+            conn = sqlite3.connect(self.database)
+            cursor = conn.cursor()
+            cursor.execute("SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,))
+            results = cursor.fetchall()
+            if not results:
+                # If the guild was not in the table because the command was never used before
+                notify = 0
+                systemchannel = 0
+                cursor.execute("INSERT INTO 'guild_settings' ('guild_id', `systemchannel`, 'notify') values(?, ?, ?);", (guild_id, systemchannel, notify))
+            else:
+                notify = results[0][0]
+            cursor.close()
+            conn.close()
+            return notify
 
         except sqlite3.Error as e:
             return e

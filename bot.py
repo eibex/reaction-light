@@ -131,14 +131,17 @@ def restart():
 
 
 async def database_updates():
-    handler = schema.SchemaHandler(db_file)
+    handler = schema.SchemaHandler(db_file, bot)
     if handler.version == 0:
-        handler.update()
+        handler.zero_to_one()
         messages = db.fetch_all_messages()
         for message in messages:
             channel_id = message[1]
             channel = await getchannel(channel_id)
             db.add_guild(channel.id, channel.guild.id)
+
+    if handler.version == 1:
+        handler.one_to_two()
 
 
 async def system_notification(guild_id, text):
@@ -155,8 +158,11 @@ async def system_notification(guild_id, text):
             return
 
         if server_channel:
+            server_channel = server_channel[0][0]
+
+        if server_channel:
             try:
-                target_channel = await getchannel(server_channel[0][0])
+                target_channel = await getchannel(server_channel)
                 await target_channel.send(text)
 
             except discord.Forbidden:
@@ -379,7 +385,6 @@ async def on_ready():
         )
 
     await database_updates()
-    db.migrate_admins(bot)
     maintain_presence.start()
     cleandb.start()
     check_cleanup_queued_guilds.start()
@@ -436,6 +441,8 @@ async def on_raw_reaction_add(payload):
             if user_id != bot.user.id:
                 try:
                     await member.add_roles(role)
+                    if db.notify(guild_id):
+                        await user.send(f"You now have the following role: **{role.name}**")
 
                 except discord.Forbidden:
                     await system_notification(
@@ -483,6 +490,8 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(server.roles, id=role_id)
             try:
                 await member.remove_roles(role)
+                if db.notify(guild_id):
+                    await member.send(f"You do not have the following role anymore: **{role.name}**")
 
             except discord.Forbidden:
                 await system_notification(
@@ -1053,6 +1062,23 @@ async def set_systemchannel(ctx):
 
     else:
         await ctx.send("You do not have an admin role.")
+
+
+@bot.command(name="notify")
+async def toggle_notify(ctx):
+    if isadmin(ctx.message.author, ctx.guild.id):
+        notify = db.toggle_notify(ctx.guild.id)
+        if notify:
+            await ctx.send(
+                "Notifications have been set to ON for this server.\n"
+                "Use this command again to turn them off."
+            )
+        else:
+            await ctx.send(
+                "Notifications have been set to OFF for this server.\n"
+                "Use this command again to turn them on."
+            )
+
 
 @commands.is_owner()
 @bot.command(name="colour")
