@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light 2.2.0](https://img.shields.io/badge/Reaction%20Light-2.2.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Reaction Light 2.3.0](https://img.shields.io/badge/Reaction%20Light-2.3.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)](#)
 [![discord.py 1.5.0+](https://img.shields.io/badge/discord.py-1.5.0+-blue.svg)](#)
 
@@ -79,6 +79,7 @@ All commands require an admin role which you can set by using `rl!admin` (requir
 - `rl!new` starts the creation process for a new reaction role message. Check [below](#example) for an example.
 - `rl!edit` edits the text and embed of an existing reaction role message.
 - `rl!reaction` adds or removes a reaction from an existing reaction role message.
+- `rl!notify` toggles sending messages to users when they get/lose a role (default off) for the current server (the command affects only the server it was used in).
 - `rl!colour` changes the colour of the embeds of new and newly edited reaction role messages.
 - `rl!activity` adds an activity for the bot to loop through and show as status.
 - `rl!rm-activity` removes an activity from the bot's list.

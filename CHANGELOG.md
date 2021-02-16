@@ -1,4 +1,9 @@
 # Reaction Light - Changelog
+### 2.3.0
+- Adds the option to send a DM to the user when they add or remove a role from themselves ([#50](https://github.com/eibex/reaction-light/issues/50) closed by [#58](https://github.com/eibex/reaction-light/pull/58) by [eibex](https://github.com/eibex))
+- Add the `rl!notify` command to toggle user notifications on add/remove for the current server (if you want to turn them on on multiple servers, use the command on each server)
+- Merge `systemchannels` table into the `guild_settings` table
+
 ### 2.2.0
 - Added support for custom messages & reworked creation process ([#56](https://github.com/eibex/reaction-light/issues/56) closed by [#57](https://github.com/eibex/reaction-light/pull/57) by [Edwinexd](https://github.com/Edwinexd))
 - Reworked ReactionRole ID generation ([#30](https://github.com/eibex/reaction-light/issues/30) closed by [#57](https://github.com/eibex/reaction-light/pull/57) by [Edwinexd](https://github.com/Edwinexd))
