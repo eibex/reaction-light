@@ -488,7 +488,7 @@ async def on_raw_reaction_remove(payload):
             try:
                 await member.remove_roles(role)
                 if db.notify(guild_id):
-                    await user.send(f"You do not have the following role anymore: **{role.name}**")
+                    await member.send(f"You do not have the following role anymore: **{role.name}**")
 
             except discord.Forbidden:
                 await system_notification(
