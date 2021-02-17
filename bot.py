@@ -73,6 +73,18 @@ activities = activity.Activities(activities_file)
 db_file = f"{directory}/files/reactionlight.db"
 db = database.Database(db_file)
 
+class Locks:
+    def __init__(self):
+        self.locks = {}
+        self.main_lock = asyncio.Lock()
+    
+    async def get_lock(self, user_id):
+        async with self.main_lock:
+            if not user_id in self.locks:
+                self.locks[user_id] = asyncio.Lock()
+            return(self.locks[user_id])
+
+lock_manager = Locks()
 
 def isadmin(member, guild_id):
     # Checks if command author has an admin role that was added with rl!admin
@@ -411,61 +423,62 @@ async def on_raw_reaction_add(payload):
     guild_id = payload.guild_id
     exists = db.exists(msg_id)
 
-    if isinstance(exists, Exception):
-        await system_notification(
-            guild_id,
-            f"Database error after a user added a reaction:\n```\n{exists}\n```",
-        )
-
-    elif exists:
-        # Checks that the message that was reacted to is a reaction-role message managed by the bot
-        reactions = db.get_reactions(msg_id)
-
-        if isinstance(reactions, Exception):
+    async with (await lock_manager.get_lock(user_id)):
+        if isinstance(exists, Exception):
             await system_notification(
                 guild_id,
-                f"Database error when getting reactions:\n```\n{reactions}\n```",
+                f"Database error after a user added a reaction:\n```\n{exists}\n```",
             )
-            return
 
-        ch = await getchannel(ch_id)
-        msg = await ch.fetch_message(msg_id)
-        user = await getuser(user_id)
-        if reaction not in reactions:
-            # Removes reactions added to the reaction-role message that are not connected to any role
-            await msg.remove_reaction(reaction, user)
+        elif exists:
+            # Checks that the message that was reacted to is a reaction-role message managed by the bot
+            reactions = db.get_reactions(msg_id)
 
-        else:
-            # Gives role if it has permissions, else 403 error is raised
-            role_id = reactions[reaction]
-            server = await getguild(guild_id)
-            member = server.get_member(user_id)
-            role = discord.utils.get(server.roles, id=role_id)
-            if user_id != bot.user.id:
-                unique = db.isunique(msg_id)
-                if unique:
-                    for existing_reaction in msg.reactions:
-                        if str(existing_reaction.emoji) == reaction:
-                            continue
-                        async for reaction_user in existing_reaction.users():
-                            if reaction_user.id == user_id:
-                                await msg.remove_reaction(existing_reaction, user)
-                                # We can safely break since a user can only have one reaction at once
-                                break
+            if isinstance(reactions, Exception):
+                await system_notification(
+                    guild_id,
+                    f"Database error when getting reactions:\n```\n{reactions}\n```",
+                )
+                return
 
-                try:
-                    await member.add_roles(role)
-                    if db.notify(guild_id):
-                        await user.send(f"You now have the following role: **{role.name}**")
+            ch = await getchannel(ch_id)
+            msg = await ch.fetch_message(msg_id)
+            user = await getuser(user_id)
+            if reaction not in reactions:
+                # Removes reactions added to the reaction-role message that are not connected to any role
+                await msg.remove_reaction(reaction, user)
 
-                except discord.Forbidden:
-                    await system_notification(
-                        guild_id,
-                        "Someone tried to add a role to themselves but I do not have"
-                        " permissions to add it. Ensure that I have a role that is"
-                        " hierarchically higher than the role I have to assign, and"
-                        " that I have the `Manage Roles` permission.",
-                    )
+            else:
+                # Gives role if it has permissions, else 403 error is raised
+                role_id = reactions[reaction]
+                server = await getguild(guild_id)
+                member = server.get_member(user_id)
+                role = discord.utils.get(server.roles, id=role_id)
+                if user_id != bot.user.id:
+                    unique = db.isunique(msg_id)
+                    if unique:
+                        for existing_reaction in msg.reactions:
+                            if str(existing_reaction.emoji) == reaction:
+                                continue
+                            async for reaction_user in existing_reaction.users():
+                                if reaction_user.id == user_id:
+                                    await msg.remove_reaction(existing_reaction, user)
+                                    # We can safely break since a user can only have one reaction at once
+                                    break
+
+                    try:
+                        await member.add_roles(role)
+                        if db.notify(guild_id):
+                            await user.send(f"You now have the following role: **{role.name}**")
+
+                    except discord.Forbidden:
+                        await system_notification(
+                            guild_id,
+                            "Someone tried to add a role to themselves but I do not have"
+                            " permissions to add it. Ensure that I have a role that is"
+                            " hierarchically higher than the role I have to assign, and"
+                            " that I have the `Manage Roles` permission.",
+                        )
 
 
 @bot.event
@@ -576,15 +589,15 @@ async def new(ctx):
                 for message in error_messages + user_messages:
                     await message.delete()
         if cancelled == False:
-            sent_oldmessagequestion_message = await ctx.send(f"Would you like to limit users to select only have one of the roles at a given time? Please react with a 🔒 to limit users or with a ♾️ to allow users to select multiple roles.")
+            sent_limited_message = await ctx.send(f"Would you like to limit users to select only have one of the roles at a given time? Please react with a 🔒 to limit users or with a ♾️ to allow users to select multiple roles.")
             def reaction_check(payload):
-                return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
+                return payload.member.id == ctx.message.author.id and payload.message_id == sent_limited_message.id and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
             try:
-                await sent_oldmessagequestion_message.add_reaction("🔒")
-                await sent_oldmessagequestion_message.add_reaction("♾️")
-                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
+                await sent_limited_message.add_reaction("🔒")
+                await sent_limited_message.add_reaction("♾️")
+                limited_message_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
                 
-                if str(oldmessagequestion_response_payload.emoji) == "🔒":
+                if str(limited_message_response_payload.emoji) == "🔒":
                     rl_object["limit_to_one"] = 1
                 else:
                     rl_object["limit_to_one"] = 0
@@ -592,15 +605,15 @@ async def new(ctx):
                 await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
                 cancelled = True
             finally:
-                await sent_oldmessagequestion_message.delete()
+                await sent_limited_message.delete()
         if cancelled == False:
             sent_oldmessagequestion_message = await ctx.send(f"Would you like to use an existing message or create one using {bot.user.mention}? Please react with a 🗨️ to use an existing message or a 🤖 to create one.")
-            def reaction_check(payload):
+            def reaction_check2(payload):
                 return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
             try:
                 await sent_oldmessagequestion_message.add_reaction("🗨️")
                 await sent_oldmessagequestion_message.add_reaction("🤖")
-                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
+                oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check2)
                 
                 if str(oldmessagequestion_response_payload.emoji) == "🗨️":
                     rl_object["old_message"] = True
@@ -616,11 +629,11 @@ async def new(ctx):
             user_messages = []
             if rl_object["old_message"] == True:
                 sent_oldmessage_message = await ctx.send(f"Which message would you like to use? Please react with a 🔧 on the message you would like to use.")
-                def reaction_check2(payload):
+                def reaction_check3(payload):
                     return payload.member.id == ctx.message.author.id and payload.guild_id == sent_oldmessage_message.guild.id and str(payload.emoji) == "🔧"
                 try:
                     while True:
-                        oldmessage_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check2)
+                        oldmessage_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check3)
                         try:
                             channel = await getchannel(oldmessage_response_payload.channel_id)
                             if channel is None:
