@@ -130,7 +130,7 @@ class SchemaHandler:
         cursor.execute("PRAGMA table_info(messages);")
         result = cursor.fetchall()
         columns = [value[1] for value in result]
-        if "unique" not in columns:
+        if "limit_to_one" not in columns:
             cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
             cursor.execute("UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;")
             conn.commit()
