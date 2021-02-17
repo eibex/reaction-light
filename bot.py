@@ -254,7 +254,7 @@ async def updates():
         await system_notification(
             None,
             f"An update is available. Download Reaction Light v{new_version} at"
-            f" https://github.com/eibex/reaction-light or simply use `{prefix}update`"
+            f" <https://github.com/eibex/reaction-light> or simply use `{prefix}update`"
             " (only works with git installations).\n\nYou can view what has changed"
             " here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>",
         )
