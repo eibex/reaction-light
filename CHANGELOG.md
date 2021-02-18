@@ -1,6 +1,7 @@
 # Reaction Light - Changelog
 ### 2.4.0
 - Added support for mutually exclusive role/reactions: when creating a new message you can choose to limit users to select only one reaction (and role) at a time ([#44](https://github.com/eibex/reaction-light/issues/44) closed by [#60](https://github.com/eibex/reaction-light/pull/60) by [eibex](https://github.com/eibex) and [Edwinexd](https://github.com/Edwinexd))
+- Show the latest version changes with the update notifications and `rl!version` command ([#60](https://github.com/eibex/reaction-light/pull/60) by [eibex])
 - Fix missing error reporting when checking for notifications ([#60](https://github.com/eibex/reaction-light/pull/60) by [eibex])
 
 ### 2.3.0

@@ -164,7 +164,7 @@ async def database_updates():
         handler.two_to_three()
 
 
-async def system_notification(guild_id, text):
+async def system_notification(guild_id, text, embed=None):
     # Send a message to the system channel (if set)
     if guild_id:
         server_channel = db.fetch_systemchannel(guild_id)
@@ -183,18 +183,27 @@ async def system_notification(guild_id, text):
         if server_channel:
             try:
                 target_channel = await getchannel(server_channel)
-                await target_channel.send(text)
+                if embed:
+                    await target_channel.send(text, embed=embed)
+                else:
+                    await target_channel.send(text)
 
             except discord.Forbidden:
                 await system_notification(None, text)
 
         else:
-            await system_notification(None, text)
+            if embed:
+                await system_notification(None, text, embed=embed)
+            else:
+                await system_notification(None, text)
 
     elif system_channel:
         try:
             target_channel = await getchannel(system_channel)
-            await target_channel.send(text)
+            if embed:
+                await target_channel.send(text, embed=embed)
+            else:
+                await target_channel.send(text)
 
         except discord.NotFound:
             print("I cannot find the system channel.")
@@ -254,14 +263,21 @@ async def maintain_presence():
 @tasks.loop(hours=24)
 async def updates():
     # Sends a reminder once a day if there are updates available
-    new_version = github.check_for_updates(__version__)
+    new_version = await github.check_for_updates(__version__)
     if new_version:
+        changelog = await github.latest_changelog()
+        em = discord.Embed(
+            title=f"Reaction Light v{new_version} - Changes",
+            description=changelog,
+            colour=botcolour,
+        )
+        em.set_footer(text=f"{botname}", icon_url=logo)
         await system_notification(
             None,
-            f"An update is available. Download Reaction Light v{new_version} at"
+            f"An update is available. Download Reaction Light **v{new_version}** at"
             f" <https://github.com/eibex/reaction-light> or simply use `{prefix}update`"
-            " (only works with git installations).\n\nYou can view what has changed"
-            " here: <https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md>",
+            " (only works with git installations).",
+            embed=em,
         )
 
 
@@ -1481,10 +1497,18 @@ async def list_admin(ctx):
 @bot.command(name="version")
 async def print_version(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
-        latest = github.get_latest()
+        latest = await github.get_latest()
+        changelog = await github.latest_changelog()
+        em = discord.Embed(
+            title=f"Reaction Light v{latest} - Changes",
+            description=changelog,
+            colour=botcolour,
+        )
+        em.set_footer(text=f"{botname}", icon_url=logo)
         await ctx.send(
-            f"I am currently running Reaction Light v{__version__}. The latest"
-            f" available version is v{latest}."
+            f"I am currently running Reaction Light **v{__version__}**. The latest"
+            f" available version is **v{latest}**.",
+            embed=em,
         )
 
     else:
