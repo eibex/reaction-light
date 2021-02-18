@@ -39,7 +39,8 @@ class Activities:
         if not path.isfile(self.file):
             # Create activities.csv from the sample if it does not already exist
             copy(
-                f"{self.file}.sample", self.file,
+                f"{self.file}.sample",
+                self.file,
             )
 
         with open(self.file, "r") as f:

@@ -103,11 +103,16 @@ class SchemaHandler:
             conn.commit()
             for guild in guilds:
                 for admin_id in guilds[guild]:
-                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
+                    cursor.execute(
+                        "UPDATE admins SET guild_id = ? WHERE role_id = ?;",
+                        (guild, admin_id),
+                    )
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
 
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';"
+        )
         systemchannels_table = cursor.fetchall()
         if systemchannels_table:
             cursor.execute("SELECT * FROM systemchannels;")
@@ -115,8 +120,11 @@ class SchemaHandler:
             for entry in entries:
                 guild_id = entry[0]
                 channel_id = entry[1]
-                notify = 0 # Set default to not notify
-                cursor.execute("INSERT INTO guild_settings ('guild_id', 'notify', 'systemchannel') values(?, ?, ?);", (guild_id, notify, channel_id))
+                notify = 0  # Set default to not notify
+                cursor.execute(
+                    "INSERT INTO guild_settings ('guild_id', 'notify', 'systemchannel') values(?, ?, ?);",
+                    (guild_id, notify, channel_id),
+                )
             cursor.execute("DROP TABLE systemchannels;")
             conn.commit()
 
@@ -132,7 +140,9 @@ class SchemaHandler:
         columns = [value[1] for value in result]
         if "limit_to_one" not in columns:
             cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
-            cursor.execute("UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;")
+            cursor.execute(
+                "UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;"
+            )
             conn.commit()
 
         cursor.close()
