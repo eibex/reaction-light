@@ -77,12 +77,13 @@ class Locks:
     def __init__(self):
         self.locks = {}
         self.main_lock = asyncio.Lock()
-    
+
     async def get_lock(self, user_id):
         async with self.main_lock:
             if not user_id in self.locks:
                 self.locks[user_id] = asyncio.Lock()
-            return(self.locks[user_id])
+
+            return self.locks[user_id]
 
 lock_manager = Locks()
 
@@ -103,12 +104,12 @@ def isadmin(member, guild_id):
         return False
 
 
-async def getchannel(id):
-    channel = bot.get_channel(id)
+async def getchannel(channel_id):
+    channel = bot.get_channel(channel_id)
 
     if not channel:
         try:
-            channel = await bot.fetch_channel(id)
+            channel = await bot.fetch_channel(channel_id)
         except discord.InvalidData:
             channel = None
         except discord.HTTPException:
@@ -117,20 +118,20 @@ async def getchannel(id):
     return channel
 
 
-async def getguild(id):
-    guild = bot.get_guild(id)
+async def getguild(guild_id):
+    guild = bot.get_guild(guild_id)
 
     if not guild:
-        guild = await bot.fetch_guild(id)
+        guild = await bot.fetch_guild(guild_id)
 
     return guild
 
 
-async def getuser(id):
-    user = bot.get_user(id)
+async def getuser(user_id):
+    user = bot.get_user(user_id)
 
     if not user:
-        user = await bot.fetch_user(id)
+        user = await bot.fetch_user(user_id)
 
     return user
 
@@ -468,7 +469,15 @@ async def on_raw_reaction_add(payload):
 
                     try:
                         await member.add_roles(role)
-                        if db.notify(guild_id):
+                        notify = db.notify(guild_id)
+                        if isinstance(notify, Exception):
+                            await system_notification(
+                                guild_id,
+                                f"Database error when checking if role notifications are turned on:\n```\n{notify}\n```",
+                            )
+                            return
+
+                        if notify:
                             await user.send(f"You now have the following role: **{role.name}**")
 
                     except discord.Forbidden:
@@ -517,7 +526,15 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(server.roles, id=role_id)
             try:
                 await member.remove_roles(role)
-                if db.notify(guild_id):
+                notify = db.notify(guild_id)
+                if isinstance(notify, Exception):
+                    await system_notification(
+                        guild_id,
+                        f"Database error when checking if role notifications are turned on:\n```\n{notify}\n```",
+                    )
+                    return
+
+                if notify:
                     await member.send(f"You do not have the following role anymore: **{role.name}**")
 
             except discord.Forbidden:
@@ -539,8 +556,8 @@ async def new(ctx):
 
         def check(message):
             return message.author.id == ctx.message.author.id and message.content != ""
-        
-        if cancelled == False:
+
+        if not cancelled:
             error_messages = []
             user_messages = []
             sent_reactions_message = await ctx.send(
@@ -588,15 +605,16 @@ async def new(ctx):
                 await sent_reactions_message.delete()
                 for message in error_messages + user_messages:
                     await message.delete()
-        if cancelled == False:
-            sent_limited_message = await ctx.send(f"Would you like to limit users to select only have one of the roles at a given time? Please react with a 🔒 to limit users or with a ♾️ to allow users to select multiple roles.")
+
+        if not cancelled:
+            sent_limited_message = await ctx.send("Would you like to limit users to select only have one of the roles at a given time? Please react with a 🔒 to limit users or with a ♾️ to allow users to select multiple roles.")
             def reaction_check(payload):
                 return payload.member.id == ctx.message.author.id and payload.message_id == sent_limited_message.id and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
             try:
                 await sent_limited_message.add_reaction("🔒")
                 await sent_limited_message.add_reaction("♾️")
                 limited_message_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check)
-                
+
                 if str(limited_message_response_payload.emoji) == "🔒":
                     rl_object["limit_to_one"] = 1
                 else:
@@ -606,7 +624,8 @@ async def new(ctx):
                 cancelled = True
             finally:
                 await sent_limited_message.delete()
-        if cancelled == False:
+
+        if not cancelled:
             sent_oldmessagequestion_message = await ctx.send(f"Would you like to use an existing message or create one using {bot.user.mention}? Please react with a 🗨️ to use an existing message or a 🤖 to create one.")
             def reaction_check2(payload):
                 return payload.member.id == ctx.message.author.id and payload.message_id == sent_oldmessagequestion_message.id and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
@@ -614,7 +633,7 @@ async def new(ctx):
                 await sent_oldmessagequestion_message.add_reaction("🗨️")
                 await sent_oldmessagequestion_message.add_reaction("🤖")
                 oldmessagequestion_response_payload = await bot.wait_for('raw_reaction_add', timeout=120, check=reaction_check2)
-                
+
                 if str(oldmessagequestion_response_payload.emoji) == "🗨️":
                     rl_object["old_message"] = True
                 else:
@@ -624,11 +643,12 @@ async def new(ctx):
                 cancelled = True
             finally:
                 await sent_oldmessagequestion_message.delete()
-        if cancelled == False:
+
+        if not cancelled:
             error_messages = []
             user_messages = []
-            if rl_object["old_message"] == True:
-                sent_oldmessage_message = await ctx.send(f"Which message would you like to use? Please react with a 🔧 on the message you would like to use.")
+            if rl_object["old_message"]:
+                sent_oldmessage_message = await ctx.send("Which message would you like to use? Please react with a 🔧 on the message you would like to use.")
                 def reaction_check3(payload):
                     return payload.member.id == ctx.message.author.id and payload.guild_id == sent_oldmessage_message.guild.id and str(payload.emoji) == "🔧"
                 try:
@@ -674,14 +694,15 @@ async def new(ctx):
                             break
                         else:
                             error_messages.append((await message.channel.send("The channel you mentioned is invalid.")))
-                except asyncio.TimeoutError: 
+                except asyncio.TimeoutError:
                     await ctx.author.send("Reaction Light creation failed, you took too long to provide the requested information.")
                     cancelled = True
                 finally:
                     await sent_channel_message.delete()
                     for message in error_messages:
                         await message.delete()
-        if cancelled == False and 'target_channel' in rl_object:
+
+        if not cancelled and 'target_channel' in rl_object:
             error_messages = []
             selector_embed = discord.Embed(
                 title="Embed_title",
@@ -701,7 +722,7 @@ async def new(ctx):
             try:
                 while True:
                     message_message = await bot.wait_for('message', timeout=120, check=check)
-                    # I would usually end up deleting message_message in the end but users usually want to be able to access the 
+                    # I would usually end up deleting message_message in the end but users usually want to be able to access the
                     # format they once used incase they want to make any minor changes
                     msg_values = message_message.content.split(" // ")
                     # This whole system could also be re-done using wait_for to make the syntax easier for the user
@@ -748,14 +769,15 @@ async def new(ctx):
                 await sent_message_message.delete()
                 for message in error_messages:
                     await message.delete()
-        if cancelled == False:
+
+        if not cancelled:
             # Ait we are (almost) all done, now we just need to insert that into the database and add the reactions 💪
             try:
                 r = db.add_reaction_role(rl_object)
             except Exception:
                 await ctx.send(f"The requested message already got a reaction light instance attached to it, consider running `{prefix}edit` instead.")
                 return
-            
+
             if isinstance(r, Exception):
                 await system_notification(
                     ctx.message.guild.id,
@@ -766,7 +788,8 @@ async def new(ctx):
                 await final_message.add_reaction(reaction)
             await ctx.message.add_reaction("✅")
         await sent_initial_message.delete()
-        if cancelled == True:
+
+        if not cancelled:
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
@@ -1102,7 +1125,7 @@ async def set_systemchannel(ctx):
                 )
                 return
 
-        await ctx.send(f"System channel updated.")
+        await ctx.send("System channel updated.")
 
     else:
         await ctx.send("You do not have an admin role.")
@@ -1318,7 +1341,7 @@ async def list_admin(ctx):
             f"Database error when fetching admins:\n```\n{admin_ids}\n```",
         )
         return
-    
+
     adminrole_objects = []
     for admin_id in admin_ids:
         adminrole_objects.append(discord.utils.get(ctx.guild.roles, id=admin_id).mention)

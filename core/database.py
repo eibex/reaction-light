@@ -89,7 +89,7 @@ class Database:
             conn.close()
         except sqlite3.Error as e:
             return e
-    
+
     def exists(self, message_id):
         try:
             conn = sqlite3.connect(self.database)
@@ -145,7 +145,7 @@ class Database:
             conn.close()
             return unique
         except sqlite3.Error as e:
-            return e            
+            return e
 
     def fetch_messages(self, channel):
         try:
@@ -235,7 +235,7 @@ class Database:
 
         except sqlite3.Error as e:
             return e
-        
+
     def delete(self, message_id, guild_id=None):
         try:
             conn = sqlite3.connect(self.database)
@@ -391,7 +391,7 @@ class Database:
             for guild in guilds:
                 if guild[0] is not None:
                     guild_ids.append(guild[0])
-            
+
             cursor.close()
             conn.close()
             return guild_ids

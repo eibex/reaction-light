@@ -1,5 +1,5 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light 2.3.0](https://img.shields.io/badge/Reaction%20Light-2.3.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Reaction Light 2.4.0](https://img.shields.io/badge/Reaction%20Light-2.4.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)](#)
 [![discord.py 1.5.0+](https://img.shields.io/badge/discord.py-1.5.0+-blue.svg)](#)
 
@@ -7,9 +7,10 @@
 
 Light yet powerful reaction role bot coded in discord.py.
 
-## Features
+## Key Features
 - Create multiple custom embedded messages with custom reactions and roles
 - Automatically assign/remove roles to users when they select/deselect a certain reaction
+- Optionally limit users to select one reaction (and role) at a time
 - Use the same instance of the bot on multiple servers
 - Easy installation, setup, and updating
 - Optional update notifications and error reporting to your own Discord server
@@ -113,7 +114,7 @@ User: :joy: @HappyRole
 User: done
 ```
 
-Next, you will be asked to either create a new message or use an existing one. Using an existing message will prevent you from using `rl!edit` if the target message wasn't created by the bot. If you choose to use an already existing message simply react to it with 🔧, the bot will remove the 🔧 reaction and add the ones you chose.
+Next, you will be asked if you want to allow users to select multiple reactions (and role) at a time or not. Then, you will be asked to either create a new message or use an existing one. Using an existing message will prevent you from using `rl!edit` if the target message wasn't created by the bot. If you choose to use an already existing message simply react to it with 🔧, the bot will remove the 🔧 reaction and add the ones you chose.
 
 Otherwise, you will have to customise the message that the bot is going to send with the roles attached to it. Enter a title and the content of your message by separating them with ` // ` (the space before and after `//` is important).
 ```
