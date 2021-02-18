@@ -888,7 +888,7 @@ async def new(ctx):
             # Ait we are (almost) all done, now we just need to insert that into the database and add the reactions 💪
             try:
                 r = db.add_reaction_role(rl_object)
-            except Exception:
+            except database.DuplicateInstance:
                 await ctx.send(
                     f"The requested message already got a reaction light instance attached to it, consider running `{prefix}edit` instead."
                 )

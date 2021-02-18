@@ -62,6 +62,10 @@ def initialize(database):
     conn.close()
 
 
+class DuplicateInstance(Exception):
+    pass
+
+
 class Database:
     def __init__(self, database):
         self.database = database
@@ -74,7 +78,7 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             if self.exists(rl_dict["message"]["message_id"]):
-                raise Exception("The message id is already in use!")
+                raise DuplicateInstance("The message id is already in use!")
             while True:
                 try:
                     reactionrole_id = randint(0, 100000)
