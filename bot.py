@@ -111,12 +111,7 @@ async def getchannel(channel_id):
     channel = bot.get_channel(channel_id)
 
     if not channel:
-        try:
-            channel = await bot.fetch_channel(channel_id)
-        except discord.InvalidData:
-            channel = None
-        except discord.HTTPException:
-            channel = None
+        channel = await bot.fetch_channel(channel_id)
 
     return channel
 
@@ -737,9 +732,15 @@ async def new(ctx):
                             "raw_reaction_add", timeout=120, check=reaction_check3
                         )
                         try:
-                            channel = await getchannel(
-                                oldmessage_response_payload.channel_id
-                            )
+                            try:
+                                channel = await getchannel(
+                                    oldmessage_response_payload.channel_id
+                                )
+                            except discord.InvalidData:
+                                channel = None
+                            except discord.HTTPException:
+                                channel = None
+                            
                             if channel is None:
                                 raise discord.NotFound
                             try:
