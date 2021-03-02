@@ -33,13 +33,10 @@ from sys import platform, exit as shutdown
 import discord
 from discord.ext import commands, tasks
 
-from core import database, migration, activity, github, schema
+from core import database, activity, github, schema
 
 
 directory = os.path.dirname(os.path.realpath(__file__))
-
-migrated = migration.migrate()
-config_migrated = migration.migrateconfig()
 
 with open(f"{directory}/.version") as f:
     __version__ = f.read().rstrip("\n").rstrip("\r")
@@ -404,21 +401,6 @@ async def check_cleanup_queued_guilds():
 @bot.event
 async def on_ready():
     print("Reaction Light ready!")
-    if migrated:
-        await system_notification(
-            None,
-            "Your CSV files have been deleted and migrated to an SQLite"
-            " `reactionlight.db` file.",
-        )
-
-    if config_migrated:
-        await system_notification(
-            None,
-            "Your `config.ini` has been edited and your admin IDs are now stored in"
-            f" the database.\nYou can add or remove them with `{prefix}admin` and"
-            f" `{prefix}rm-admin`.",
-        )
-
     await database_updates()
     maintain_presence.start()
     cleandb.start()
