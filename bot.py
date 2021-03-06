@@ -1226,8 +1226,8 @@ async def set_systemchannel(ctx):
                 " reports errors and notifications related to this server only,"
                 " while the main system channel is used as a fall-back and for"
                 " bot-wide errors and notifications.\n\nThe current channels are:\n"
-                f"**Main:** {system_channel.mention if system_channel else 'none'}\n"
-                f"**Server:** {server_channel.mention if server_channel else 'none'}"
+                f"**Main:** {(await getchannel(system_channel)).mention if system_channel else 'none'}\n"
+                f"**Server:** {(await getchannel(server_channel)).mention if server_channel else 'none'}"
             )
             return
 
