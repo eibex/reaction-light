@@ -1207,10 +1207,27 @@ async def set_systemchannel(ctx):
             or not mentioned_channels
             or channel_type not in ["main", "server"]
         ):
+            server_channel = db.fetch_systemchannel(guild_id)
+            if isinstance(server_channel, Exception):
+                await system_notification(
+                    None,
+                    "Database error when fetching guild system"
+                    f" channels:\n```\n{server_channel}\n```\n\n{text}",
+                )
+                return
+
+            if server_channel:
+                server_channel = server_channel[0][0]
+
             await ctx.send(
                 "Define if you are setting up a server or main system channel and"
                 f" mention the target channel.\n```\n{prefix}systemchannel"
-                " <main/server> #channelname\n```"
+                " <main/server> #channelname\n```\nThe server system channel"
+                " reports errors and notifications related to this server only,"
+                " while the main system channel is used as a fall-back and for"
+                " bot-wide errors and notifications.\n\nThe current channels are:\n"
+                f"**Main:** {system_channel.mention if system_channel else "none"}\n"
+                f"**Server:** {server_channel.mention if server_channel else "none"}"
             )
             return
 
@@ -1219,7 +1236,7 @@ async def set_systemchannel(ctx):
 
         server = await getguild(guild_id)
         bot_user = server.get_member(bot.user.id)
-        bot_permissions = (await getchannel(system_channel)).permissions_for(bot_user)
+        bot_permissions = (await getchannel(target_channel)).permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
