@@ -1207,7 +1207,7 @@ async def set_systemchannel(ctx):
             or not mentioned_channels
             or channel_type not in ["main", "server"]
         ):
-            server_channel = db.fetch_systemchannel(guild_id)
+            server_channel = db.fetch_systemchannel(ctx.guild.id)
             if isinstance(server_channel, Exception):
                 await system_notification(
                     None,
