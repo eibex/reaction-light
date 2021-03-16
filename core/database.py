@@ -88,7 +88,7 @@ class Database:
                         (
                             rl_dict["message"]["message_id"],
                             rl_dict["message"]["channel_id"],
-                            reactionrole_id,
+                            ["reactionrole_id"],
                             rl_dict["message"]["guild_id"],
                             rl_dict["limit_to_one"],
                         ),
