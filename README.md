@@ -35,7 +35,7 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [License](#license)
 
 ## Requirements
-This bot requires discord.py 1.5.0+, which requires Python 3.5.3+.
+This bot requires discord.py, which requires Python 3.5.3+.
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
