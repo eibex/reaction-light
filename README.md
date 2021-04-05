@@ -1,6 +1,6 @@
 # Reaction Light - Discord Role Bot
 [![Reaction Light 2.4.0](https://img.shields.io/badge/Reaction%20Light-2.4.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
-[![Python 3.5.3+](https://img.shields.io/badge/python-3.5.3+-blue.svg)](#)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](#)
 [![discord.py 1.6.0+](https://img.shields.io/badge/discord.py-1.6.0+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
@@ -35,7 +35,7 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [License](#license)
 
 ## Requirements
-This bot requires discord.py, which requires Python 3.5.3+.
+This bot requires discord.py and Python 3.6+.
 
 You can get discord.py (and other dependencies) via PyPI:
 ```
