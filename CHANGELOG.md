@@ -1,4 +1,11 @@
 # Reaction Light - Changelog
+### 2.4.1
+- Removed migration from CSV to SQLite ([#63](https://github.com/eibex/reaction-light/issues/63) closed by [#64](https://github.com/eibex/reaction-light/pull/64) by [eibex](https://github.com/eibex))
+- Improved `rl!systemchannel` explanation when running the command with no arguments ([#65](https://github.com/eibex/reaction-light/issues/65) by [eibex](https://github.com/eibex))
+- Fix f-string syntax errors on older Python versions ([#68](https://github.com/eibex/reaction-light/issues/68) closed by [#69](https://github.com/eibex/reaction-light/pull/69) by [Edwinexd](https://github.com/Edwinexd))
+- Corrected dependencies ([#70](https://github.com/eibex/reaction-light/pull/70) by [minemalox](https://github.com/minemalox))
+- Corrected Python minimum version to 3.6 ([#71](https://github.com/eibex/reaction-light/pull/71) by [Edwinexd](https://github.com/Edwinexd))
+
 ### 2.4.0
 - Added support for mutually exclusive role/reactions: when creating a new message you can choose to limit users to select only one reaction (and role) at a time ([#44](https://github.com/eibex/reaction-light/issues/44) closed by [#60](https://github.com/eibex/reaction-light/pull/60) by [eibex](https://github.com/eibex) and [Edwinexd](https://github.com/Edwinexd))
 - Show the latest version changes with the update notifications and `rl!version` command ([#60](https://github.com/eibex/reaction-light/pull/60) by [eibex](https://github.com/eibex))
