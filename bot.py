@@ -1212,7 +1212,7 @@ async def set_systemchannel(ctx):
                 await system_notification(
                     None,
                     "Database error when fetching guild system"
-                    f" channels:\n```\n{server_channel}\n```\n\n{text}",
+                    f" channels:\n```\n{server_channel}\n```",
                 )
                 return
 
