@@ -1549,6 +1549,8 @@ async def update(ctx):
         await ctx.send("Creating database backup...")
         copy(db_file, f"{db_file}.bak")
         restart()
+        await ctx.send("Restarting...")
+        shutdown()  # sys.exit()
 
     else:
         await ctx.send("I cannot do this on Windows.")
