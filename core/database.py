@@ -347,7 +347,7 @@ class Database:
             notify = 0
             cursor.execute(
                 "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
-                " values(?, ?);",
+                " values(?, ?, ?);",
                 (guild_id, notify, channel_id),
             )
             cursor.execute(
