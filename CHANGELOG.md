@@ -1,4 +1,7 @@
 # Reaction Light - Changelog
+### 2.4.2
+- Fix errors when trying to set a new server-specific system channel with `rl!systemchannel server #channel`
+
 ### 2.4.1
 - Removed migration from CSV to SQLite ([#63](https://github.com/eibex/reaction-light/issues/63) closed by [#64](https://github.com/eibex/reaction-light/pull/64) by [eibex](https://github.com/eibex))
 - Improved `rl!systemchannel` explanation when running the command with no arguments ([#65](https://github.com/eibex/reaction-light/issues/65) by [eibex](https://github.com/eibex))

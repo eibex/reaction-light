@@ -722,7 +722,7 @@ async def new(ctx):
                                 channel = None
                             except discord.HTTPException:
                                 channel = None
-                            
+
                             if channel is None:
                                 raise discord.NotFound
                             try:
