@@ -340,16 +340,25 @@ class Database:
         except sqlite3.Error as e:
             return e
 
+    def insert_guildsettings(self, guild_id: int):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        notify = 0
+        channel_id = 0
+        cursor.execute(
+            "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
+            " values(?, ?, ?);",
+            (guild_id, notify, channel_id),
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
     def add_systemchannel(self, guild_id, channel_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            notify = 0
-            cursor.execute(
-                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
-                " values(?, ?, ?);",
-                (guild_id, notify, channel_id),
-            )
+            self.insert_guildsettings(guild_id)
             cursor.execute(
                 "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
                 (channel_id, guild_id),
@@ -366,12 +375,7 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             channel_id = 0  # Set to false
-            notify = 0
-            cursor.execute(
-                "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')"
-                " values(?, ?);",
-                (guild_id, notify, channel_id),
-            )
+            self.insert_guildsettings(guild_id)
             cursor.execute(
                 "UPDATE guild_settings SET systemchannel = ? WHERE guild_id = ?;",
                 (channel_id, guild_id),
@@ -538,33 +542,25 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            self.insert_guildsettings(guild_id)
             cursor.execute(
                 "SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,)
             )
             results = cursor.fetchall()
-            if not results:
-                # If the guild was not in the table because the command was never used before
-                notify = 1
-                systemchannel = 0
+            notify = results[0][0]
+            if notify:
+                notify = 0
                 cursor.execute(
-                    "INSERT INTO 'guild_settings' ('guild_id', 'notify') values(?, ?, ?);",
-                    (guild_id, systemchannel, notify),
+                    "UPDATE guild_settings SET notify = ? WHERE guild_id = ?",
+                    (notify, guild_id),
                 )
-            else:
-                notify = results[0][0]
-                if notify:
-                    notify = 0
-                    cursor.execute(
-                        "UPDATE guild_settings SET notify = ? WHERE guild_id = ?",
-                        (notify, guild_id),
-                    )
 
-                else:
-                    notify = 1
-                    cursor.execute(
-                        "UPDATE guild_settings SET notify = ? WHERE guild_id = ?",
-                        (notify, guild_id),
-                    )
+            else:
+                notify = 1
+                cursor.execute(
+                    "UPDATE guild_settings SET notify = ? WHERE guild_id = ?",
+                    (notify, guild_id),
+                )
             conn.commit()
             cursor.close()
             conn.close()
@@ -579,20 +575,12 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
+            self.insert_guildsettings(guild_id)
             cursor.execute(
                 "SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,)
             )
             results = cursor.fetchall()
-            if not results:
-                # If the guild was not in the table because the command was never used before
-                notify = 0
-                systemchannel = 0
-                cursor.execute(
-                    "INSERT INTO 'guild_settings' ('guild_id', `systemchannel`, 'notify') values(?, ?, ?);",
-                    (guild_id, systemchannel, notify),
-                )
-            else:
-                notify = results[0][0]
+            notify = results[0][0]
             cursor.close()
             conn.close()
             return notify
