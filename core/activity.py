@@ -47,7 +47,10 @@ class Activities:
             # Get activities.csv contents
             reader = csv.reader(f, delimiter=",")
             for row in reader:
-                activity = row[0]
+                try:
+                    activity = row[0]
+                except IndexError:
+                    pass
                 self.activity_list.append(activity)
 
         if not self.activity_list:
