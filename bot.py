@@ -1251,7 +1251,7 @@ async def remove_activity(ctx):
 
     removed = activities.remove(activity_to_delete)
     if removed:
-        await ctx.send(response.get("rm-activity-success"))
+        await ctx.send(response.get("rm-activity-success").format(activity_to_delete))
 
     else:
         await ctx.send(response.get("rm-activity-not-exists"))
