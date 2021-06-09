@@ -50,6 +50,9 @@ class Activities:
                 activity = row[0]
                 self.activity_list.append(activity)
 
+        if not self.activity_list:
+            self.activity_list = ["with reactions"]
+
         self.loop = cycle(self.activity_list)
 
     def get(self):
