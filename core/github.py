@@ -54,8 +54,12 @@ async def latest_changelog():
         ) as r:
             changelog = await r.text()
 
-    changelog = changelog.split("###")[1].rstrip("\n")  # Only get the latest version changes
-    changelog = changelog[changelog.index("-"):]  # Remove every character up to the first bullet point
+    changelog = changelog.split("###")[1].rstrip(
+        "\n"
+    )  # Only get the latest version changes
+    changelog = changelog[
+        changelog.index("-") :
+    ]  # Remove every character up to the first bullet point
     changelog += "\n\n[View more](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)"
 
     return changelog
