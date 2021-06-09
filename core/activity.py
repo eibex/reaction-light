@@ -49,9 +49,10 @@ class Activities:
             for row in reader:
                 try:
                     activity = row[0]
+                    self.activity_list.append(activity)
                 except IndexError:
                     pass
-                self.activity_list.append(activity)
+
 
         if not self.activity_list:
             self.activity_list = ["with reactions"]
