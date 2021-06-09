@@ -14,7 +14,7 @@ class Response:
         for file in os.listdir(self.directory):
             if file.endswith(".json"):
                 with open(f"{self.directory}/{file}", encoding="utf-8") as f:
-                    data[file.rstrip(".json")] = json.load(f)
+                    data[file.replace(".json", "")] = json.load(f)
         return data
 
     def get(self, item):
