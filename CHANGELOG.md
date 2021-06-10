@@ -1,6 +1,6 @@
 # Reaction Light - Changelog
 ### 2.4.3
-- Fix deletion of wrong database entries under certain circumstances. Please check that all your messages are working before updating, and restore a backup if necessary. ([#73](https://github.com/eibex/reaction-light/issues/73) closed by [#78](https://github.com/eibex/reaction-light/pull/78) by [Edwinexd](https://github.com/Edwinexd))
+- Fix deletion of wrong database entries under certain circumstances. Please check that all your messages are working before updating, and restore a backup if necessary ([#73](https://github.com/eibex/reaction-light/issues/73) closed by [#78](https://github.com/eibex/reaction-light/pull/78) by [Edwinexd](https://github.com/Edwinexd))
 
 ### 2.4.2
 - Fix errors when trying to set a new server-specific system channel with `rl!systemchannel server #channel`
