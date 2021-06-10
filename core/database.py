@@ -268,7 +268,7 @@ class Database:
                 (message_id,),
             )
 
-            result = cursor.fetcone()
+            result = cursor.fetchone()
             if result:
                 reactionrole_id = result[0]
                 cursor.execute(
