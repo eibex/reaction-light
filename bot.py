@@ -95,7 +95,7 @@ def isadmin(member, guild_id):
     admins = db.get_admins(guild_id)
 
     if isinstance(admins, Exception):
-        print(response.get("db-error-admin-check").format(admins))
+        print(response.get("db-error-admin-check").format(exception=admins))
         return False
 
     try:
@@ -168,7 +168,7 @@ async def system_notification(guild_id, text, embed=None):
             await system_notification(
                 None,
                 response.get("db-error-fetching-systemchannels-server").format(
-                    server_channel, text
+                    exception=server_channel, text=text
                 ),
             )
             return
@@ -216,7 +216,7 @@ async def formatted_channel_list(channel):
     if isinstance(all_messages, Exception):
         await system_notification(
             channel.guild.id,
-            response.get("db-error-fetching-messages").format(all_messages),
+            response.get("db-error-fetching-messages").format(exception=all_messages),
         )
         return
 
@@ -261,7 +261,7 @@ async def updates():
         em.set_footer(text=f"{botname}", icon_url=logo)
         await system_notification(
             None,
-            response.get("update-notification").format(new_version),
+            response.get("update-notification").format(new_version=new_version),
             embed=em,
         )
 
@@ -277,7 +277,7 @@ async def cleandb():
     if isinstance(messages, Exception):
         await system_notification(
             None,
-            response.get("db-error-fetching-cleaning").format(messages),
+            response.get("db-error-fetching-cleaning").format(exception=messages),
         )
         return
 
@@ -296,14 +296,14 @@ async def cleandb():
                 if isinstance(delete, Exception):
                     await system_notification(
                         channel.guild.id,
-                        response.get("db-error-fetching-cleaning").format(delete),
+                        response.get("db-error-fetching-cleaning").format(exception=delete),
                     )
                     return
 
                 await system_notification(
                     channel.guild.id,
                     response.get("db-message-delete-success").format(
-                        message, channel.mention
+                        message_id=message, channel=channel.mention
                     ),
                 )
 
@@ -311,12 +311,12 @@ async def cleandb():
             # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
             await system_notification(
                 message[3],
-                response.get("db-forbidden-message").format(message[0], message[1]),
+                response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]),
             )
 
     if isinstance(guilds, Exception):
         await system_notification(
-            None, response.get("db-error-fetching-cleaning-guild").format(guilds)
+            None, response.get("db-error-fetching-cleaning-guild").format(exception=guilds)
         )
         return
 
@@ -339,7 +339,7 @@ async def cleandb():
 
     if isinstance(cleanup_guilds, Exception):
         await system_notification(
-            None, response.get("db-error-fetching-cleanup-guild").format(cleanup_guilds)
+            None, response.get("db-error-fetching-cleanup-guild").format(exception=cleanup_guilds)
         )
         return
 
@@ -358,7 +358,7 @@ async def cleandb():
                 if isinstance(delete, Exception):
                     await system_notification(
                         None,
-                        response.get("db-error-deleting-cleaning-guild").format(delete),
+                        response.get("db-error-deleting-cleaning-guild").format(exception=delete),
                     )
                     return
 
@@ -366,7 +366,7 @@ async def cleandb():
                     await system_notification(
                         None,
                         response.get("db-error-deleting-cleaning-guild").format(
-                            delete2
+                            exception=delete2
                         ),
                     )
                     return
@@ -416,7 +416,7 @@ async def on_raw_reaction_add(payload):
     async with (await lock_manager.get_lock(user_id)):
         if isinstance(exists, Exception):
             await system_notification(
-                guild_id, response.get("db-error-reaction-add").format(exists)
+                guild_id, response.get("db-error-reaction-add").format(exception=exists)
             )
 
         elif exists:
@@ -425,7 +425,7 @@ async def on_raw_reaction_add(payload):
 
             if isinstance(reactions, Exception):
                 await system_notification(
-                    guild_id, response.get("db-error-reaction-get").format(reactions)
+                    guild_id, response.get("db-error-reaction-get").format(exception=reactions)
                 )
                 return
 
@@ -461,14 +461,14 @@ async def on_raw_reaction_add(payload):
                             await system_notification(
                                 guild_id,
                                 response.get("db-error-notification-check").format(
-                                    notify
+                                    exception=notify
                                 ),
                             )
                             return
 
                         if notify:
                             await user.send(
-                                response.get("new-role-dm").format(role.name)
+                                response.get("new-role-dm").format(role_name=role.name)
                             )
 
                     except discord.Forbidden:
@@ -487,7 +487,7 @@ async def on_raw_reaction_remove(payload):
 
     if isinstance(exists, Exception):
         await system_notification(
-            guild_id, response.get("db-error-reaction-remove").format(exists)
+            guild_id, response.get("db-error-reaction-remove").format(exception=exists)
         )
 
     elif exists:
@@ -496,7 +496,7 @@ async def on_raw_reaction_remove(payload):
 
         if isinstance(reactions, Exception):
             await system_notification(
-                guild_id, response.get("db-error-reaction-get").format(reactions)
+                guild_id, response.get("db-error-reaction-get").format(exception=reactions)
             )
 
         elif reaction in reactions:
@@ -515,12 +515,12 @@ async def on_raw_reaction_remove(payload):
                 if isinstance(notify, Exception):
                     await system_notification(
                         guild_id,
-                        response.get("db-error-notification-check").format(notify),
+                        response.get("db-error-notification-check").format(exception=notify),
                     )
                     return
 
                 if notify:
-                    await member.send(response.get("removed-role-dm").format(role.name))
+                    await member.send(response.get("removed-role-dm").format(role_name=role.name))
 
             except discord.Forbidden:
                 await system_notification(
@@ -624,7 +624,7 @@ async def new(ctx):
 
         if not cancelled:
             sent_oldmessagequestion_message = await ctx.send(
-                response.get("new-reactionrole-old-or-new").format(bot.user.mention)
+                response.get("new-reactionrole-old-or-new").format(bot_mention=bot.user.mention)
             )
 
             def reaction_check2(payload):
@@ -657,7 +657,7 @@ async def new(ctx):
             if rl_object["old_message"]:
                 sent_oldmessage_message = await ctx.send(
                     response.get("new-reactionrole-which-message").format(
-                        bot.user.mention
+                        bot_mention=bot.user.mention
                     )
                 )
 
@@ -712,7 +712,7 @@ async def new(ctx):
                                     await ctx.send(
                                         response.get(
                                             "new-reactionrole-permission-error"
-                                        ).format(bot.user.mention)
+                                        ).format(bot_mention=bot.user.mention)
                                     )
                                 )
                             )
@@ -824,7 +824,7 @@ async def new(ctx):
                                     await message.channel.send(
                                         response.get(
                                             "new-reactionrole-message-send-permission-error"
-                                        ).format(target_channel.mention)
+                                        ).format(channel_mention=target_channel.mention)
                                     )
                                 )
                             )
@@ -847,7 +847,7 @@ async def new(ctx):
             if isinstance(r, Exception):
                 await system_notification(
                     ctx.message.guild.id,
-                    response.get("db-error-new-reactionrole").format(r),
+                    response.get("db-error-new-reactionrole").format(exception=r),
                 )
                 return
             for reaction, _ in rl_object["reactions"].items():
@@ -882,13 +882,13 @@ async def edit_selector(ctx):
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
                 await ctx.send(
-                    response.get("edit-reactionrole-one").format(channel.name)
+                    response.get("edit-reactionrole-one").format(channel_name=channel.name)
                 )
 
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("edit-reactionrole-instructions").format(
-                        len(all_messages), channel.name
+                        num_messages=len(all_messages), channel_name=channel.name
                     )
                     + "\n".join(all_messages)
                 )
@@ -909,7 +909,7 @@ async def edit_selector(ctx):
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         ctx.message.guild.id,
-                        response.get("db-error-fetching-messages").format(all_messages),
+                        response.get("db-error-fetching-messages").format(message_ids=all_messages),
                     )
                     return
 
@@ -995,13 +995,13 @@ async def edit_reaction(ctx):
             channel = ctx.message.channel_mentions[0]
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await ctx.send(response.get("reaction-edit-one").format(channel.name))
+                await ctx.send(response.get("reaction-edit-one").format(channel_name=channel.name))
                 return
 
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("reaction-edit-multi").format(
-                        len(all_messages), channel.name
+                        num_messages=len(all_messages), channel_name=channel.name
                     )
                     + "\n".join(all_messages)
                 )
@@ -1026,7 +1026,7 @@ async def edit_reaction(ctx):
         if isinstance(all_messages, Exception):
             await system_notification(
                 ctx.message.guild.id,
-                response.get("db-error-fetching-messages").format(all_messages),
+                response.get("db-error-fetching-messages").format(exception=all_messages),
             )
             return
 
@@ -1066,7 +1066,7 @@ async def edit_reaction(ctx):
                 await system_notification(
                     ctx.message.guild.id,
                     response.get("db-error-add-reaction").format(
-                        message_to_edit.channel.mention, react
+                        channel_mention=message_to_edit.channel.mention, exception=react
                     ),
                 )
                 return
@@ -1090,7 +1090,7 @@ async def edit_reaction(ctx):
                 await system_notification(
                     ctx.message.guild.id,
                     response.get("db-error-remove-reaction").format(
-                        message_to_edit.channel.mention, react
+                        channel_mention=message_to_edit.channel.mention, exception=react
                     ),
                 )
                 return
@@ -1118,7 +1118,7 @@ async def set_systemchannel(ctx):
                 await system_notification(
                     None,
                     response.get("db-error-fetching-systemchannels").format(
-                        server_channel
+                        exception=server_channel
                     ),
                 )
                 return
@@ -1133,7 +1133,7 @@ async def set_systemchannel(ctx):
                 (await getchannel(server_channel)).mention if server_channel else "none"
             )
             await ctx.send(
-                response.get("systemchannels-info").format(main_text, server_text)
+                response.get("systemchannels-info").format(main_channel=main_text, server_channel=server_text)
             )
             return
 
@@ -1161,7 +1161,7 @@ async def set_systemchannel(ctx):
             if isinstance(add_channel, Exception):
                 await system_notification(
                     guild_id,
-                    response.get("db-error-adding-systemchannels").format(add_channel),
+                    response.get("db-error-adding-systemchannels").format(exception=add_channel),
                 )
                 return
 
@@ -1204,12 +1204,12 @@ async def set_language(ctx):
         else:
             await ctx.send(
                 response.get("language-not-exists").format(
-                    ", ".join(available_languages)
+                    available_languages=", ".join(available_languages)
                 )
             )
     else:
         await ctx.send(
-            response.get("language-info").format(", ".join(available_languages))
+            response.get("language-info").format(available_languages=", ".join(available_languages))
         )
 
 
@@ -1254,7 +1254,7 @@ async def add_activity(ctx):
 
     else:
         activities.add(new_activity)
-        await ctx.send(response.get("activity-success").format(new_activity))
+        await ctx.send(response.get("activity-success").format(new_activity=new_activity))
 
 
 @commands.is_owner()
@@ -1283,7 +1283,7 @@ async def remove_activity(ctx):
 
     removed = activities.remove(activity_to_delete)
     if removed:
-        await ctx.send(response.get("rm-activity-success").format(activity_to_delete))
+        await ctx.send(response.get("rm-activity-success").format(activity_to_delete=activity_to_delete))
 
     else:
         await ctx.send(response.get("rm-activity-not-exists"))
@@ -1316,7 +1316,7 @@ async def hlp(ctx):
             + response.get("help-restart")
             + response.get("help-update")
             + response.get("help-version")
-            + response.get("help-footer").format(__version__)
+            + response.get("help-footer").format(version=__version__)
         )
 
     else:
@@ -1331,7 +1331,7 @@ async def add_admin(ctx, role: discord.Role):
 
     if isinstance(add, Exception):
         await system_notification(
-            ctx.message.guild.id, response.get("db-error-admin-add").format(add)
+            ctx.message.guild.id, response.get("db-error-admin-add").format(exception=add)
         )
         return
 
@@ -1352,7 +1352,7 @@ async def remove_admin(ctx, role: discord.Role):
 
     if isinstance(remove, Exception):
         await system_notification(
-            ctx.message.guild.id, response.get("db-error-admin-remove").format(remove)
+            ctx.message.guild.id, response.get("db-error-admin-remove").format(exception=remove)
         )
         return
 
@@ -1374,7 +1374,7 @@ async def list_admin(ctx):
     if isinstance(admin_ids, Exception):
         await system_notification(
             ctx.message.guild.id,
-            response.get("db-error-fetching-admins").format(admin_ids),
+            response.get("db-error-fetching-admins").format(exception=admin_ids),
         )
         return
 
@@ -1402,7 +1402,7 @@ async def print_version(ctx):
         )
         em.set_footer(text=f"{botname}", icon_url=logo)
         await ctx.send(
-            response.get("version").format(__version__, latest),
+            response.get("version").format(version=__version__, latest_version=latest),
             embed=em,
         )
 
