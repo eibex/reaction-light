@@ -888,9 +888,8 @@ async def edit_selector(ctx):
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("edit-reactionrole-instructions").format(
-                        num_messages=len(all_messages), channel_name=channel.name
+                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
                     )
-                    + "\n".join(all_messages)
                 )
 
             else:
@@ -1001,9 +1000,8 @@ async def edit_reaction(ctx):
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("reaction-edit-multi").format(
-                        num_messages=len(all_messages), channel_name=channel.name
+                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
                     )
-                    + "\n".join(all_messages)
                 )
                 return
 
@@ -1265,7 +1263,7 @@ async def list_activities(ctx):
         for item in activities.activity_list:
             formatted_list.append(f"`{item}`")
 
-        await ctx.send(response.get("current-activities") + "\n- ".join(formatted_list))
+        await ctx.send(response.get("current-activities").format(activity_list="\n- ".join(formatted_list)))
 
     else:
         await ctx.send(response.get("no-current-activities"))
@@ -1385,7 +1383,7 @@ async def list_admin(ctx):
         )
 
     if adminrole_objects:
-        await ctx.send(response.get("adminlist-local") + "\n- ".join(adminrole_objects))
+        await ctx.send(response.get("adminlist-local").format(admin_list="\n- ".join(adminrole_objects)))
     else:
         await ctx.send(response.get("adminlist-local-empty"))
 
