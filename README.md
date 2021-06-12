@@ -124,7 +124,7 @@ Bot: What would you like the message to say? Formatting is: `Message // Embed_ti
 User: none // Select your roles // Click on the buttons below to give yourself some roles!
 ```
 
-Finally, the bot will send the message to the channel specified in the first step, and it will react with each reactions specified so that the buttons are ready to be used. The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
+Finally, the bot will send the message to the channel specified and it will react with each reactions specified so that the buttons are ready to be used (or just add the reactions if you chose to use an existing message). The bot will remove any new reactions to the message to avoid clutter. For example, if you added an `:eggplant:` reaction to the message created in this example, the bot will remove it as it is not attached to any role.
 
 ## Updating
 You can view new features in the [changelog](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md).
