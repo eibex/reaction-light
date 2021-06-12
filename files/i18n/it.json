@@ -59,6 +59,7 @@
     "adminlist-local-empty": "Non ci sono amministratori del bot registrati su questo server.",
     "language-info": "Le lingue disponibili sono {0}. Per cambiare lingua usa, per esempio:\n```\nrl!language en\n```",
     "language-not-exists": "La lingua selezionata non esiste. Le lingue disponibili sono {0}.",
+    "language-success": "Lingua aggiornata.",
     "not-admin": "Non hai un ruolo d'amministratore.",
     "not-owner": "Solo il proprietario del bot può eseguire questo comando.",
     "systemchannel-404": "Non riesco a trovare il canale di sistema.",

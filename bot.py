@@ -1187,18 +1187,29 @@ async def set_language(ctx):
     msg = ctx.message.content.split()
     args = len(msg) - 1
     available_languages = os.listdir(f"{directory}/files/i18n")
-    available_languages = [i.replace(".json", "") for i in available_languages if i.endswith(".json")]
+    available_languages = [
+        i.replace(".json", "") for i in available_languages if i.endswith(".json")
+    ]
     if args:
         new_language = msg[1].lower()
         if new_language in available_languages:
             global language
+            global response
             config["server"]["language"] = language
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
+            response = i18n.Response(f"{folder}/i18n", language, prefix)
+            await ctx.send(response.get("language-success"))
         else:
-            await ctx.send(response.get("language-not-exists").format(", ".join(available_languages)))
+            await ctx.send(
+                response.get("language-not-exists").format(
+                    ", ".join(available_languages)
+                )
+            )
     else:
-        await ctx.send(response.get("language-info").format(", ".join(available_languages)))
+        await ctx.send(
+            response.get("language-info").format(", ".join(available_languages))
+        )
 
 
 @commands.is_owner()
