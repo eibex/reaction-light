@@ -1195,6 +1195,7 @@ async def set_language(ctx):
         if new_language in available_languages:
             global language
             global response
+            language = new_language
             config["server"]["language"] = language
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
@@ -1305,8 +1306,8 @@ async def hlp(ctx):
         )
         await ctx.send(
             response.get("help-admins-title")
-            + response.get("help-admin").format(botname)
-            + response.get("help-rm-admin").format(botname)
+            + response.get("help-admin")
+            + response.get("help-rm-admin")
             + response.get("help-adminlist")
             + response.get("help-system-title")
             + response.get("help-systemchannel")
@@ -1315,7 +1316,7 @@ async def hlp(ctx):
             + response.get("help-restart")
             + response.get("help-update")
             + response.get("help-version")
-            + response.get("help-footer").format(botname, __version__)
+            + response.get("help-footer").format(__version__)
         )
 
     else:

@@ -88,7 +88,7 @@
     "db-error-admin-check": "Database error when checking if the member is an admin:\n{0}",
     "permission-error-channel": "I cannot read or send messages in that channel.",
     "permission-error-add": "Someone tried to add a role to themselves but I do not have permissions to add it. Ensure that I have a role that is hierarchically higher than the role I have to assign, and that I have the `Manage Roles` permission.",
-    "permission-error-remove": "Someone tried to remove a role from themselves but I do not have permissions to add it. Ensure that I have a role that is hierarchically higher than the role I have to assign, and that I have the `Manage Roles` permission.",
+    "permission-error-remove": "Someone tried to remove a role from themselves but I do not have permissions to remove it. Ensure that I have a role that is hierarchically higher than the role I have to remove, and that I have the `Manage Roles` permission.",
     "example-embed": "Example embed",
     "example-embed-new-colour": "This embed has a new colour!",
     "shutdown": "Shutting down...",
@@ -109,9 +109,9 @@
     "help-rm-activity": "- `{prefix}rm-activity` removes an activity from the bot's list.\n",
     "help-activitylist": "- `{prefix}activitylist` lists the current activities used by the bot as statuses.\n",
     "help-admins-title": "**Admins**\n",
-    "help-admin": "- `{prefix}admin` adds the mentioned role to the list of {0} admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n",
-    "help-rm-admin": "- `{prefix}rm-admin` removes the mentioned role from the list of {0} admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n",
-    "help-adminlist": "- `{prefix}adminlist` lists the current admins on the server the command was run in by mentioning them and the current admins from other servers by printing out the role IDs. You need to be a server administrator to use this command.\n",
+    "help-admin": "- `{prefix}admin` adds the mentioned role to the list of Reaction Light admins, allowing them to create and edit reaction-role messages. You need to be a server administrator to use this command.\n",
+    "help-rm-admin": "- `{prefix}rm-admin` removes the mentioned role from the list of Reaction Light admins, preventing them from creating and editing reaction-role messages. You need to be a server administrator to use this command.\n",
+    "help-adminlist": "- `{prefix}adminlist` lists the current admins on the server the command was run in by mentioning them. You need to be a server administrator to use this command.\n",
     "help-system-title": "**System**\n",
     "help-systemchannel": "- `{prefix}systemchannel` updates the main or server system channel where the bot sends errors and update notifications.\n",
     "help-bot-control-title": "**Bot Control**\n",
@@ -119,5 +119,5 @@
     "help-restart": "- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n",
     "help-update": "- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations running on GNU/Linux.\n",
     "help-version": "- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n",
-    "help-footer": "{0} is running version {1} of Reaction Light. You can find more resources, submit feedback, and report bugs at: <https://github.com/eibex/reaction-light>"
+    "help-footer": "I am running version {1} of Reaction Light. You can find more resources, submit feedback, and report bugs at: <https://github.com/eibex/reaction-light>"
 }
