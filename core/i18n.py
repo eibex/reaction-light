@@ -21,7 +21,7 @@ class Response:
         try:
             response = self.responses[self.language][item]
         except KeyError:
-            response = self.responses["en"][item]
+            response = self.responses["en-gb"][item]
             print(
                 f"Could not find a translation ({self.language}) for the requested i18n item: {item}. Please file an issue on GitHub."
             )

@@ -48,7 +48,7 @@ logo = str(config.get("server", "logo"))
 TOKEN = str(config.get("server", "token"))
 botname = str(config.get("server", "name"))
 prefix = str(config.get("server", "prefix"))
-language = str(config.get("server", "language", fallback="en"))
+language = str(config.get("server", "language", fallback="en-gb"))
 botcolour = discord.Colour(int(config.get("server", "colour"), 16))
 system_channel = (
     int(config.get("server", "system_channel"))
