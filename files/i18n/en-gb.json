@@ -118,6 +118,7 @@
     "help-kill": "- `{prefix}kill` shuts down the bot.\n",
     "help-restart": "- `{prefix}restart` restarts the bot. Only works on installations running on GNU/Linux.\n",
     "help-update": "- `{prefix}update` updates the bot and restarts it. Only works on `git clone` installations running on GNU/Linux.\n",
-    "help-version": "- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n\n",
+    "help-version": "- `{prefix}version` reports the bot's current version and the latest available one from GitHub.\n",
+    "help-language": "- `{prefix}language` sets a new language for the bot. Currently available languages are: `en-gb` (English), `it-it` (Italian).\n\n",
     "help-footer": "I am running version {version} of Reaction Light. You can find more resources, submit feedback, and report bugs at: <https://github.com/eibex/reaction-light>"
 }
