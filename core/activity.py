@@ -53,7 +53,6 @@ class Activities:
                 except IndexError:
                     pass
 
-
         if not self.activity_list:
             self.activity_list = ["with reactions"]
 
