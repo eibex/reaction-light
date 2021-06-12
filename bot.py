@@ -291,7 +291,7 @@ async def cleandb():
         except discord.NotFound as e:
             # If unknown channel or unknown message
             if e.code == 10003 or e.code == 10008:
-                delete = db.delete(message[0], message[3])
+                delete = db.delete(message[0])
 
                 if isinstance(delete, Exception):
                     await system_notification(

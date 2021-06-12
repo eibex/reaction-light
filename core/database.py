@@ -258,25 +258,19 @@ class Database:
         except sqlite3.Error as e:
             return e
 
-    def delete(self, message_id, guild_id=None):
+    def delete(self, message_id):
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            if guild_id:
-                cursor.execute(
-                    "SELECT reactionrole_id FROM messages WHERE guild_id = ?;",
-                    (guild_id,),
-                )
 
-            else:
-                cursor.execute(
-                    "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
-                    (message_id,),
-                )
+            cursor.execute(
+                "SELECT reactionrole_id FROM messages WHERE message_id = ?;",
+                (message_id,),
+            )
 
-            result = cursor.fetchall()
+            result = cursor.fetchone()
             if result:
-                reactionrole_id = result[0][0]
+                reactionrole_id = result[0]
                 cursor.execute(
                     "DELETE FROM messages WHERE reactionrole_id = ?;",
                     (reactionrole_id,),
