@@ -57,7 +57,7 @@
     "admin-invalid": "Please mention a valid @Role or role ID.",
     "adminlist-local": "The bot admins on this server are:\n- {admin_list}",
     "adminlist-local-empty": "There are no bot admins registered in this server.",
-    "language-info": "The available languages are {available_languages}. To change language use, for example:\n```\nrl!language en\n```",
+    "language-info": "The available languages are {available_languages}. To change language use, for example:\n```\nrl!language en-gb\n```",
     "language-not-exists": "The selected language does not exist. The available languages are {available_languages}.",
     "language-success": "Language changed.",
     "not-admin": "You do not have an admin role.",
