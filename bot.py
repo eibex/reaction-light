@@ -28,7 +28,7 @@ import datetime
 import configparser
 import asyncio
 from shutil import copy
-from sys import platform, exit as shutdown
+from sys import platform
 
 import discord
 from discord.ext import commands, tasks
@@ -1412,7 +1412,7 @@ async def print_version(ctx):
 @bot.command(name="kill")
 async def kill(ctx):
     await ctx.send(response.get("shutdown"))
-    shutdown()  # sys.exit()
+    await bot.close()
 
 
 @commands.is_owner()
@@ -1421,7 +1421,7 @@ async def restart_cmd(ctx):
     if platform != "win32":
         restart()
         await ctx.send(response.get("restart"))
-        shutdown()  # sys.exit()
+        await bot.close()
 
     else:
         await ctx.send(response.get("windows-error"))
@@ -1441,7 +1441,7 @@ async def update(ctx):
         copy(db_file, f"{db_file}.bak")
         restart()
         await ctx.send(response.get("restart"))
-        shutdown()  # sys.exit()
+        await bot.close()
 
     else:
         await ctx.send(response.get("windows-error"))
