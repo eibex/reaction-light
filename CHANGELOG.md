@@ -1,6 +1,12 @@
 # Reaction Light - Changelog
+
+### 2.5.0
+- Fix `rl!new` showing unsuccessful reaction when the message creation was actually successful
+- Add support for translations. To translate the bot's responses make a copy of [en.json](https://github.com/eibex/reaction-light/blob/master/files/i18n/en.json) and translate the associated strings. Consider sharing your translation as a pull request ([#74](https://github.com/eibex/reaction-light/issues/74) closed by [#77](https://github.com/eibex/reaction-light/pull/77) by [eibex](https://github.com/eibex), [Edwinexd](https://github.com/Edwinexd), and [d7415](https://github.com/d7415)).
+
 ### 2.4.3
 - Fix deletion of wrong database entries under certain circumstances. Please check that all your messages are working before updating, and restore a backup if necessary ([#73](https://github.com/eibex/reaction-light/issues/73) closed by [#78](https://github.com/eibex/reaction-light/pull/78) by [Edwinexd](https://github.com/Edwinexd))
+
 
 ### 2.4.2
 - Fix errors when trying to set a new server-specific system channel with `rl!systemchannel server #channel`

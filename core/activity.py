@@ -47,8 +47,14 @@ class Activities:
             # Get activities.csv contents
             reader = csv.reader(f, delimiter=",")
             for row in reader:
-                activity = row[0]
-                self.activity_list.append(activity)
+                try:
+                    activity = row[0]
+                    self.activity_list.append(activity)
+                except IndexError:
+                    pass
+
+        if not self.activity_list:
+            self.activity_list = ["with reactions"]
 
         self.loop = cycle(self.activity_list)
 
