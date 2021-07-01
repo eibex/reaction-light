@@ -1197,7 +1197,7 @@ async def set_language(ctx):
             config["server"]["language"] = language
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
-            response = i18n.Response(f"{folder}/i18n", language, prefix)
+            response.language = language
             await ctx.send(response.get("language-success"))
         else:
             await ctx.send(
