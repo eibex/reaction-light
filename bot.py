@@ -30,8 +30,8 @@ import asyncio
 from shutil import copy
 from sys import platform
 
-import discord
-from discord.ext import commands, tasks
+import disnake as discord
+from disnake.ext import commands, tasks
 
 from core import database, activity, github, schema, i18n
 

@@ -1,7 +1,7 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light 2.5.0](https://img.shields.io/badge/Reaction%20Light-2.5.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](#)
-[![discord.py 1.6.0+](https://img.shields.io/badge/discord.py-1.6.0+-blue.svg)](#)
+[![Reaction Light 3.0.0](https://img.shields.io/badge/Reaction%20Light-3.0.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
+[![disnake 2.2.1+](https://img.shields.io/badge/disnake-2.2.1+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
