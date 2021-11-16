@@ -1,11 +1,11 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light 2.5.0](https://img.shields.io/badge/Reaction%20Light-2.5.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](#)
-[![discord.py 1.6.0+](https://img.shields.io/badge/discord.py-1.6.0+-blue.svg)](#)
+[![Reaction Light 3.0.0](https://img.shields.io/badge/Reaction%20Light-3.0.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
+[![enhanced-d.py 1.7.3+](https://img.shields.io/badge/enhanced--d.py-1.7.3+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
-Light yet powerful reaction role bot coded in discord.py.
+Light yet powerful reaction role bot coded in Python.
 
 ## Key Features
 - Create multiple custom embedded messages with custom reactions and roles
@@ -36,11 +36,11 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [License](#license)
 
 ## Requirements
-This bot requires discord.py and Python 3.6+.
+This bot requires [enhanced-discord.py](https://github.com/iDevision/enhanced-discord.py) and Python 3.8+.
 
-You can get discord.py (and other dependencies) via PyPI:
+You can get disnake via PyPI:
 ```
-python3 -m pip install -U discord.py
+python3 -m pip install -U disnake
 ```
 
 ## Setup
