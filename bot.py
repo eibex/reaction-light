@@ -58,13 +58,9 @@ system_channel = (
 
 response = i18n.Response(f"{folder}/i18n", language, prefix)
 
-intents = discord.Intents.default()
-intents.members = True
-intents.reactions = True
-intents.messages = True
-intents.emojis = True
+intents = discord.Intents.all()
 
-bot = commands.Bot(command_prefix=prefix, intents=intents)
+bot = commands.Bot(command_prefix=prefix, intents=intents, slash_commands=True, slash_command_guilds=[293178252741050368])
 
 bot.remove_command("help")
 
@@ -1451,6 +1447,10 @@ async def update(ctx):
 async def on_command_error(ctx, error):
     if isinstance(error, commands.NotOwner):
         await ctx.send(response.get("not-owner"))
+    else:
+        import traceback
+        traceback.print_tb(error.__traceback__)
+        print(error)
 
 
 try:

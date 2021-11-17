@@ -48,7 +48,7 @@ python3 -m pip install -U disnake
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
-    - Make sure you enabled the **server members intent** on your bot developer page
+    - Make sure you enabled all intents on your bot developer page
   - Choose a prefix of your liking (default: `rl!`)
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
@@ -59,7 +59,7 @@ python3 -m pip install -U disnake
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
   - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
-  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=8`
+  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=8`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
