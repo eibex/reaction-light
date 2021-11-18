@@ -49,7 +49,7 @@ python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
-    - Make sure you enabled all intents on your bot developer page
+    - Make sure you enabled the message intent on your bot developer page
   - Set a name to appear in embed footers (default: Reaction Light)
   - URL of the footer logo (default: same as picture above)
   - Hexadecimal value of embeds (default: 0xffff00 (yellow))
