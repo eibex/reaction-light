@@ -124,6 +124,8 @@
     "brief-message-new": "Create a new reaction-role message",
     "brief-message-edit": "Edit an existing reaction-role message",
     "brief-message-reaction": "Add or remove reactions from an existing reaction-role message",
+    "brief-settings-notify": "Toggles sending messages to users when they get/lose a role (default off) for the current server",
+    "brief-settings-systemchannel": "Updates the main or server system channel where the bot sends errors and update notifications",
     "message-edit-option-channel": "The channel in which the message you want to edit is located",
     "message-edit-option-number": "The number of the message in the channel (enter 0 for explanation)",
     "message-edit-option-message": "The message of the reaction-role message (enter 'none' to skip)",

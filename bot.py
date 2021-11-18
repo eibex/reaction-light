@@ -1094,7 +1094,7 @@ async def edit_reaction(
         await ctx.send(response.get("not-admin"))
 
 
-@settings_group.command(name="systemchannel")
+@settings_group.command(name="systemchannel", brief=response.get("brief-settings-systemchannel"))
 async def set_systemchannel(
     ctx,
     channel_type: str = commands.Option(None, description=response.get("settings-systemchannel-option-type")),
@@ -1157,7 +1157,7 @@ async def set_systemchannel(
         await ctx.send(response.get("not-admin"))
 
 
-@bot.command(name="notify")
+@settings_group.command(name="notify", brief=response.get("brief-settings-notify"))
 async def toggle_notify(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         notify = db.toggle_notify(ctx.guild.id)
