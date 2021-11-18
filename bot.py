@@ -46,7 +46,13 @@ with open(f"{directory}/.version") as f:
 folder = f"{directory}/files"
 config = configparser.ConfigParser()
 config.read(f"{directory}/config.ini")
-logo = str(config.get("server", "logo", fallback="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg"))
+logo = str(
+    config.get(
+        "server",
+        "logo",
+        fallback="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg",
+    )
+)
 TOKEN = str(config.get("server", "token"))
 botname = str(config.get("server", "name", fallback="Reaction Light"))
 prefix = str(config.get("server", "prefix", fallback="rl!"))
@@ -65,7 +71,13 @@ intents.guild_messages = True
 intents.guild_reactions = True
 intents.guilds = True
 
-bot = commands.Bot(command_prefix=prefix, intents=intents, slash_commands=True, message_commands=False, slash_command_guilds=[293178252741050368])
+bot = commands.Bot(
+    command_prefix=prefix,
+    intents=intents,
+    slash_commands=True,
+    message_commands=False,
+    slash_command_guilds=[293178252741050368],
+)
 
 bot.remove_command("help")
 
@@ -142,6 +154,7 @@ async def getmember(guild, user_id):
         member = await guild.fetch_member(user_id)
 
     return member
+
 
 def restart():
     # Create a new python process of bot.py and stops the current one
@@ -305,7 +318,9 @@ async def cleandb():
                 if isinstance(delete, Exception):
                     await system_notification(
                         channel.guild.id,
-                        response.get("db-error-fetching-cleaning").format(exception=delete),
+                        response.get("db-error-fetching-cleaning").format(
+                            exception=delete
+                        ),
                     )
                     return
 
@@ -320,12 +335,15 @@ async def cleandb():
             # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
             await system_notification(
                 message[3],
-                response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]),
+                response.get("db-forbidden-message").format(
+                    message_id=message[0], channel_id=message[1]
+                ),
             )
 
     if isinstance(guilds, Exception):
         await system_notification(
-            None, response.get("db-error-fetching-cleaning-guild").format(exception=guilds)
+            None,
+            response.get("db-error-fetching-cleaning-guild").format(exception=guilds),
         )
         return
 
@@ -348,7 +366,10 @@ async def cleandb():
 
     if isinstance(cleanup_guilds, Exception):
         await system_notification(
-            None, response.get("db-error-fetching-cleanup-guild").format(exception=cleanup_guilds)
+            None,
+            response.get("db-error-fetching-cleanup-guild").format(
+                exception=cleanup_guilds
+            ),
         )
         return
 
@@ -367,7 +388,9 @@ async def cleandb():
                 if isinstance(delete, Exception):
                     await system_notification(
                         None,
-                        response.get("db-error-deleting-cleaning-guild").format(exception=delete),
+                        response.get("db-error-deleting-cleaning-guild").format(
+                            exception=delete
+                        ),
                     )
                     return
 
@@ -434,7 +457,8 @@ async def on_raw_reaction_add(payload):
 
             if isinstance(reactions, Exception):
                 await system_notification(
-                    guild_id, response.get("db-error-reaction-get").format(exception=reactions)
+                    guild_id,
+                    response.get("db-error-reaction-get").format(exception=reactions),
                 )
                 return
 
@@ -505,7 +529,8 @@ async def on_raw_reaction_remove(payload):
 
         if isinstance(reactions, Exception):
             await system_notification(
-                guild_id, response.get("db-error-reaction-get").format(exception=reactions)
+                guild_id,
+                response.get("db-error-reaction-get").format(exception=reactions),
             )
 
         elif reaction in reactions:
@@ -521,12 +546,16 @@ async def on_raw_reaction_remove(payload):
                 if isinstance(notify, Exception):
                     await system_notification(
                         guild_id,
-                        response.get("db-error-notification-check").format(exception=notify),
+                        response.get("db-error-notification-check").format(
+                            exception=notify
+                        ),
                     )
                     return
 
                 if notify:
-                    await member.send(response.get("removed-role-dm").format(role_name=role.name))
+                    await member.send(
+                        response.get("removed-role-dm").format(role_name=role.name)
+                    )
 
             except discord.Forbidden:
                 await system_notification(
@@ -645,7 +674,9 @@ async def new(ctx):
 
         if not cancelled:
             sent_oldmessagequestion_message = await ctx.send(
-                response.get("new-reactionrole-old-or-new").format(bot_mention=bot.user.mention)
+                response.get("new-reactionrole-old-or-new").format(
+                    bot_mention=bot.user.mention
+                )
             )
 
             def reaction_check2(payload):
@@ -885,25 +916,39 @@ async def new(ctx):
 
 @message_group.command(name="edit", brief=response.get("brief-message-edit"))
 async def edit_selector(
-        ctx,
-        channel: discord.TextChannel = commands.Option(description=response.get("message-edit-option-channel")),
-        number: int = commands.Option(description=response.get("message-edit-option-number")),
-        message: str = commands.Option("none", description=response.get("message-edit-option-message")),
-        title: str = commands.Option("none", description=response.get("message-edit-option-title")),
-        description: str = commands.Option("none", description=response.get("message-edit-option-description")),
-    ):
+    ctx,
+    channel: discord.TextChannel = commands.Option(
+        description=response.get("message-edit-option-channel")
+    ),
+    number: int = commands.Option(
+        description=response.get("message-edit-option-number")
+    ),
+    message: str = commands.Option(
+        "none", description=response.get("message-edit-option-message")
+    ),
+    title: str = commands.Option(
+        "none", description=response.get("message-edit-option-title")
+    ),
+    description: str = commands.Option(
+        "none", description=response.get("message-edit-option-description")
+    ),
+):
     if isadmin(ctx.message.author, ctx.guild.id):
         all_messages = await formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
                 await ctx.send(
-                    response.get("edit-reactionrole-one").format(channel_name=channel.name)
+                    response.get("edit-reactionrole-one").format(
+                        channel_name=channel.name
+                    )
                 )
 
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("edit-reactionrole-instructions").format(
-                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
+                        num_messages=len(all_messages),
+                        channel_name=channel.name,
+                        message_list="\n".join(all_messages),
                     )
                 )
 
@@ -919,7 +964,9 @@ async def edit_selector(
                 if isinstance(all_messages, Exception):
                     await system_notification(
                         ctx.message.guild.id,
-                        response.get("db-error-fetching-messages").format(message_ids=all_messages),
+                        response.get("db-error-fetching-messages").format(
+                            message_ids=all_messages
+                        ),
                     )
                     return
 
@@ -945,9 +992,7 @@ async def edit_selector(
                     await ctx.send(response.get("select-valid-reactionrole"))
                     return
                 await old_msg.edit(suppress=False)
-                selector_msg_new_body = (
-                    message if message.lower() != "none" else None
-                )
+                selector_msg_new_body = message if message.lower() != "none" else None
                 selector_embed = discord.Embed()
 
                 if title.lower() != "none":
@@ -994,23 +1039,37 @@ async def edit_selector(
 @message_group.command(name="reaction", brief=response.get("brief-message-reaction"))
 async def edit_reaction(
     ctx,
-    channel: discord.TextChannel = commands.Option(description=response.get("message-reaction-option-channel")),
-    action: str = commands.Option(description=response.get("message-reaction-option-action")),
-    number: int = commands.Option(description=response.get("message-reaction-option-number")),
-    reaction: str = commands.Option(None, description=response.get("message-reaction-option-reaction")),
-    role: discord.Role = commands.Option(None, description=response.get("message-reaction-option-role"))
+    channel: discord.TextChannel = commands.Option(
+        description=response.get("message-reaction-option-channel")
+    ),
+    action: str = commands.Option(
+        description=response.get("message-reaction-option-action")
+    ),
+    number: int = commands.Option(
+        description=response.get("message-reaction-option-number")
+    ),
+    reaction: str = commands.Option(
+        None, description=response.get("message-reaction-option-reaction")
+    ),
+    role: discord.Role = commands.Option(
+        None, description=response.get("message-reaction-option-role")
+    ),
 ):
     if isadmin(ctx.message.author, ctx.guild.id):
         if number == 0 or not reaction:
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await ctx.send(response.get("reaction-edit-one").format(channel_name=channel.name))
+                await ctx.send(
+                    response.get("reaction-edit-one").format(channel_name=channel.name)
+                )
                 return
 
             elif len(all_messages) > 1:
                 await ctx.send(
                     response.get("reaction-edit-multi").format(
-                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
+                        num_messages=len(all_messages),
+                        channel_name=channel.name,
+                        message_list="\n".join(all_messages),
                     )
                 )
                 return
@@ -1032,7 +1091,9 @@ async def edit_reaction(
         if isinstance(all_messages, Exception):
             await system_notification(
                 ctx.message.guild.id,
-                response.get("db-error-fetching-messages").format(exception=all_messages),
+                response.get("db-error-fetching-messages").format(
+                    exception=all_messages
+                ),
             )
             return
 
@@ -1107,11 +1168,17 @@ async def edit_reaction(
         await ctx.send(response.get("not-admin"))
 
 
-@settings_group.command(name="systemchannel", brief=response.get("brief-settings-systemchannel"))
+@settings_group.command(
+    name="systemchannel", brief=response.get("brief-settings-systemchannel")
+)
 async def set_systemchannel(
     ctx,
-    channel_type: str = commands.Option(None, description=response.get("settings-systemchannel-option-type")),
-    channel: discord.TextChannel = commands.Option(None, description=response.get("settings-systemchannel-option-channel"))
+    channel_type: str = commands.Option(
+        None, description=response.get("settings-systemchannel-option-type")
+    ),
+    channel: discord.TextChannel = commands.Option(
+        None, description=response.get("settings-systemchannel-option-channel")
+    ),
 ):
     if isadmin(ctx.message.author, ctx.guild.id):
         global system_channel
@@ -1136,11 +1203,13 @@ async def set_systemchannel(
                 (await getchannel(server_channel)).mention if server_channel else "none"
             )
             await ctx.send(
-                response.get("systemchannels-info").format(main_channel=main_text, server_channel=server_text)
+                response.get("systemchannels-info").format(
+                    main_channel=main_text, server_channel=server_text
+                )
             )
             return
 
-        bot_user = ctx.message.guild.get_member(bot.user.id) 
+        bot_user = ctx.message.guild.get_member(bot.user.id)
         bot_permissions = channel.permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
@@ -1160,7 +1229,9 @@ async def set_systemchannel(
             if isinstance(add_channel, Exception):
                 await system_notification(
                     ctx.message.guild.id,
-                    response.get("db-error-adding-systemchannels").format(exception=add_channel),
+                    response.get("db-error-adding-systemchannels").format(
+                        exception=add_channel
+                    ),
                 )
                 return
 
@@ -1184,7 +1255,9 @@ async def toggle_notify(ctx):
 @settings_group.command(name="language", brief=response.get("brief-settings-language"))
 async def set_language(
     ctx,
-    new_language: str = commands.Option(name="language", description=response.get("settings-language-option-language"))
+    new_language: str = commands.Option(
+        name="language", description=response.get("settings-language-option-language")
+    ),
 ):
     available_languages = os.listdir(f"{directory}/files/i18n")
     available_languages = [
@@ -1208,7 +1281,9 @@ async def set_language(
             )
     else:
         await ctx.send(
-            response.get("language-info").format(available_languages=", ".join(available_languages))
+            response.get("language-info").format(
+                available_languages=", ".join(available_languages)
+            )
         )
 
 
@@ -1216,7 +1291,9 @@ async def set_language(
 @settings_group.command(name="colour", brief=response.get("brief-settings-colour"))
 async def set_colour(
     ctx,
-    colour: str = commands.Option(description=response.get("settings-colour-option-colour"))
+    colour: str = commands.Option(
+        description=response.get("settings-colour-option-colour")
+    ),
 ):
     global botcolour
     try:
@@ -1241,8 +1318,12 @@ async def set_colour(
 @settings_group.command(name="activity", brief=response.get("brief-settings-activity"))
 async def change_activity(
     ctx,
-    action: str = commands.Option(description=response.get("settings-activity-option-action")),
-    activity: str = commands.Option(None, description=response.get("settings-activity-option-activity"))
+    action: str = commands.Option(
+        description=response.get("settings-activity-option-action")
+    ),
+    activity: str = commands.Option(
+        None, description=response.get("settings-activity-option-activity")
+    ),
 ):
     if action.lower() == "add" and activity:
         if "," in activity:
@@ -1250,7 +1331,9 @@ async def change_activity(
 
         else:
             activities.add(activity)
-            await ctx.send(response.get("activity-success").format(new_activity=activity))
+            await ctx.send(
+                response.get("activity-success").format(new_activity=activity)
+            )
 
     elif action.lower() == "list":
         if activities.activity_list:
@@ -1258,7 +1341,11 @@ async def change_activity(
             for item in activities.activity_list:
                 formatted_list.append(f"`{item}`")
 
-            await ctx.send(response.get("current-activities").format(activity_list="\n- ".join(formatted_list)))
+            await ctx.send(
+                response.get("current-activities").format(
+                    activity_list="\n- ".join(formatted_list)
+                )
+            )
 
         else:
             await ctx.send(response.get("no-current-activities"))
@@ -1266,7 +1353,9 @@ async def change_activity(
     elif action.lower() == "remove" and activity:
         removed = activities.remove(activity)
         if removed:
-            await ctx.send(response.get("rm-activity-success").format(activity_to_delete=activity))
+            await ctx.send(
+                response.get("rm-activity-success").format(activity_to_delete=activity)
+            )
 
         else:
             await ctx.send(response.get("rm-activity-not-exists"))
@@ -1308,7 +1397,9 @@ async def hlp(ctx):
 async def admin(
     ctx,
     action: str = commands.Option(description=response.get("admin-option-action")),
-    role: discord.Role = commands.Option(None, description=response.get("admin-option-role"))
+    role: discord.Role = commands.Option(
+        None, description=response.get("admin-option-role")
+    ),
 ):
     if role is None or action.lower() == "list":
         # Lists all admin IDs in the database, mentioning them if possible
@@ -1328,7 +1419,11 @@ async def admin(
             )
 
         if adminrole_objects:
-            await ctx.send(response.get("adminlist-local").format(admin_list="\n- ".join(adminrole_objects)))
+            await ctx.send(
+                response.get("adminlist-local").format(
+                    admin_list="\n- ".join(adminrole_objects)
+                )
+            )
         else:
             await ctx.send(response.get("adminlist-local-empty"))
 
@@ -1338,7 +1433,8 @@ async def admin(
 
         if isinstance(add, Exception):
             await system_notification(
-                ctx.message.guild.id, response.get("db-error-admin-add").format(exception=add)
+                ctx.message.guild.id,
+                response.get("db-error-admin-add").format(exception=add),
             )
             return
 
@@ -1350,7 +1446,8 @@ async def admin(
 
         if isinstance(remove, Exception):
             await system_notification(
-                ctx.message.guild.id, response.get("db-error-admin-remove").format(exception=remove)
+                ctx.message.guild.id,
+                response.get("db-error-admin-remove").format(exception=remove),
             )
             return
 
