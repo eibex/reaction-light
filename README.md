@@ -13,9 +13,10 @@ Light yet powerful reaction role bot coded in Python.
 - Optionally limit users to select one reaction (and role) at a time
 - Use the same instance of the bot on multiple servers
 - Easy installation, setup, and updating
+- - No need to rely on developer mode and IDs
 - Optional update notifications and error reporting to your own Discord server
-- No need to rely on developer mode and IDs
 - Multiple languages
+- Slash command ready
 
 You can host the bot yourself by configuring the `config.ini` file (manually or via `setup.py`).
 
