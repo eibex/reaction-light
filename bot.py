@@ -32,6 +32,7 @@ from sys import platform
 
 import discord
 from discord.ext import commands, tasks
+from discord.ext.commands.core import group
 
 from core import database, activity, github, schema, i18n
 
@@ -524,7 +525,12 @@ async def on_raw_reaction_remove(payload):
                 )
 
 
-@bot.command(name="new", aliases=["create"])
+@bot.group(name="message")
+async def message_group(ctx):
+    pass
+
+
+@message_group.command(name="new", brief=response.get("brief-message-new"))
 async def new(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         sent_initial_message = await ctx.send(response.get("new-reactionrole-init"))
@@ -846,36 +852,31 @@ async def new(ctx):
                     response.get("db-error-new-reactionrole").format(exception=r),
                 )
                 return
+
             for reaction, _ in rl_object["reactions"].items():
                 await final_message.add_reaction(reaction)
-            await ctx.message.add_reaction("✅")
+            await ctx.send("✅")
+
         await sent_initial_message.delete()
 
         if cancelled:
-            await ctx.message.add_reaction("❌")
+            await ctx.send("❌")
     else:
         await ctx.send(response.get("new-reactionrole-noadmin"))
 
 
-@bot.command(name="edit")
-async def edit_selector(ctx):
+@message_group.command(name="edit", brief=response.get("brief-message-edit"))
+async def edit_selector(
+        ctx,
+        channel: discord.TextChannel = commands.Option(description="The channel in which the message you want to edit is located"),
+        number: int = commands.Option(description="The number of the message in the channel (enter 0 for explanation)"),
+        message: str = commands.Option("none", description="The message of the reaction-role message (enter 'none' to skip)"),
+        title: str = commands.Option("none", description="The title of the reaction-role message (enter 'none' to skip)"),
+        description: str = commands.Option("none", description="The description of the reaction-role message (enter 'none' to skip)"),
+    ):
     if isadmin(ctx.message.author, ctx.guild.id):
-        # Reminds user of formatting if it is wrong
-        msg_values = ctx.message.content.split()
-        if len(msg_values) < 2:
-            await ctx.send(response.get("edit-reactionrole-info"))
-            return
-
-        elif len(msg_values) == 2:
-            try:
-                channel_id = ctx.message.channel_mentions[0].id
-
-            except IndexError:
-                await ctx.send(response.get("edit-reactionrole-nochannel"))
-                return
-
-            channel = await getchannel(channel_id)
-            all_messages = await formatted_channel_list(channel)
+        all_messages = await formatted_channel_list(channel)
+        if number == 0:
             if len(all_messages) == 1:
                 await ctx.send(
                     response.get("edit-reactionrole-one").format(channel_name=channel.name)
@@ -891,15 +892,11 @@ async def edit_selector(ctx):
             else:
                 await ctx.send(response.get("no-reactionrole-messages"))
 
-        elif len(msg_values) > 2:
+        else:
             try:
                 # Tries to edit the reaction-role message
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
-                channel_id = ctx.message.channel_mentions[0].id
-                channel = await getchannel(channel_id)
-                msg_values = ctx.message.content.split(" // ")
-                selector_msg_number = msg_values[1]
-                all_messages = db.fetch_messages(channel_id)
+                all_messages = db.fetch_messages(channel.id)
 
                 if isinstance(all_messages, Exception):
                     await system_notification(
@@ -913,7 +910,7 @@ async def edit_selector(ctx):
                     message_to_edit_id = None
                     for msg_id in all_messages:
                         # Loop through all msg_ids and stops when the counter matches the user input
-                        if str(counter) == selector_msg_number:
+                        if counter == number:
                             message_to_edit_id = msg_id
                             break
 
@@ -931,17 +928,17 @@ async def edit_selector(ctx):
                     return
                 await old_msg.edit(suppress=False)
                 selector_msg_new_body = (
-                    msg_values[2] if msg_values[2].lower() != "none" else None
+                    message if message.lower() != "none" else None
                 )
                 selector_embed = discord.Embed()
 
-                if len(msg_values) > 3 and msg_values[3].lower() != "none":
-                    selector_embed.title = msg_values[3]
+                if title.lower() != "none":
+                    selector_embed.title = title
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
-                if len(msg_values) > 4 and msg_values[4].lower() != "none":
-                    selector_embed.description = msg_values[4]
+                if description.lower() != "none":
+                    selector_embed.description = description
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 

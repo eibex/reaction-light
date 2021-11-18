@@ -7,7 +7,7 @@
     "new-reactionrole-timeout": "La creazione di Reaction Light non è andata a buon fine, hai impiegato troppo tempo a fornire le informazioni richieste.",
     "new-reactionrole-limit": "Vuoi limitare gli utenti a selezionare un solo ruolo per volta? Reagisci con 🔒 per limitare gli utenti o con ♾️ per permettergli di selezionare più di un ruolo.",
     "new-reactionrole-old-or-new": "Vuoi usare un messaggio già esistente o crearne uno nuovo utilizzando {bot_mention}? Reagisci con 🗨️ per utilizzare un messaggio già esistente o con 🤖 per crearne uno nuovo.",
-    "new-reactionrole-permission-error": "I can not access or add reactions to the requested message. Do I have sufficent permissions?",
+    "new-reactionrole-permission-error": "Non posso accedere o aggiungere reazioni al messaggio richiesto. Ho i permessi necessari?",
     "new-reactionrole-already-exists": "Questo messaggio è già collegato a Reaction Light, utilizza `{prefix}edit` per modificarlo.",
     "new-reactionrole-target-channel": "Menziona il #canale in cui mandare il messaggio.",
     "invalid-target-channel": "Il canale che hai menzionato non è valido.",
@@ -120,5 +120,7 @@
     "help-update": "- `{prefix}update` updates the bot and restarts it. Funziona solamente se il bot è installato su GNU/Linux tramite git.\n",
     "help-version": "- `{prefix}version` mostra la versione attuale del bot e l'ultima versione disponibile su GitHub.\n",
     "help-language": "- `{prefix}language` setta una nuova lingua per il bot. Le lingue attualmente disponibili sono: `en-gb` (Inglese), `it-it` (Italiano).\n\n",
-    "help-footer": "Sto utilizzando la versione {version} di Reaction Light. Puoi trovare più risorse, fornire feedback e segnalare bug su: <https://github.com/eibex/reaction-light>"
+    "help-footer": "Sto utilizzando la versione {version} di Reaction Light. Puoi trovare più risorse, fornire feedback e segnalare bug su: <https://github.com/eibex/reaction-light>",
+    "brief-message-new": "Crea un nuovo messaggio per associare le reazioni ai ruoli",
+    "brief-message-edit": "Modifica un messaggio per associare le reazioni ai ruoli esistente"
 }
