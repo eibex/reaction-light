@@ -127,6 +127,7 @@
     "brief-settings-notify": "Toggles sending messages to users when they get/lose a role (default off) for the current server",
     "brief-settings-systemchannel": "Updates the main or server system channel where the bot sends errors and update notifications",
     "brief-settings-language": "Sets the bot language",
+    "brief-settings-colour": "Sets the colour of the embeds of new and newly edited reaction role messages",
     "message-edit-option-channel": "The channel in which the message you want to edit is located",
     "message-edit-option-number": "The number of the message in the channel (enter 0 for explanation)",
     "message-edit-option-message": "The message of the reaction-role message (enter 'none' to skip)",
@@ -140,5 +141,6 @@
     "no-add-remove-specified": "The only accepted actions are **add** and **remove**",
     "settings-systemchannel-option-type": "Define if it is a 'main' (general errors) or 'server' (guild speficic errors) channel",
     "settings-systemchannel-option-channel": "The channel in which error message will be sent",
-    "settings-language-option-language": "The language to set, enter 'check' to see the available languages"
+    "settings-language-option-language": "The language to set, enter 'check' to see the available languages",
+    "settings-colour-option-colour": "The hex value of the colour you wish to set (e.g. 0xffff00)"
 }

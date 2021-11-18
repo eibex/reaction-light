@@ -1200,31 +1200,27 @@ async def set_language(
 
 
 @commands.is_owner()
-@bot.command(name="colour")
-async def set_colour(ctx):
-    msg = ctx.message.content.split()
-    args = len(msg) - 1
-    if args:
-        global botcolour
-        colour = msg[1]
-        try:
-            botcolour = discord.Colour(int(colour, 16))
+@settings_group.command(name="colour", brief=response.get("brief-settings-colour"))
+async def set_colour(
+    ctx,
+    colour: str = commands.Option(description=response.get("settings-colour-option-colour"))
+):
+    global botcolour
+    try:
+        botcolour = discord.Colour(int(colour, 16))
 
-            config["server"]["colour"] = colour
-            with open(f"{directory}/config.ini", "w") as configfile:
-                config.write(configfile)
+        config["server"]["colour"] = colour
+        with open(f"{directory}/config.ini", "w") as configfile:
+            config.write(configfile)
 
-            example = discord.Embed(
-                title=response.get("example-embed"),
-                description=response.get("example-embed-new-colour"),
-                colour=botcolour,
-            )
-            await ctx.send(response.get("colour-changed"), embed=example)
+        example = discord.Embed(
+            title=response.get("example-embed"),
+            description=response.get("example-embed-new-colour"),
+            colour=botcolour,
+        )
+        await ctx.send(response.get("colour-changed"), embed=example)
 
-        except ValueError:
-            await ctx.send(response.get("colour-hex-error"))
-
-    else:
+    except ValueError:
         await ctx.send(response.get("colour-hex-error"))
 
 
