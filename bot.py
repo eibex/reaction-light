@@ -61,9 +61,10 @@ response = i18n.Response(f"{folder}/i18n", language, prefix)
 
 intents = discord.Intents.all()
 
-bot = commands.Bot(command_prefix=prefix, intents=intents, slash_commands=True, slash_command_guilds=[293178252741050368])
+bot = commands.Bot(command_prefix=prefix, intents=intents, slash_commands=True, message_commands=False, slash_command_guilds=[293178252741050368])
 
 bot.remove_command("help")
+
 
 activities_file = f"{directory}/files/activities.csv"
 activities = activity.Activities(activities_file)
@@ -1275,20 +1276,14 @@ async def hlp(ctx):
             + response.get("help-new")
             + response.get("help-edit")
             + response.get("help-reaction")
+            + response.get("help-settings-title")
             + response.get("help-notify")
             + response.get("help-colour")
-            + response.get("help-activities-title")
             + response.get("help-activity")
-            + response.get("help-rm-activity")
-            + response.get("help-activitylist")
-        )
-        await ctx.send(
-            response.get("help-admins-title")
-            + response.get("help-admin")
-            + response.get("help-rm-admin")
-            + response.get("help-adminlist")
-            + response.get("help-system-title")
             + response.get("help-systemchannel")
+            + response.get("help-language")
+            + response.get("help-admins-title")
+            + response.get("help-admin")
             + response.get("help-bot-control-title")
             + response.get("help-kill")
             + response.get("help-restart")

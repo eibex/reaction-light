@@ -38,9 +38,9 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 ## Requirements
 This bot requires [enhanced-discord.py](https://github.com/iDevision/enhanced-discord.py) and Python 3.8+.
 
-You can get disnake via PyPI:
+You can get enhanced-discord.py via PyPI or GitHub:
 ```
-python3 -m pip install -U disnake
+python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py
 ```
 
 ## Setup
