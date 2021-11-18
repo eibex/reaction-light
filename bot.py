@@ -535,6 +535,11 @@ async def settings_group(ctx):
     pass
 
 
+@bot.group(name="bot")
+async def bot_group(ctx):
+    pass
+
+
 @message_group.command(name="new", brief=response.get("brief-message-new"))
 async def new(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
@@ -1262,7 +1267,7 @@ async def change_activity(
         await ctx.send(response.get("activity-add-list-remove"))
 
 
-@bot.command(name="help")
+@bot.command(name="help", brief=response.get("brief-help"))
 async def hlp(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         await ctx.send(
@@ -1296,7 +1301,7 @@ async def hlp(ctx):
         await ctx.send(response.get("not-admin"))
 
 
-@bot.command(name="admin")
+@bot.command(name="admin", brief=response.get("brief-admin"))
 @commands.has_permissions(administrator=True)
 async def admin(
     ctx,
@@ -1356,7 +1361,7 @@ async def add_admin_error(ctx, error):
         await ctx.send(response.get("admin-invalid"))
 
 
-@bot.command(name="version")
+@bot_group.command(name="version", brief=response.get("brief-version"))
 async def print_version(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         latest = await github.get_latest()
@@ -1377,14 +1382,14 @@ async def print_version(ctx):
 
 
 @commands.is_owner()
-@bot.command(name="kill")
+@bot_group.command(name="kill", brief=response.get("brief-kill"))
 async def kill(ctx):
     await ctx.send(response.get("shutdown"))
     await bot.close()
 
 
 @commands.is_owner()
-@bot.command(name="restart")
+@bot_group.command(name="restart", brief=response.get("brief-restart"))
 async def restart_cmd(ctx):
     if platform != "win32":
         restart()
@@ -1396,7 +1401,7 @@ async def restart_cmd(ctx):
 
 
 @commands.is_owner()
-@bot.command(name="update")
+@bot_group.command(name="update", brief=response.get("brief-update"))
 async def update(ctx):
     if platform != "win32":
         await ctx.send(response.get("attempting-update"))
@@ -1420,8 +1425,6 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.NotOwner):
         await ctx.send(response.get("not-owner"))
     else:
-        import traceback
-        traceback.print_tb(error.__traceback__)
         print(error)
 
 
