@@ -128,6 +128,7 @@
     "brief-settings-systemchannel": "Updates the main or server system channel where the bot sends errors and update notifications",
     "brief-settings-language": "Sets the bot language",
     "brief-settings-colour": "Sets the colour of the embeds of new and newly edited reaction role messages",
+    "brief-settings-activity": "Add or remove an activity for the bot to loop through and show as status",
     "message-edit-option-channel": "The channel in which the message you want to edit is located",
     "message-edit-option-number": "The number of the message in the channel (enter 0 for explanation)",
     "message-edit-option-message": "The message of the reaction-role message (enter 'none' to skip)",
@@ -138,9 +139,12 @@
     "message-reaction-option-number": "The number of the message in the channel (enter 0 for explanation)",
     "message-reaction-option-reaction": "The reaction you want to add or remove",
     "message-reaction-option-role": "The role you want to associate to the new reaction (not necessary for 'remove')",
-    "no-add-remove-specified": "The only accepted actions are **add** and **remove**",
+    "no-add-remove-specified": "The only accepted actions are `add` and `remove`",
     "settings-systemchannel-option-type": "Define if it is a 'main' (general errors) or 'server' (guild speficic errors) channel",
     "settings-systemchannel-option-channel": "The channel in which error message will be sent",
     "settings-language-option-language": "The language to set, enter 'check' to see the available languages",
-    "settings-colour-option-colour": "The hex value of the colour you wish to set (e.g. 0xffff00)"
+    "settings-colour-option-colour": "The hex value of the colour you wish to set (e.g. 0xffff00)",
+    "settings-activity-option-action": "Use 'add', 'remove', 'list' to add/remove/view a bot status message",
+    "settings-activity-option-activity": "The text that appears after 'Playing' in the bot's status message (case sensitive)",
+    "activity-add-list-remove": "The only actions supported are `add`, `list`, and `remove`. You need to provide an activity if using `add` or `remove`."
 }

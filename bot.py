@@ -1225,50 +1225,41 @@ async def set_colour(
 
 
 @commands.is_owner()
-@bot.command(name="activity")
-async def add_activity(ctx):
-    new_activity = ctx.message.content[(len(prefix) + len("activity")) :].strip()
-    if not activity:
-        await ctx.send(response.get("activity-info"))
+@settings_group.command(name="activity", brief=response.get("brief-settings-activity"))
+async def change_activity(
+    ctx,
+    action: str = commands.Option(description=response.get("settings-activity-option-action")),
+    activity: str = commands.Option(None, description=response.get("settings-activity-option-activity"))
+):
+    if action.lower() == "add" and activity:
+        if "," in activity:
+            await ctx.send(response.get("activity-no-commas"))
 
-    elif "," in new_activity:
-        await ctx.send(response.get("activity-no-commas"))
+        else:
+            activities.add(activity)
+            await ctx.send(response.get("activity-success").format(new_activity=activity))
 
-    else:
-        activities.add(new_activity)
-        await ctx.send(response.get("activity-success").format(new_activity=new_activity))
+    elif action.lower() == "list":
+        if activities.activity_list:
+            formatted_list = []
+            for item in activities.activity_list:
+                formatted_list.append(f"`{item}`")
 
+            await ctx.send(response.get("current-activities").format(activity_list="\n- ".join(formatted_list)))
 
-@commands.is_owner()
-@bot.command(name="activitylist")
-async def list_activities(ctx):
-    if activities.activity_list:
-        formatted_list = []
-        for item in activities.activity_list:
-            formatted_list.append(f"`{item}`")
+        else:
+            await ctx.send(response.get("no-current-activities"))
 
-        await ctx.send(response.get("current-activities").format(activity_list="\n- ".join(formatted_list)))
+    elif action.lower() == "remove" and activity:
+        removed = activities.remove(activity)
+        if removed:
+            await ctx.send(response.get("rm-activity-success").format(activity_to_delete=activity))
 
-    else:
-        await ctx.send(response.get("no-current-activities"))
-
-
-@commands.is_owner()
-@bot.command(name="rm-activity")
-async def remove_activity(ctx):
-    activity_to_delete = ctx.message.content[
-        (len(prefix) + len("rm-activity")) :
-    ].strip()
-    if not activity_to_delete:
-        await ctx.send(response.get("rm-activity-info"))
-        return
-
-    removed = activities.remove(activity_to_delete)
-    if removed:
-        await ctx.send(response.get("rm-activity-success").format(activity_to_delete=activity_to_delete))
+        else:
+            await ctx.send(response.get("rm-activity-not-exists"))
 
     else:
-        await ctx.send(response.get("rm-activity-not-exists"))
+        await ctx.send(response.get("activity-add-list-remove"))
 
 
 @bot.command(name="help")
