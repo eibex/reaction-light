@@ -134,5 +134,7 @@
     "message-reaction-option-number": "The number of the message in the channel (enter 0 for explanation)",
     "message-reaction-option-reaction": "The reaction you want to add or remove",
     "message-reaction-option-role": "The role you want to associate to the new reaction (not necessary for 'remove')",
-    "no-add-remove-specified": "The only accepted actions are **add** and **remove**"
+    "no-add-remove-specified": "The only accepted actions are **add** and **remove**",
+    "settings-systemchannel-option-type": "Define if it is a 'main' (general errors) or 'server' (guild speficic errors) channel",
+    "settings-systemchannel-option-channel": "The channel in which error message will be sent"
 }

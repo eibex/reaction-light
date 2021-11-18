@@ -530,6 +530,11 @@ async def message_group(ctx):
     pass
 
 
+@bot.group(name="settings")
+async def settings_group(ctx):
+    pass
+
+
 @message_group.command(name="new", brief=response.get("brief-message-new"))
 async def new(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
@@ -1089,18 +1094,15 @@ async def edit_reaction(
         await ctx.send(response.get("not-admin"))
 
 
-@bot.command(name="systemchannel")
-async def set_systemchannel(ctx):
+@settings_group.command(name="systemchannel")
+async def set_systemchannel(
+    ctx,
+    channel_type: str = commands.Option(None, description=response.get("settings-systemchannel-option-type")),
+    channel: discord.TextChannel = commands.Option(None, description=response.get("settings-systemchannel-option-channel"))
+):
     if isadmin(ctx.message.author, ctx.guild.id):
         global system_channel
-        msg = ctx.message.content.split()
-        mentioned_channels = ctx.message.channel_mentions
-        channel_type = None if len(msg) < 2 else msg[1].lower()
-        if (
-            len(msg) < 3
-            or not mentioned_channels
-            or channel_type not in ["main", "server"]
-        ):
+        if not channel or channel_type.lower() not in ["main", "server"]:
             server_channel = db.fetch_systemchannel(ctx.guild.id)
             if isinstance(server_channel, Exception):
                 await system_notification(
@@ -1125,30 +1127,26 @@ async def set_systemchannel(ctx):
             )
             return
 
-        target_channel = mentioned_channels[0].id
-        guild_id = ctx.message.guild.id
-
-        server = await getguild(guild_id)
-        bot_user = server.get_member(bot.user.id)
-        bot_permissions = (await getchannel(target_channel)).permissions_for(bot_user)
+        bot_user = ctx.message.guild.get_member(bot.user.id) 
+        bot_permissions = channel.permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
             await ctx.send(response.get("permission-error-channel"))
             return
 
-        if channel_type == "main":
-            system_channel = target_channel
-            config["server"]["system_channel"] = str(system_channel)
+        if channel_type.lower() == "main":
+            system_channel = str(channel.id)
+            config["server"]["system_channel"] = system_channel
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
 
-        elif channel_type == "server":
-            add_channel = db.add_systemchannel(guild_id, target_channel)
+        elif channel_type.lower() == "server":
+            add_channel = db.add_systemchannel(ctx.message.guild.id, channel.id)
 
             if isinstance(add_channel, Exception):
                 await system_notification(
-                    guild_id,
+                    ctx.message.guild.id,
                     response.get("db-error-adding-systemchannels").format(exception=add_channel),
                 )
                 return
