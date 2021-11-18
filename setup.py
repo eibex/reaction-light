@@ -69,11 +69,6 @@ while True:
         break
 
 
-prefix = input("\nInsert the prefix of the bot (help not available for this) [rl!]  ")
-if prefix == "":
-    prefix = "rl!"
-
-
 while True:
     name = input("\nInsert the name you wish to give the bot [Reaction Light]  ")
     if name.lower() == "help":
@@ -142,7 +137,6 @@ copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 config = configparser.ConfigParser()
 config.read("{}/config.ini".format(folder))
 config["server"]["token"] = token
-config["server"]["prefix"] = prefix
 config["server"]["name"] = name
 config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
