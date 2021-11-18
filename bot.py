@@ -1296,71 +1296,64 @@ async def hlp(ctx):
         await ctx.send(response.get("not-admin"))
 
 
-@bot.command(pass_context=True, name="admin")
+@bot.command(name="admin")
 @commands.has_permissions(administrator=True)
-async def add_admin(ctx, role: discord.Role):
-    # Adds an admin role ID to the database
-    add = db.add_admin(role.id, ctx.guild.id)
+async def admin(
+    ctx,
+    action: str = commands.Option(description=response.get("admin-option-action")),
+    role: discord.Role = commands.Option(None, description=response.get("admin-option-role"))
+):
+    if role is None or action.lower() == "list":
+        # Lists all admin IDs in the database, mentioning them if possible
+        admin_ids = db.get_admins(ctx.guild.id)
 
-    if isinstance(add, Exception):
-        await system_notification(
-            ctx.message.guild.id, response.get("db-error-admin-add").format(exception=add)
-        )
-        return
+        if isinstance(admin_ids, Exception):
+            await system_notification(
+                ctx.message.guild.id,
+                response.get("db-error-fetching-admins").format(exception=admin_ids),
+            )
+            return
 
-    await ctx.send(response.get("admin-add-success"))
+        adminrole_objects = []
+        for admin_id in admin_ids:
+            adminrole_objects.append(
+                discord.utils.get(ctx.guild.roles, id=admin_id).mention
+            )
+
+        if adminrole_objects:
+            await ctx.send(response.get("adminlist-local").format(admin_list="\n- ".join(adminrole_objects)))
+        else:
+            await ctx.send(response.get("adminlist-local-empty"))
+
+    elif action.lower() == "add":
+        # Adds an admin role ID to the database
+        add = db.add_admin(role.id, ctx.guild.id)
+
+        if isinstance(add, Exception):
+            await system_notification(
+                ctx.message.guild.id, response.get("db-error-admin-add").format(exception=add)
+            )
+            return
+
+        await ctx.send(response.get("admin-add-success"))
+
+    elif action.lower() == "remove":
+        # Removes an admin role ID from the database
+        remove = db.remove_admin(role.id, ctx.guild.id)
+
+        if isinstance(remove, Exception):
+            await system_notification(
+                ctx.message.guild.id, response.get("db-error-admin-remove").format(exception=remove)
+            )
+            return
+
+        await ctx.send(response.get("admin-remove-success"))
 
 
-@add_admin.error
+@admin.error
 async def add_admin_error(ctx, error):
     if isinstance(error, commands.RoleNotFound):
         await ctx.send(response.get("admin-invalid"))
-
-
-@bot.command(name="rm-admin")
-@commands.has_permissions(administrator=True)
-async def remove_admin(ctx, role: discord.Role):
-    # Removes an admin role ID from the database
-    remove = db.remove_admin(role.id, ctx.guild.id)
-
-    if isinstance(remove, Exception):
-        await system_notification(
-            ctx.message.guild.id, response.get("db-error-admin-remove").format(exception=remove)
-        )
-        return
-
-    await ctx.send(response.get("admin-remove-success"))
-
-
-@remove_admin.error
-async def remove_admin_error(ctx, error):
-    if isinstance(error, commands.RoleNotFound):
-        await ctx.send(response.get("admin-invalid"))
-
-
-@bot.command(name="adminlist")
-@commands.has_permissions(administrator=True)
-async def list_admin(ctx):
-    # Lists all admin IDs in the database, mentioning them if possible
-    admin_ids = db.get_admins(ctx.guild.id)
-
-    if isinstance(admin_ids, Exception):
-        await system_notification(
-            ctx.message.guild.id,
-            response.get("db-error-fetching-admins").format(exception=admin_ids),
-        )
-        return
-
-    adminrole_objects = []
-    for admin_id in admin_ids:
-        adminrole_objects.append(
-            discord.utils.get(ctx.guild.roles, id=admin_id).mention
-        )
-
-    if adminrole_objects:
-        await ctx.send(response.get("adminlist-local").format(admin_list="\n- ".join(adminrole_objects)))
-    else:
-        await ctx.send(response.get("adminlist-local-empty"))
 
 
 @bot.command(name="version")

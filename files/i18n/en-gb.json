@@ -53,7 +53,7 @@
     "rm-activity-success": "The activity `{activity_to_delete}` was removed.",
     "rm-activity-not-exists": "The activity you mentioned does not exist.",
     "admin-add-success": "Added the role to my admin list.",
-    "admin-remove-success": "Removed the role to my admin list.",
+    "admin-remove-success": "Removed the role from my admin list.",
     "admin-invalid": "Please mention a valid @Role or role ID.",
     "adminlist-local": "The bot admins on this server are:\n- {admin_list}",
     "adminlist-local-empty": "There are no bot admins registered in this server.",
@@ -144,7 +144,9 @@
     "settings-systemchannel-option-channel": "The channel in which error message will be sent",
     "settings-language-option-language": "The language to set, enter 'check' to see the available languages",
     "settings-colour-option-colour": "The hex value of the colour you wish to set (e.g. 0xffff00)",
-    "settings-activity-option-action": "Use 'add', 'remove', 'list' to add/remove/view a bot status message",
+    "settings-activity-option-action": "Use 'add', 'remove', 'list' to add/remove/view bot status messages",
     "settings-activity-option-activity": "The text that appears after 'Playing' in the bot's status message (case sensitive)",
-    "activity-add-list-remove": "The only actions supported are `add`, `list`, and `remove`. You need to provide an activity if using `add` or `remove`."
+    "activity-add-list-remove": "The only actions supported are `add`, `list`, and `remove`. You need to provide an activity if using `add` or `remove`.",
+    "admin-option-action": "Use 'add', 'remove', 'list' to add/remove/view bot admins",
+    "admin-option-role": "The role you want to add/remove as a bot admin"
 }
