@@ -10,6 +10,7 @@
     "new-reactionrole-permission-error": "I can not access or add reactions to the requested message. Do I have sufficent permissions?",
     "new-reactionrole-already-exists": "This message already has a Reaction Light instance attached to it, consider running `/message edit` instead.",
     "new-reactionrole-target-channel": "Mention the #channel where to send the auto-role message.",
+    "new-reactionrole-cancelled": "Reaction role message creation cancelled.",
     "invalid-target-channel": "The channel you mentioned is invalid.",
     "new-reactionrole-message-contents": "What would you like the message to say?\nFormatting is: `Message // Embed_title // Embed_content`.\n\n`Embed_title` and `Embed_content` are optional. You can type `none` in any of the argument fields above (e.g. `Embed_title`) to make the bot ignore it.",
     "new-reactionrole-which-message": "Which message would you like to use? Please react with a 🔧 on the message you would like to use.",

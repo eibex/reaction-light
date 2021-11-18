@@ -25,6 +25,7 @@ SOFTWARE.
 
 import os
 import datetime
+import traceback
 import configparser
 import asyncio
 from shutil import copy
@@ -59,7 +60,10 @@ system_channel = (
 
 response = i18n.Response(f"{folder}/i18n", language, prefix)
 
-intents = discord.Intents.all()
+intents = discord.Intents.none()
+intents.guild_messages = True
+intents.guild_reactions = True
+intents.guilds = True
 
 bot = commands.Bot(command_prefix=prefix, intents=intents, slash_commands=True, message_commands=False, slash_command_guilds=[293178252741050368])
 
@@ -131,6 +135,13 @@ async def getuser(user_id):
 
     return user
 
+
+async def getmember(guild, user_id):
+    member = guild.get_member(user_id)
+    if not member:
+        member = await guild.fetch_member(user_id)
+
+    return member
 
 def restart():
     # Create a new python process of bot.py and stops the current one
@@ -437,9 +448,9 @@ async def on_raw_reaction_add(payload):
             else:
                 # Gives role if it has permissions, else 403 error is raised
                 role_id = reactions[reaction]
-                server = await getguild(guild_id)
-                member = server.get_member(user_id)
-                role = discord.utils.get(server.roles, id=role_id)
+                guild = await getguild(guild_id)
+                member = await getmember(guild, user_id)
+                role = discord.utils.get(guild.roles, id=role_id)
                 if user_id != bot.user.id:
                     unique = db.isunique(msg_id)
                     if unique:
@@ -500,13 +511,10 @@ async def on_raw_reaction_remove(payload):
         elif reaction in reactions:
             role_id = reactions[reaction]
             # Removes role if it has permissions, else 403 error is raised
-            server = await getguild(guild_id)
-            member = server.get_member(user_id)
+            guild = await getguild(guild_id)
+            member = await getmember(guild, user_id)
 
-            if not member:
-                member = await server.fetch_member(user_id)
-
-            role = discord.utils.get(server.roles, id=role_id)
+            role = discord.utils.get(guild.roles, id=role_id)
             try:
                 await member.remove_roles(role)
                 notify = db.notify(guild_id)
@@ -676,8 +684,8 @@ async def new(ctx):
 
                 def reaction_check3(payload):
                     return (
-                        payload.member.id == ctx.message.author.id
-                        and payload.guild_id == sent_oldmessage_message.guild.id
+                        payload.user_id == ctx.message.author.id
+                        and payload.guild_id == ctx.guild.id
                         and str(payload.emoji) == "🔧"
                     )
 
@@ -866,12 +874,11 @@ async def new(ctx):
 
             for reaction, _ in rl_object["reactions"].items():
                 await final_message.add_reaction(reaction)
-            await ctx.send("✅")
 
         await sent_initial_message.delete()
 
         if cancelled:
-            await ctx.send("❌")
+            await ctx.send(response.get("new-reactionrole-cancelled"))
     else:
         await ctx.send(response.get("new-reactionrole-noadmin"))
 
@@ -1420,6 +1427,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.NotOwner):
         await ctx.send(response.get("not-owner"))
     else:
+        traceback.print_tb(error.__traceback__)
         print(error)
 
 
