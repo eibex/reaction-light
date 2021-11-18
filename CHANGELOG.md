@@ -4,7 +4,7 @@
 - This version is breaking. Version 2.5.0 will continue working until Discord supports the old API (April 2022)
 - README: What you need to do to make the bot work after updating:
   - Kick the bot from your instance
-  - Reinvite it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=8` (replace CLIENT_ID)
+  - Reinvite it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415929408` (replace CLIENT_ID)
   - On https://discord.com/developers select your bot and under the "Bot" setting turn on presence intent, server members intent, message content intent
   - Wait ~1 hour before Discord register your bot's commands
 
