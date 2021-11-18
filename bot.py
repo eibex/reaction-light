@@ -1168,16 +1168,16 @@ async def toggle_notify(ctx):
 
 
 @commands.is_owner()
-@bot.command(name="language")
-async def set_language(ctx):
-    msg = ctx.message.content.split()
-    args = len(msg) - 1
+@settings_group.command(name="language", brief=response.get("brief-settings-language"))
+async def set_language(
+    ctx,
+    new_language: str = commands.Option(name="language", description=response.get("settings-language-option-language"))
+):
     available_languages = os.listdir(f"{directory}/files/i18n")
     available_languages = [
         i.replace(".json", "") for i in available_languages if i.endswith(".json")
     ]
-    if args:
-        new_language = msg[1].lower()
+    if new_language.lower() != "check":
         if new_language in available_languages:
             global language
             global response
