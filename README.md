@@ -59,7 +59,9 @@ python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py
   - Do not use commas `,`.
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
   - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
-  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=8`
+```
+https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415929408
+```
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
