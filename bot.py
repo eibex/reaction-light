@@ -868,11 +868,11 @@ async def new(ctx):
 @message_group.command(name="edit", brief=response.get("brief-message-edit"))
 async def edit_selector(
         ctx,
-        channel: discord.TextChannel = commands.Option(description="The channel in which the message you want to edit is located"),
-        number: int = commands.Option(description="The number of the message in the channel (enter 0 for explanation)"),
-        message: str = commands.Option("none", description="The message of the reaction-role message (enter 'none' to skip)"),
-        title: str = commands.Option("none", description="The title of the reaction-role message (enter 'none' to skip)"),
-        description: str = commands.Option("none", description="The description of the reaction-role message (enter 'none' to skip)"),
+        channel: discord.TextChannel = commands.Option(description=response.get("message-edit-option-channel")),
+        number: int = commands.Option(description=response.get("message-edit-option-number")),
+        message: str = commands.Option("none", description=response.get("message-edit-option-message")),
+        title: str = commands.Option("none", description=response.get("message-edit-option-title")),
+        description: str = commands.Option("none", description=response.get("message-edit-option-description")),
     ):
     if isadmin(ctx.message.author, ctx.guild.id):
         all_messages = await formatted_channel_list(channel)
@@ -973,18 +973,17 @@ async def edit_selector(
         await ctx.send(response.get("not-admin"))
 
 
-@bot.command(name="reaction")
-async def edit_reaction(ctx):
+@message_group.command(name="reaction", brief=response.get("brief-message-reaction"))
+async def edit_reaction(
+    ctx,
+    channel: discord.TextChannel = commands.Option(description=response.get("message-reaction-option-channel")),
+    action: str = commands.Option(description=response.get("message-reaction-option-action")),
+    number: int = commands.Option(description=response.get("message-reaction-option-number")),
+    reaction: str = commands.Option(None, description=response.get("message-reaction-option-reaction")),
+    role: discord.Role = commands.Option(None, description=response.get("message-reaction-option-role"))
+):
     if isadmin(ctx.message.author, ctx.guild.id):
-        msg_values = ctx.message.content.split()
-        mentioned_roles = ctx.message.role_mentions
-        mentioned_channels = ctx.message.channel_mentions
-        if len(msg_values) < 4:
-            if not mentioned_channels:
-                await ctx.send(response.get("reaction-edit-info"))
-                return
-
-            channel = ctx.message.channel_mentions[0]
+        if number == 0 or not reaction:
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
                 await ctx.send(response.get("reaction-edit-one").format(channel_name=channel.name))
@@ -1002,14 +1001,12 @@ async def edit_reaction(ctx):
                 await ctx.send(response.get("no-reactionrole-messages"))
                 return
 
-        action = msg_values[1].lower()
-        channel = ctx.message.channel_mentions[0]
-        message_number = msg_values[3]
-        reaction = msg_values[4]
-        if action == "add":
-            if mentioned_roles:
-                role = mentioned_roles[0]
-            else:
+        if action.lower() not in ("add", "remove"):
+            await ctx.send(response.get("no-add-remove-specified"))
+            return
+
+        if action.lower() == "add":
+            if not role:
                 await ctx.send(response.get("no-role-mentioned"))
                 return
 
@@ -1026,7 +1023,7 @@ async def edit_reaction(ctx):
             message_to_edit_id = None
             for msg_id in all_messages:
                 # Loop through all msg_ids and stops when the counter matches the user input
-                if str(counter) == message_number:
+                if counter == number:
                     message_to_edit_id = msg_id
                     break
 
@@ -1043,7 +1040,7 @@ async def edit_reaction(ctx):
             await ctx.send(response.get("select-valid-reactionrole"))
             return
 
-        if action == "add":
+        if action.lower() == "add":
             try:
                 # Check that the bot can actually use the emoji
                 await message_to_edit.add_reaction(reaction)
@@ -1068,7 +1065,7 @@ async def edit_reaction(ctx):
 
             await ctx.send(response.get("reaction-edit-add-success"))
 
-        elif action == "remove":
+        elif action.lower() == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
 

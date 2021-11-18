@@ -122,5 +122,17 @@
     "help-language": "- `{prefix}language` sets a new language for the bot. Currently available languages are: `en-gb` (English), `it-it` (Italian).\n\n",
     "help-footer": "I am running version {version} of Reaction Light. You can find more resources, submit feedback, and report bugs at: <https://github.com/eibex/reaction-light>",
     "brief-message-new": "Create a new reaction-role message",
-    "brief-message-edit": "Edit an existing reaction-role message"
+    "brief-message-edit": "Edit an existing reaction-role message",
+    "brief-message-reaction": "Add or remove reactions from an existing reaction-role message",
+    "message-edit-option-channel": "The channel in which the message you want to edit is located",
+    "message-edit-option-number": "The number of the message in the channel (enter 0 for explanation)",
+    "message-edit-option-message": "The message of the reaction-role message (enter 'none' to skip)",
+    "message-edit-option-title": "The title of the reaction-role message (enter 'none' to skip)",
+    "message-edit-option-description": "The description of the reaction-role message (enter 'none' to skip)",
+    "message-reaction-option-channel": "The channel in which the message you want to add/remove the reaction is located",
+    "message-reaction-option-action": "Use 'add' or 'remove' to add/remove a reaction to an existing message",
+    "message-reaction-option-number": "The number of the message in the channel (enter 0 for explanation)",
+    "message-reaction-option-reaction": "The reaction you want to add or remove",
+    "message-reaction-option-role": "The role you want to associate to the new reaction (not necessary for 'remove')",
+    "no-add-remove-specified": "The only accepted actions are **add** and **remove**"
 }
