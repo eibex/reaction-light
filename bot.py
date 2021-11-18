@@ -75,8 +75,7 @@ bot = commands.Bot(
     command_prefix=prefix,
     intents=intents,
     slash_commands=True,
-    message_commands=False,
-    slash_command_guilds=[293178252741050368],
+    message_commands=False
 )
 
 bot.remove_command("help")
