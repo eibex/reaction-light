@@ -8,7 +8,7 @@
     - `python3 -m pip install -r requirements.txt`
   - What you need to do to make the bot work AFTER updating:
     - Kick the bot from your instance
-    - Reauthorize it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415929408` (replace CLIENT_ID)
+    - Reauthorize it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
     - On https://discord.com/developers select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
     - Wait ~1 hour before Discord register your bot's commands
 
