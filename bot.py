@@ -73,8 +73,7 @@ intents.guilds = True
 bot = commands.Bot(
     command_prefix=prefix,
     intents=intents,
-    slash_commands=True,
-    message_commands=False
+    test_guilds=[293178252741050368]
 )
 
 bot.remove_command("help")
@@ -82,6 +81,10 @@ bot.remove_command("help")
 
 activities_file = f"{directory}/files/activities.csv"
 activities = activity.Activities(activities_file)
+
+available_languages = os.listdir(f"{directory}/files/i18n")
+available_languages = [i.replace(".json", "") for i in available_languages if i.endswith(".json")]
+
 db_file = f"{directory}/files/reactionlight.db"
 db = database.Database(db_file)
 
@@ -561,35 +564,35 @@ async def on_raw_reaction_remove(payload):
                 )
 
 
-@bot.group(name="message")
-async def message_group(ctx):
+@bot.slash_command(name="message")
+async def message_group(inter):
     pass
 
 
-@bot.group(name="settings")
-async def settings_group(ctx):
+@bot.slash_command(name="settings")
+async def settings_group(inter):
     pass
 
 
-@bot.group(name="bot")
-async def bot_group(ctx):
+@bot.slash_command(name="bot")
+async def bot_group(inter):
     pass
 
 
-@message_group.command(name="new", brief=response.get("brief-message-new"))
-async def new(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        sent_initial_message = await ctx.send(response.get("new-reactionrole-init"))
+@message_group.sub_command(name="new", description=response.get("brief-message-new"))
+async def new(inter):
+    if isadmin(inter.author, inter.guild.id):
+        await inter.send(response.get("new-reactionrole-init"))
         rl_object = {}
         cancelled = False
 
         def check(message):
-            return message.author.id == ctx.message.author.id and message.content != ""
+            return message.author.id == inter.author.id and message.content != ""
 
         if not cancelled:
             error_messages = []
             user_messages = []
-            sent_reactions_message = await ctx.send(
+            sent_reactions_message = await inter.channel.send(
                 response.get("new-reactionrole-roles-emojis")
             )
             rl_object["reactions"] = {}
@@ -605,14 +608,14 @@ async def new(ctx):
                             role = reactions_message.role_mentions[0].id
                         except IndexError:
                             error_messages.append(
-                                (await ctx.send(response.get("new-reactionrole-error")))
+                                (await inter.channel.send(response.get("new-reactionrole-error")))
                             )
                             continue
 
                         if reaction in rl_object["reactions"]:
                             error_messages.append(
                                 (
-                                    await ctx.send(
+                                    await inter.channel.send(
                                         response.get("new-reactionrole-already-used")
                                     )
                                 )
@@ -625,7 +628,7 @@ async def new(ctx):
                             except disnake.HTTPException:
                                 error_messages.append(
                                     (
-                                        await ctx.send(
+                                        await inter.channel.send(
                                             response.get("new-reactionrole-emoji-403")
                                         )
                                     )
@@ -634,7 +637,7 @@ async def new(ctx):
                     else:
                         break
             except asyncio.TimeoutError:
-                await ctx.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(response.get("new-reactionrole-timeout"))
                 cancelled = True
             finally:
                 await sent_reactions_message.delete()
@@ -642,13 +645,13 @@ async def new(ctx):
                     await message.delete()
 
         if not cancelled:
-            sent_limited_message = await ctx.send(
+            sent_limited_message = await inter.channel.send(
                 response.get("new-reactionrole-limit")
             )
 
             def reaction_check(payload):
                 return (
-                    payload.member.id == ctx.message.author.id
+                    payload.member.id == inter.author.id
                     and payload.message_id == sent_limited_message.id
                     and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
                 )
@@ -665,13 +668,13 @@ async def new(ctx):
                 else:
                     rl_object["limit_to_one"] = 0
             except asyncio.TimeoutError:
-                await ctx.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(response.get("new-reactionrole-timeout"))
                 cancelled = True
             finally:
                 await sent_limited_message.delete()
 
         if not cancelled:
-            sent_oldmessagequestion_message = await ctx.send(
+            sent_oldmessagequestion_message = await inter.channel.send(
                 response.get("new-reactionrole-old-or-new").format(
                     bot_mention=bot.user.mention
                 )
@@ -679,7 +682,7 @@ async def new(ctx):
 
             def reaction_check2(payload):
                 return (
-                    payload.member.id == ctx.message.author.id
+                    payload.member.id == inter.author.id
                     and payload.message_id == sent_oldmessagequestion_message.id
                     and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
                 )
@@ -696,7 +699,7 @@ async def new(ctx):
                 else:
                     rl_object["old_message"] = False
             except asyncio.TimeoutError:
-                await ctx.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(response.get("new-reactionrole-timeout"))
                 cancelled = True
             finally:
                 await sent_oldmessagequestion_message.delete()
@@ -705,7 +708,7 @@ async def new(ctx):
             error_messages = []
             user_messages = []
             if rl_object["old_message"]:
-                sent_oldmessage_message = await ctx.send(
+                sent_oldmessage_message = await inter.channel.send(
                     response.get("new-reactionrole-which-message").format(
                         bot_mention=bot.user.mention
                     )
@@ -713,8 +716,8 @@ async def new(ctx):
 
                 def reaction_check3(payload):
                     return (
-                        payload.user_id == ctx.message.author.id
-                        and payload.guild_id == ctx.guild.id
+                        payload.user_id == inter.author.id
+                        and payload.guild_id == inter.guild.id
                         and str(payload.emoji) == "🔧"
                     )
 
@@ -744,7 +747,7 @@ async def new(ctx):
                             try:
                                 await message.add_reaction("👌")
                                 await message.remove_reaction("👌", message.guild.me)
-                                await message.remove_reaction("🔧", ctx.author)
+                                await message.remove_reaction("🔧", inter.author)
                             except disnake.HTTPException:
                                 raise disnake.NotFound
                             if db.exists(message.id):
@@ -759,7 +762,7 @@ async def new(ctx):
                         except disnake.NotFound:
                             error_messages.append(
                                 (
-                                    await ctx.send(
+                                    await inter.send(
                                         response.get(
                                             "new-reactionrole-permission-error"
                                         ).format(bot_mention=bot.user.mention)
@@ -769,20 +772,20 @@ async def new(ctx):
                         except ValueError:
                             error_messages.append(
                                 (
-                                    await ctx.send(
+                                    await inter.send(
                                         response.get("new-reactionrole-already-exists")
                                     )
                                 )
                             )
                 except asyncio.TimeoutError:
-                    await ctx.author.send(response.get("new-reactionrole-timeout"))
+                    await inter.author.send(response.get("new-reactionrole-timeout"))
                     cancelled = True
                 finally:
                     await sent_oldmessage_message.delete()
                     for message in error_messages:
                         await message.delete()
             else:
-                sent_channel_message = await ctx.send(
+                sent_channel_message = await inter.channel.send(
                     response.get("new-reactionrole-target-channel")
                 )
                 try:
@@ -804,7 +807,7 @@ async def new(ctx):
                                 )
                             )
                 except asyncio.TimeoutError:
-                    await ctx.author.send(response.get("new-reactionrole-timeout"))
+                    await inter.author.send(response.get("new-reactionrole-timeout"))
                     cancelled = True
                 finally:
                     await sent_channel_message.delete()
@@ -879,7 +882,7 @@ async def new(ctx):
                                 )
                             )
             except asyncio.TimeoutError:
-                await ctx.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(response.get("new-reactionrole-timeout"))
                 cancelled = True
             finally:
                 await sent_message_message.delete()
@@ -891,12 +894,12 @@ async def new(ctx):
             try:
                 r = db.add_reaction_role(rl_object)
             except database.DuplicateInstance:
-                await ctx.send(response.get("new-reactionrole-already-exists"))
+                await inter.send(response.get("new-reactionrole-already-exists"))
                 return
 
             if isinstance(r, Exception):
                 await system_notification(
-                    ctx.message.guild.id,
+                    inter.guild.id,
                     response.get("db-error-new-reactionrole").format(exception=r),
                 )
                 return
@@ -904,45 +907,48 @@ async def new(ctx):
             for reaction, _ in rl_object["reactions"].items():
                 await final_message.add_reaction(reaction)
 
-        await sent_initial_message.delete()
+        await inter.delete_original_message()
 
         if cancelled:
-            await ctx.send(response.get("new-reactionrole-cancelled"))
+            await inter.send(response.get("new-reactionrole-cancelled"))
     else:
-        await ctx.send(response.get("new-reactionrole-noadmin"))
+        await inter.send(response.get("new-reactionrole-noadmin"))
 
 
-@message_group.command(name="edit", brief=response.get("brief-message-edit"))
+@message_group.sub_command(name="edit", description=response.get("brief-message-edit"))
 async def edit_selector(
-    ctx,
-    channel: disnake.TextChannel = commands.Option(
+    inter,
+    channel: disnake.TextChannel = commands.Param(
         description=response.get("message-edit-option-channel")
     ),
-    number: int = commands.Option(
+    number: int = commands.Param(
         description=response.get("message-edit-option-number")
     ),
-    message: str = commands.Option(
-        "none", description=response.get("message-edit-option-message")
+    message: str = commands.Param(
+        description=response.get("message-edit-option-message"),
+        default="none"
     ),
-    title: str = commands.Option(
-        "none", description=response.get("message-edit-option-title")
+    title: str = commands.Param(
+        description=response.get("message-edit-option-title"),
+        default="none"
     ),
-    description: str = commands.Option(
-        "none", description=response.get("message-edit-option-description")
+    description: str = commands.Param(
+        description=response.get("message-edit-option-description"),
+        default="none"
     ),
 ):
-    if isadmin(ctx.message.author, ctx.guild.id):
+    if isadmin(inter.author, inter.guild.id):
         all_messages = await formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await ctx.send(
+                await inter.send(
                     response.get("edit-reactionrole-one").format(
                         channel_name=channel.name
                     )
                 )
 
             elif len(all_messages) > 1:
-                await ctx.send(
+                await inter.send(
                     response.get("edit-reactionrole-instructions").format(
                         num_messages=len(all_messages),
                         channel_name=channel.name,
@@ -951,7 +957,7 @@ async def edit_selector(
                 )
 
             else:
-                await ctx.send(response.get("no-reactionrole-messages"))
+                await inter.send(response.get("no-reactionrole-messages"))
 
         else:
             try:
@@ -961,7 +967,7 @@ async def edit_selector(
 
                 if isinstance(all_messages, Exception):
                     await system_notification(
-                        ctx.message.guild.id,
+                        inter.guild.id,
                         response.get("db-error-fetching-messages").format(
                             message_ids=all_messages
                         ),
@@ -980,25 +986,25 @@ async def edit_selector(
                         counter += 1
 
                 else:
-                    await ctx.send(response.get("reactionrole-not-exists"))
+                    await inter.send(response.get("reactionrole-not-exists"))
                     return
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
 
                 else:
-                    await ctx.send(response.get("select-valid-reactionrole"))
+                    await inter.send(response.get("select-valid-reactionrole"))
                     return
                 await old_msg.edit(suppress=False)
-                selector_msg_new_body = message if message.lower() != "none" else None
+                selector_msg_new_body = message if not message else None
                 selector_embed = disnake.Embed()
 
-                if title.lower() != "none":
+                if not title:
                     selector_embed.title = title
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
-                if description.lower() != "none":
+                if not description:
                     selector_embed.description = description
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
@@ -1012,58 +1018,61 @@ async def edit_selector(
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await ctx.send(response.get("message-edited"))
+                    await inter.send(response.get("message-edited"))
                 except disnake.Forbidden:
-                    await ctx.send(response.get("other-author-error"))
+                    await inter.send(response.get("other-author-error"))
                     return
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await ctx.send(response.get("empty-message-error"))
+                        await inter.send(response.get("empty-message-error"))
 
                     else:
-                        guild_id = ctx.message.guild.id
+                        guild_id = inter.guild.id
                         await system_notification(guild_id, str(e))
 
             except IndexError:
-                await ctx.send(response.get("invalid-target-channel"))
+                await inter.send(response.get("invalid-target-channel"))
 
             except disnake.Forbidden:
-                await ctx.send(response.get("edit-permission-error"))
+                await inter.send(response.get("edit-permission-error"))
 
     else:
-        await ctx.send(response.get("not-admin"))
+        await inter.send(response.get("not-admin"))
 
 
-@message_group.command(name="reaction", brief=response.get("brief-message-reaction"))
+@message_group.sub_command(name="reaction", description=response.get("brief-message-reaction"))
 async def edit_reaction(
-    ctx,
-    channel: disnake.TextChannel = commands.Option(
+    inter,
+    channel: disnake.TextChannel = commands.Param(
         description=response.get("message-reaction-option-channel")
     ),
-    action: str = commands.Option(
-        description=response.get("message-reaction-option-action")
+    action: str = commands.Param(
+        description=response.get("message-reaction-option-action"),
+        choices={"add": "add", "remove": "remove"}
     ),
-    number: int = commands.Option(
+    number: int = commands.Param(
         description=response.get("message-reaction-option-number")
     ),
-    reaction: str = commands.Option(
-        None, description=response.get("message-reaction-option-reaction")
+    reaction: str = commands.Param(
+        description=response.get("message-reaction-option-reaction"),
+        default=None
     ),
-    role: disnake.Role = commands.Option(
-        None, description=response.get("message-reaction-option-role")
+    role: disnake.Role = commands.Param(
+        description=response.get("message-reaction-option-role"),
+        default=None
     ),
 ):
-    if isadmin(ctx.message.author, ctx.guild.id):
+    if isadmin(inter.author, inter.guild.id):
         if number == 0 or not reaction:
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await ctx.send(
+                await inter.send(
                     response.get("reaction-edit-one").format(channel_name=channel.name)
                 )
                 return
 
             elif len(all_messages) > 1:
-                await ctx.send(
+                await inter.send(
                     response.get("reaction-edit-multi").format(
                         num_messages=len(all_messages),
                         channel_name=channel.name,
@@ -1073,22 +1082,22 @@ async def edit_reaction(
                 return
 
             else:
-                await ctx.send(response.get("no-reactionrole-messages"))
+                await inter.send(response.get("no-reactionrole-messages"))
                 return
 
-        if action.lower() not in ("add", "remove"):
-            await ctx.send(response.get("no-add-remove-specified"))
+        if action not in ("add", "remove"):
+            await inter.send(response.get("no-add-remove-specified"))
             return
 
-        if action.lower() == "add":
+        if action == "add":
             if not role:
-                await ctx.send(response.get("no-role-mentioned"))
+                await inter.send(response.get("no-role-mentioned"))
                 return
 
         all_messages = db.fetch_messages(channel.id)
         if isinstance(all_messages, Exception):
             await system_notification(
-                ctx.message.guild.id,
+                inter.guild.id,
                 response.get("db-error-fetching-messages").format(
                     exception=all_messages
                 ),
@@ -1107,29 +1116,29 @@ async def edit_reaction(
                 counter += 1
 
         else:
-            await ctx.send(response.get("reactionrole-not-exists"))
+            await inter.send(response.get("reactionrole-not-exists"))
             return
 
         if message_to_edit_id:
             message_to_edit = await channel.fetch_message(int(message_to_edit_id))
 
         else:
-            await ctx.send(response.get("select-valid-reactionrole"))
+            await inter.send(response.get("select-valid-reactionrole"))
             return
 
-        if action.lower() == "add":
+        if action == "add":
             try:
                 # Check that the bot can actually use the emoji
                 await message_to_edit.add_reaction(reaction)
 
             except disnake.HTTPException:
-                await ctx.send(response.get("new-reactionrole-emoji-403"))
+                await inter.send(response.get("new-reactionrole-emoji-403"))
                 return
 
             react = db.add_reaction(message_to_edit.id, role.id, reaction)
             if isinstance(react, Exception):
                 await system_notification(
-                    ctx.message.guild.id,
+                    inter.guild.id,
                     response.get("db-error-add-reaction").format(
                         channel_mention=message_to_edit.channel.mention, exception=react
                     ),
@@ -1137,51 +1146,53 @@ async def edit_reaction(
                 return
 
             if not react:
-                await ctx.send(response.get("reaction-edit-already-exists"))
+                await inter.send(response.get("reaction-edit-already-exists"))
                 return
 
-            await ctx.send(response.get("reaction-edit-add-success"))
+            await inter.send(response.get("reaction-edit-add-success"))
 
-        elif action.lower() == "remove":
+        elif action == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
 
             except disnake.HTTPException:
-                await ctx.send(response.get("reaction-edit-invalid-reaction"))
+                await inter.send(response.get("reaction-edit-invalid-reaction"))
                 return
 
             react = db.remove_reaction(message_to_edit.id, reaction)
             if isinstance(react, Exception):
                 await system_notification(
-                    ctx.message.guild.id,
+                    inter.guild.id,
                     response.get("db-error-remove-reaction").format(
                         channel_mention=message_to_edit.channel.mention, exception=react
                     ),
                 )
                 return
 
-            await ctx.send(response.get("reaction-edit-remove-success"))
+            await inter.send(response.get("reaction-edit-remove-success"))
 
     else:
-        await ctx.send(response.get("not-admin"))
+        await inter.send(response.get("not-admin"))
 
 
-@settings_group.command(
-    name="systemchannel", brief=response.get("brief-settings-systemchannel")
+@settings_group.sub_command(
+    name="systemchannel", description=response.get("brief-settings-systemchannel")
 )
 async def set_systemchannel(
-    ctx,
-    channel_type: str = commands.Option(
-        None, description=response.get("settings-systemchannel-option-type")
+    inter,
+    channel_type: str = commands.Param(
+        description=response.get("settings-systemchannel-option-type"),
+        choices={"main": "main", "server": "server", "explanation": "explanation"}
     ),
-    channel: disnake.TextChannel = commands.Option(
-        None, description=response.get("settings-systemchannel-option-channel")
+    channel: disnake.TextChannel = commands.Param(
+        description=response.get("settings-systemchannel-option-channel"),
+        default=None
     ),
 ):
-    if isadmin(ctx.message.author, ctx.guild.id):
+    if isadmin(inter.author, inter.guild.id):
         global system_channel
-        if not channel or channel_type.lower() not in ["main", "server"]:
-            server_channel = db.fetch_systemchannel(ctx.guild.id)
+        if not channel or channel_type not in ["main", "server"]:
+            server_channel = db.fetch_systemchannel(inter.guild.id)
             if isinstance(server_channel, Exception):
                 await system_notification(
                     None,
@@ -1200,67 +1211,65 @@ async def set_systemchannel(
             server_text = (
                 (await getchannel(server_channel)).mention if server_channel else "none"
             )
-            await ctx.send(
+            await inter.send(
                 response.get("systemchannels-info").format(
                     main_channel=main_text, server_channel=server_text
                 )
             )
             return
 
-        bot_user = ctx.message.guild.get_member(bot.user.id)
+        bot_user = inter.guild.get_member(bot.user.id)
         bot_permissions = channel.permissions_for(bot_user)
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
-            await ctx.send(response.get("permission-error-channel"))
+            await inter.send(response.get("permission-error-channel"))
             return
 
-        if channel_type.lower() == "main":
+        if channel_type == "main":
             system_channel = str(channel.id)
             config["server"]["system_channel"] = system_channel
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
 
-        elif channel_type.lower() == "server":
-            add_channel = db.add_systemchannel(ctx.message.guild.id, channel.id)
+        elif channel_type == "server":
+            add_channel = db.add_systemchannel(inter.guild.id, channel.id)
 
             if isinstance(add_channel, Exception):
                 await system_notification(
-                    ctx.message.guild.id,
+                    inter.guild.id,
                     response.get("db-error-adding-systemchannels").format(
                         exception=add_channel
                     ),
                 )
                 return
 
-        await ctx.send(response.get("systemchannels-success"))
+        await inter.send(response.get("systemchannels-success"))
 
     else:
-        await ctx.send(response.get("not-admin"))
+        await inter.send(response.get("not-admin"))
 
 
-@settings_group.command(name="notify", brief=response.get("brief-settings-notify"))
-async def toggle_notify(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        notify = db.toggle_notify(ctx.guild.id)
+@settings_group.sub_command(name="notify", description=response.get("brief-settings-notify"))
+async def toggle_notify(inter):
+    if isadmin(inter.author, inter.guild.id):
+        notify = db.toggle_notify(inter.guild.id)
         if notify:
-            await ctx.send(response.get("notifications-on"))
+            await inter.send(response.get("notifications-on"))
         else:
-            await ctx.send(response.get("notifications-off"))
+            await inter.send(response.get("notifications-off"))
 
 
 @commands.is_owner()
-@settings_group.command(name="language", brief=response.get("brief-settings-language"))
+@settings_group.sub_command(name="language", description=response.get("brief-settings-language"))
 async def set_language(
-    ctx,
-    new_language: str = commands.Option(
-        name="language", description=response.get("settings-language-option-language")
+    inter,
+    new_language: str = commands.Param(
+        name="language",
+        description=response.get("settings-language-option-language"),
+        choices=available_languages
     ),
 ):
-    available_languages = os.listdir(f"{directory}/files/i18n")
-    available_languages = [
-        i.replace(".json", "") for i in available_languages if i.endswith(".json")
-    ]
     if new_language.lower() != "check":
         if new_language in available_languages:
             global language
@@ -1270,15 +1279,15 @@ async def set_language(
             with open(f"{directory}/config.ini", "w") as configfile:
                 config.write(configfile)
             response.language = language
-            await ctx.send(response.get("language-success"))
+            await inter.send(response.get("language-success"))
         else:
-            await ctx.send(
+            await inter.send(
                 response.get("language-not-exists").format(
                     available_languages=", ".join(available_languages)
                 )
             )
     else:
-        await ctx.send(
+        await inter.send(
             response.get("language-info").format(
                 available_languages=", ".join(available_languages)
             )
@@ -1286,10 +1295,10 @@ async def set_language(
 
 
 @commands.is_owner()
-@settings_group.command(name="colour", brief=response.get("brief-settings-colour"))
+@settings_group.sub_command(name="colour", description=response.get("brief-settings-colour"))
 async def set_colour(
-    ctx,
-    colour: str = commands.Option(
+    inter,
+    colour: str = commands.Param(
         description=response.get("settings-colour-option-colour")
     ),
 ):
@@ -1306,30 +1315,31 @@ async def set_colour(
             description=response.get("example-embed-new-colour"),
             colour=botcolour,
         )
-        await ctx.send(response.get("colour-changed"), embed=example)
+        await inter.send(response.get("colour-changed"), embed=example)
 
     except ValueError:
-        await ctx.send(response.get("colour-hex-error"))
+        await inter.send(response.get("colour-hex-error"))
 
 
 @commands.is_owner()
-@settings_group.command(name="activity", brief=response.get("brief-settings-activity"))
+@settings_group.sub_command(name="activity", description=response.get("brief-settings-activity"))
 async def change_activity(
-    ctx,
-    action: str = commands.Option(
+    inter,
+    action: str = commands.Param(
         description=response.get("settings-activity-option-action")
     ),
-    activity: str = commands.Option(
-        None, description=response.get("settings-activity-option-activity")
+    activity: str = commands.Param(
+        description=response.get("settings-activity-option-activity"),
+        default=None
     ),
 ):
     if action.lower() == "add" and activity:
         if "," in activity:
-            await ctx.send(response.get("activity-no-commas"))
+            await inter.send(response.get("activity-no-commas"))
 
         else:
             activities.add(activity)
-            await ctx.send(
+            await inter.send(
                 response.get("activity-success").format(new_activity=activity)
             )
 
@@ -1339,33 +1349,33 @@ async def change_activity(
             for item in activities.activity_list:
                 formatted_list.append(f"`{item}`")
 
-            await ctx.send(
+            await inter.send(
                 response.get("current-activities").format(
                     activity_list="\n- ".join(formatted_list)
                 )
             )
 
         else:
-            await ctx.send(response.get("no-current-activities"))
+            await inter.send(response.get("no-current-activities"))
 
     elif action.lower() == "remove" and activity:
         removed = activities.remove(activity)
         if removed:
-            await ctx.send(
+            await inter.send(
                 response.get("rm-activity-success").format(activity_to_delete=activity)
             )
 
         else:
-            await ctx.send(response.get("rm-activity-not-exists"))
+            await inter.send(response.get("rm-activity-not-exists"))
 
     else:
-        await ctx.send(response.get("activity-add-list-remove"))
+        await inter.send(response.get("activity-add-list-remove"))
 
 
-@bot.command(name="help", brief=response.get("brief-help"))
-async def hlp(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
-        await ctx.send(
+@bot.slash_command(name="help", description=response.get("brief-help"))
+async def hlp(inter):
+    if isadmin(inter.author, inter.guild.id):
+        await inter.send(
             response.get("help-messages-title")
             + response.get("help-new")
             + response.get("help-edit")
@@ -1387,25 +1397,26 @@ async def hlp(ctx):
         )
 
     else:
-        await ctx.send(response.get("not-admin"))
+        await inter.send(response.get("not-admin"))
 
 
-@bot.command(name="admin", brief=response.get("brief-admin"))
+@bot.slash_command(name="admin", description=response.get("brief-admin"))
 @commands.has_permissions(administrator=True)
 async def admin(
-    ctx,
-    action: str = commands.Option(description=response.get("admin-option-action")),
-    role: disnake.Role = commands.Option(
-        None, description=response.get("admin-option-role")
+    inter,
+    action: str = commands.Param(description=response.get("admin-option-action"), choices={"list": "list", "add": "add", "remove": "remove"}),
+    role: disnake.Role = commands.Param(
+        description=response.get("admin-option-role"),
+        default=None
     ),
 ):
-    if role is None or action.lower() == "list":
+    if role is None or action == "list":
         # Lists all admin IDs in the database, mentioning them if possible
-        admin_ids = db.get_admins(ctx.guild.id)
+        admin_ids = db.get_admins(inter.guild.id)
 
         if isinstance(admin_ids, Exception):
             await system_notification(
-                ctx.message.guild.id,
+                inter.guild.id,
                 response.get("db-error-fetching-admins").format(exception=admin_ids),
             )
             return
@@ -1413,54 +1424,54 @@ async def admin(
         adminrole_objects = []
         for admin_id in admin_ids:
             adminrole_objects.append(
-                disnake.utils.get(ctx.guild.roles, id=admin_id).mention
+                disnake.utils.get(inter.guild.roles, id=admin_id).mention
             )
 
         if adminrole_objects:
-            await ctx.send(
+            await inter.send(
                 response.get("adminlist-local").format(
                     admin_list="\n- ".join(adminrole_objects)
                 )
             )
         else:
-            await ctx.send(response.get("adminlist-local-empty"))
+            await inter.send(response.get("adminlist-local-empty"))
 
-    elif action.lower() == "add":
+    elif action == "add":
         # Adds an admin role ID to the database
-        add = db.add_admin(role.id, ctx.guild.id)
+        add = db.add_admin(role.id, inter.guild.id)
 
         if isinstance(add, Exception):
             await system_notification(
-                ctx.message.guild.id,
+                inter.guild.id,
                 response.get("db-error-admin-add").format(exception=add),
             )
             return
 
-        await ctx.send(response.get("admin-add-success"))
+        await inter.send(response.get("admin-add-success"))
 
-    elif action.lower() == "remove":
+    elif action == "remove":
         # Removes an admin role ID from the database
-        remove = db.remove_admin(role.id, ctx.guild.id)
+        remove = db.remove_admin(role.id, inter.guild.id)
 
         if isinstance(remove, Exception):
             await system_notification(
-                ctx.message.guild.id,
+                inter.guild.id,
                 response.get("db-error-admin-remove").format(exception=remove),
             )
             return
 
-        await ctx.send(response.get("admin-remove-success"))
+        await inter.send(response.get("admin-remove-success"))
 
 
 @admin.error
-async def add_admin_error(ctx, error):
+async def add_admin_error(inter, error):
     if isinstance(error, commands.RoleNotFound):
-        await ctx.send(response.get("admin-invalid"))
+        await inter.send(response.get("admin-invalid"))
 
 
-@bot_group.command(name="version", brief=response.get("brief-version"))
-async def print_version(ctx):
-    if isadmin(ctx.message.author, ctx.guild.id):
+@bot_group.sub_command(name="version", description=response.get("brief-version"))
+async def print_version(inter):
+    if isadmin(inter.author, inter.guild.id):
         latest = await github.get_latest()
         changelog = await github.latest_changelog()
         em = disnake.Embed(
@@ -1469,58 +1480,58 @@ async def print_version(ctx):
             colour=botcolour,
         )
         em.set_footer(text=f"{botname}", icon_url=logo)
-        await ctx.send(
+        await inter.send(
             response.get("version").format(version=__version__, latest_version=latest),
             embed=em,
         )
 
     else:
-        await ctx.send(response.get("not-admin"))
+        await inter.send(response.get("not-admin"))
 
 
 @commands.is_owner()
-@bot_group.command(name="kill", brief=response.get("brief-kill"))
-async def kill(ctx):
-    await ctx.send(response.get("shutdown"))
+@bot_group.sub_command(name="kill", description=response.get("brief-kill"))
+async def kill(inter):
+    await inter.send(response.get("shutdown"))
     await bot.close()
 
 
 @commands.is_owner()
-@bot_group.command(name="restart", brief=response.get("brief-restart"))
-async def restart_cmd(ctx):
+@bot_group.sub_command(name="restart", description=response.get("brief-restart"))
+async def restart_cmd(inter):
     if platform != "win32":
         restart()
-        await ctx.send(response.get("restart"))
+        await inter.send(response.get("restart"))
         await bot.close()
 
     else:
-        await ctx.send(response.get("windows-error"))
+        await inter.send(response.get("windows-error"))
 
 
 @commands.is_owner()
-@bot_group.command(name="update", brief=response.get("brief-update"))
-async def update(ctx):
+@bot_group.sub_command(name="update", description=response.get("brief-update"))
+async def update(inter):
     if platform != "win32":
-        await ctx.send(response.get("attempting-update"))
+        await inter.send(response.get("attempting-update"))
         os.chdir(directory)
         cmd = os.popen("git fetch")
         cmd.close()
         cmd = os.popen("git pull")
         cmd.close()
-        await ctx.send(response.get("database-backup"))
+        await inter.send(response.get("database-backup"))
         copy(db_file, f"{db_file}.bak")
         restart()
-        await ctx.send(response.get("restart"))
+        await inter.send(response.get("restart"))
         await bot.close()
 
     else:
-        await ctx.send(response.get("windows-error"))
+        await inter.send(response.get("windows-error"))
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(inter, error):
     if isinstance(error, commands.NotOwner):
-        await ctx.send(response.get("not-owner"))
+        await inter.send(response.get("not-owner"))
     else:
         traceback.print_tb(error.__traceback__)
         print(error)
