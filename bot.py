@@ -83,7 +83,7 @@ activities_file = f"{directory}/files/activities.csv"
 activities = activity.Activities(activities_file)
 
 available_languages = os.listdir(f"{directory}/files/i18n")
-available_languages = [i.replace(".json", "") for i in available_languages if i.endswith(".json")]
+available_languages = tuple([i.replace(".json", "") for i in available_languages if i.endswith(".json")])
 
 db_file = f"{directory}/files/reactionlight.db"
 db = database.Database(db_file)
@@ -762,7 +762,7 @@ async def new(inter):
                         except disnake.NotFound:
                             error_messages.append(
                                 (
-                                    await inter.send(
+                                    await inter.channel.send(
                                         response.get(
                                             "new-reactionrole-permission-error"
                                         ).format(bot_mention=bot.user.mention)
@@ -772,7 +772,7 @@ async def new(inter):
                         except ValueError:
                             error_messages.append(
                                 (
-                                    await inter.send(
+                                    await inter.channel.send(
                                         response.get("new-reactionrole-already-exists")
                                     )
                                 )
@@ -894,7 +894,7 @@ async def new(inter):
             try:
                 r = db.add_reaction_role(rl_object)
             except database.DuplicateInstance:
-                await inter.send(response.get("new-reactionrole-already-exists"))
+                await inter.channel.send(response.get("new-reactionrole-already-exists"))
                 return
 
             if isinstance(r, Exception):
@@ -910,7 +910,7 @@ async def new(inter):
         await inter.delete_original_message()
 
         if cancelled:
-            await inter.send(response.get("new-reactionrole-cancelled"))
+            await inter.channel.send(response.get("new-reactionrole-cancelled"))
     else:
         await inter.send(response.get("new-reactionrole-noadmin"))
 
@@ -938,18 +938,19 @@ async def edit_selector(
     ),
 ):
     if isadmin(inter.author, inter.guild.id):
+        await inter.response.defer()
         all_messages = await formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await inter.send(
-                    response.get("edit-reactionrole-one").format(
+                await inter.edit_original_message(
+                    content=response.get("edit-reactionrole-one").format(
                         channel_name=channel.name
                     )
                 )
 
             elif len(all_messages) > 1:
-                await inter.send(
-                    response.get("edit-reactionrole-instructions").format(
+                await inter.edit_original_message(
+                    content=response.get("edit-reactionrole-instructions").format(
                         num_messages=len(all_messages),
                         channel_name=channel.name,
                         message_list="\n".join(all_messages),
@@ -957,13 +958,16 @@ async def edit_selector(
                 )
 
             else:
-                await inter.send(response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
 
         else:
             try:
                 # Tries to edit the reaction-role message
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
                 all_messages = db.fetch_messages(channel.id)
+                message = message if message.lower() != "none" else None
+                title = title if title.lower() != "none" else None
+                description = description if description.lower() != "none" else None
 
                 if isinstance(all_messages, Exception):
                     await system_notification(
@@ -996,20 +1000,21 @@ async def edit_selector(
                     await inter.send(response.get("select-valid-reactionrole"))
                     return
                 await old_msg.edit(suppress=False)
-                selector_msg_new_body = message if not message else None
+                selector_msg_new_body = message
                 selector_embed = disnake.Embed()
 
-                if not title:
+                if title:
                     selector_embed.title = title
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
-                if not description:
+                if description:
                     selector_embed.description = description
                     selector_embed.colour = botcolour
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
                 try:
+
                     if selector_embed.title or selector_embed.description:
                         await old_msg.edit(
                             content=selector_msg_new_body, embed=selector_embed
@@ -1018,23 +1023,25 @@ async def edit_selector(
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await inter.send(response.get("message-edited"))
+                    await inter.edit_original_message(content=response.get("message-edited"))
+
                 except disnake.Forbidden:
-                    await inter.send(response.get("other-author-error"))
+                    await inter.edit_original_message(content=response.get("other-author-error"))
                     return
+
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await inter.send(response.get("empty-message-error"))
+                        await inter.edit_original_message(content=response.get("empty-message-error"))
 
                     else:
                         guild_id = inter.guild.id
                         await system_notification(guild_id, str(e))
 
             except IndexError:
-                await inter.send(response.get("invalid-target-channel"))
+                await inter.edit_original_message(content=response.get("invalid-target-channel"))
 
             except disnake.Forbidden:
-                await inter.send(response.get("edit-permission-error"))
+                await inter.edit_original_message(content=response.get("edit-permission-error"))
 
     else:
         await inter.send(response.get("not-admin"))
@@ -1048,7 +1055,7 @@ async def edit_reaction(
     ),
     action: str = commands.Param(
         description=response.get("message-reaction-option-action"),
-        choices={"add": "add", "remove": "remove"}
+        choices=("add", "remove")
     ),
     number: int = commands.Param(
         description=response.get("message-reaction-option-number")
@@ -1063,17 +1070,18 @@ async def edit_reaction(
     ),
 ):
     if isadmin(inter.author, inter.guild.id):
+        await inter.response.defer()
         if number == 0 or not reaction:
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await inter.send(
-                    response.get("reaction-edit-one").format(channel_name=channel.name)
+                await inter.edit_original_message(
+                    content=response.get("reaction-edit-one").format(channel_name=channel.name)
                 )
                 return
 
             elif len(all_messages) > 1:
-                await inter.send(
-                    response.get("reaction-edit-multi").format(
+                await inter.edit_original_message(
+                    content=response.get("reaction-edit-multi").format(
                         num_messages=len(all_messages),
                         channel_name=channel.name,
                         message_list="\n".join(all_messages),
@@ -1082,16 +1090,12 @@ async def edit_reaction(
                 return
 
             else:
-                await inter.send(response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
                 return
-
-        if action not in ("add", "remove"):
-            await inter.send(response.get("no-add-remove-specified"))
-            return
 
         if action == "add":
             if not role:
-                await inter.send(response.get("no-role-mentioned"))
+                await inter.edit_original_message(content=response.get("no-role-mentioned"))
                 return
 
         all_messages = db.fetch_messages(channel.id)
@@ -1116,14 +1120,14 @@ async def edit_reaction(
                 counter += 1
 
         else:
-            await inter.send(response.get("reactionrole-not-exists"))
+            await inter.edit_original_message(content=response.get("reactionrole-not-exists"))
             return
 
         if message_to_edit_id:
             message_to_edit = await channel.fetch_message(int(message_to_edit_id))
 
         else:
-            await inter.send(response.get("select-valid-reactionrole"))
+            await inter.edit_original_message(content=response.get("select-valid-reactionrole"))
             return
 
         if action == "add":
@@ -1132,7 +1136,7 @@ async def edit_reaction(
                 await message_to_edit.add_reaction(reaction)
 
             except disnake.HTTPException:
-                await inter.send(response.get("new-reactionrole-emoji-403"))
+                await inter.edit_original_message(content=response.get("new-reactionrole-emoji-403"))
                 return
 
             react = db.add_reaction(message_to_edit.id, role.id, reaction)
@@ -1146,17 +1150,17 @@ async def edit_reaction(
                 return
 
             if not react:
-                await inter.send(response.get("reaction-edit-already-exists"))
+                await inter.edit_original_message(content=response.get("reaction-edit-already-exists"))
                 return
 
-            await inter.send(response.get("reaction-edit-add-success"))
+            await inter.edit_original_message(content=response.get("reaction-edit-add-success"))
 
         elif action == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
 
             except disnake.HTTPException:
-                await inter.send(response.get("reaction-edit-invalid-reaction"))
+                await inter.edit_original_message(content=response.get("reaction-edit-invalid-reaction"))
                 return
 
             react = db.remove_reaction(message_to_edit.id, reaction)
@@ -1169,7 +1173,7 @@ async def edit_reaction(
                 )
                 return
 
-            await inter.send(response.get("reaction-edit-remove-success"))
+            await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))
 
     else:
         await inter.send(response.get("not-admin"))
@@ -1182,7 +1186,7 @@ async def set_systemchannel(
     inter,
     channel_type: str = commands.Param(
         description=response.get("settings-systemchannel-option-type"),
-        choices={"main": "main", "server": "server", "explanation": "explanation"}
+        choices=("main", "server", "explanation")
     ),
     channel: disnake.TextChannel = commands.Param(
         description=response.get("settings-systemchannel-option-channel"),
@@ -1191,7 +1195,8 @@ async def set_systemchannel(
 ):
     if isadmin(inter.author, inter.guild.id):
         global system_channel
-        if not channel or channel_type not in ["main", "server"]:
+        await inter.response.defer()
+        if not channel or channel_type not in ("main", "server"):
             server_channel = db.fetch_systemchannel(inter.guild.id)
             if isinstance(server_channel, Exception):
                 await system_notification(
@@ -1211,8 +1216,8 @@ async def set_systemchannel(
             server_text = (
                 (await getchannel(server_channel)).mention if server_channel else "none"
             )
-            await inter.send(
-                response.get("systemchannels-info").format(
+            await inter.edit_original_message(
+                content=response.get("systemchannels-info").format(
                     main_channel=main_text, server_channel=server_text
                 )
             )
@@ -1223,7 +1228,7 @@ async def set_systemchannel(
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
-            await inter.send(response.get("permission-error-channel"))
+            await inter.edit_original_message(content=response.get("permission-error-channel"))
             return
 
         if channel_type == "main":
@@ -1244,20 +1249,21 @@ async def set_systemchannel(
                 )
                 return
 
-        await inter.send(response.get("systemchannels-success"))
+        await inter.edit_original_message(content=response.get("systemchannels-success"))
 
     else:
-        await inter.send(response.get("not-admin"))
+        await inter.edit_original_message(content=response.get("not-admin"))
 
 
 @settings_group.sub_command(name="notify", description=response.get("brief-settings-notify"))
 async def toggle_notify(inter):
     if isadmin(inter.author, inter.guild.id):
+        await inter.response.defer()
         notify = db.toggle_notify(inter.guild.id)
         if notify:
-            await inter.send(response.get("notifications-on"))
+            await inter.edit_original_message(content=response.get("notifications-on"))
         else:
-            await inter.send(response.get("notifications-off"))
+            await inter.edit_original_message(content=response.get("notifications-off"))
 
 
 @commands.is_owner()
@@ -1270,28 +1276,15 @@ async def set_language(
         choices=available_languages
     ),
 ):
-    if new_language.lower() != "check":
-        if new_language in available_languages:
-            global language
-            global response
-            language = new_language
-            config["server"]["language"] = language
-            with open(f"{directory}/config.ini", "w") as configfile:
-                config.write(configfile)
-            response.language = language
-            await inter.send(response.get("language-success"))
-        else:
-            await inter.send(
-                response.get("language-not-exists").format(
-                    available_languages=", ".join(available_languages)
-                )
-            )
-    else:
-        await inter.send(
-            response.get("language-info").format(
-                available_languages=", ".join(available_languages)
-            )
-        )
+    await inter.response.defer()
+    global language
+    global response
+    language = new_language
+    config["server"]["language"] = language
+    with open(f"{directory}/config.ini", "w") as configfile:
+        config.write(configfile)
+    response.language = language
+    await inter.edit_original_message(content=response.get("language-success"))
 
 
 @commands.is_owner()
@@ -1303,6 +1296,7 @@ async def set_colour(
     ),
 ):
     global botcolour
+    await inter.response.defer()
     try:
         botcolour = disnake.Colour(int(colour, 16))
 
@@ -1315,10 +1309,10 @@ async def set_colour(
             description=response.get("example-embed-new-colour"),
             colour=botcolour,
         )
-        await inter.send(response.get("colour-changed"), embed=example)
+        await inter.edit_original_message(content=response.get("colour-changed"), embed=example)
 
     except ValueError:
-        await inter.send(response.get("colour-hex-error"))
+        await inter.edit_original_message(content=response.get("colour-hex-error"))
 
 
 @commands.is_owner()
@@ -1326,14 +1320,16 @@ async def set_colour(
 async def change_activity(
     inter,
     action: str = commands.Param(
-        description=response.get("settings-activity-option-action")
+        description=response.get("settings-activity-option-action"),
+        choices=("add", "remove", "list")
     ),
     activity: str = commands.Param(
         description=response.get("settings-activity-option-activity"),
         default=None
     ),
 ):
-    if action.lower() == "add" and activity:
+    await inter.response.defer()
+    if action == "add" and activity:
         if "," in activity:
             await inter.send(response.get("activity-no-commas"))
 
@@ -1343,7 +1339,7 @@ async def change_activity(
                 response.get("activity-success").format(new_activity=activity)
             )
 
-    elif action.lower() == "list":
+    elif action == "list":
         if activities.activity_list:
             formatted_list = []
             for item in activities.activity_list:
@@ -1358,7 +1354,7 @@ async def change_activity(
         else:
             await inter.send(response.get("no-current-activities"))
 
-    elif action.lower() == "remove" and activity:
+    elif action == "remove" and activity:
         removed = activities.remove(activity)
         if removed:
             await inter.send(
@@ -1375,8 +1371,9 @@ async def change_activity(
 @bot.slash_command(name="help", description=response.get("brief-help"))
 async def hlp(inter):
     if isadmin(inter.author, inter.guild.id):
-        await inter.send(
-            response.get("help-messages-title")
+        await inter.response.defer()
+        await inter.edit_original_message(
+            content=response.get("help-messages-title")
             + response.get("help-new")
             + response.get("help-edit")
             + response.get("help-reaction")
@@ -1397,19 +1394,20 @@ async def hlp(inter):
         )
 
     else:
-        await inter.send(response.get("not-admin"))
+        await inter.edit_original_message(content=response.get("not-admin"))
 
 
 @bot.slash_command(name="admin", description=response.get("brief-admin"))
 @commands.has_permissions(administrator=True)
 async def admin(
     inter,
-    action: str = commands.Param(description=response.get("admin-option-action"), choices={"list": "list", "add": "add", "remove": "remove"}),
+    action: str = commands.Param(description=response.get("admin-option-action"), choices=("add", "remove", "list")),
     role: disnake.Role = commands.Param(
         description=response.get("admin-option-role"),
         default=None
     ),
 ):
+    await inter.response.defer()
     if role is None or action == "list":
         # Lists all admin IDs in the database, mentioning them if possible
         admin_ids = db.get_admins(inter.guild.id)
@@ -1428,13 +1426,13 @@ async def admin(
             )
 
         if adminrole_objects:
-            await inter.send(
-                response.get("adminlist-local").format(
+            await inter.edit_original_message(
+                content=response.get("adminlist-local").format(
                     admin_list="\n- ".join(adminrole_objects)
                 )
             )
         else:
-            await inter.send(response.get("adminlist-local-empty"))
+            await inter.edit_original_message(content=response.get("adminlist-local-empty"))
 
     elif action == "add":
         # Adds an admin role ID to the database
@@ -1447,7 +1445,7 @@ async def admin(
             )
             return
 
-        await inter.send(response.get("admin-add-success"))
+        await inter.edit_original_message(content=response.get("admin-add-success"))
 
     elif action == "remove":
         # Removes an admin role ID from the database
@@ -1460,18 +1458,13 @@ async def admin(
             )
             return
 
-        await inter.send(response.get("admin-remove-success"))
-
-
-@admin.error
-async def add_admin_error(inter, error):
-    if isinstance(error, commands.RoleNotFound):
-        await inter.send(response.get("admin-invalid"))
+        await inter.edit_original_message(content=response.get("admin-remove-success"))
 
 
 @bot_group.sub_command(name="version", description=response.get("brief-version"))
 async def print_version(inter):
     if isadmin(inter.author, inter.guild.id):
+        await inter.response.defer()
         latest = await github.get_latest()
         changelog = await github.latest_changelog()
         em = disnake.Embed(
@@ -1480,19 +1473,20 @@ async def print_version(inter):
             colour=botcolour,
         )
         em.set_footer(text=f"{botname}", icon_url=logo)
-        await inter.send(
-            response.get("version").format(version=__version__, latest_version=latest),
+        await inter.edit_original_message(
+            content=response.get("version").format(version=__version__, latest_version=latest),
             embed=em,
         )
 
     else:
-        await inter.send(response.get("not-admin"))
+        await inter.edit_original_message(content=response.get("not-admin"))
 
 
 @commands.is_owner()
 @bot_group.sub_command(name="kill", description=response.get("brief-kill"))
 async def kill(inter):
-    await inter.send(response.get("shutdown"))
+    await inter.response.defer()
+    await inter.edit_original_message(content=response.get("shutdown"))
     await bot.close()
 
 
@@ -1501,7 +1495,8 @@ async def kill(inter):
 async def restart_cmd(inter):
     if platform != "win32":
         restart()
-        await inter.send(response.get("restart"))
+        await inter.response.defer()
+        await inter.edit_original_message(content=response.get("restart"))
         await bot.close()
 
     else:
@@ -1512,16 +1507,17 @@ async def restart_cmd(inter):
 @bot_group.sub_command(name="update", description=response.get("brief-update"))
 async def update(inter):
     if platform != "win32":
-        await inter.send(response.get("attempting-update"))
+        await inter.response.defer()
+        await inter.edit_original_message(content=response.get("attempting-update"))
         os.chdir(directory)
         cmd = os.popen("git fetch")
         cmd.close()
         cmd = os.popen("git pull")
         cmd.close()
-        await inter.send(response.get("database-backup"))
+        await inter.edit_original_message(content=response.get("database-backup"))
         copy(db_file, f"{db_file}.bak")
         restart()
-        await inter.send(response.get("restart"))
+        await inter.edit_original_message(content=response.get("restart"))
         await bot.close()
 
     else:
