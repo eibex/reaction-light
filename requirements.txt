@@ -1,1 +1,1 @@
-disnake>=2.2.1
+git+https://github.com/iDevision/enhanced-discord.py@7aafbc2dcf82ec4b8e42b529099c984ff55ffe29
