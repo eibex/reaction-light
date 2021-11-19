@@ -1,7 +1,7 @@
 # Reaction Light - Discord Role Bot
 [![Reaction Light 3.0.0](https://img.shields.io/badge/Reaction%20Light-3.0.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
-[![enhanced-d.py 1.7.3+](https://img.shields.io/badge/enhanced--d.py-1.7.3+-blue.svg)](#)
+[![disnake 2.2.2+](https://img.shields.io/badge/disnake-2.2.2+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 
@@ -37,11 +37,11 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [License](#license)
 
 ## Requirements
-This bot requires [enhanced-discord.py](https://github.com/iDevision/enhanced-discord.py) and Python 3.8+.
+This bot requires [disnake](https://github.com/DisnakeDev/disnake) and Python 3.8+.
 
-You can get enhanced-discord.py via PyPI or GitHub:
+You can get disnake via PyPI or GitHub:
 ```
-python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py
+python3 -m pip install -U disnake
 ```
 
 ## Setup

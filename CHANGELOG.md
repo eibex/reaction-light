@@ -5,13 +5,13 @@
 - README:
   - What you need to do to make the bot work BEFORE updating:
     - `python3 -m pip uninstall discord.py`
-    - `python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py`
+    - `python3 -m pip install -U disnake`
   - What you need to do to make the bot work AFTER updating:
     - Kick the bot from your instance
     - Reinvite it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415929408` (replace CLIENT_ID)
     - On https://discord.com/developers select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
     - Wait ~1 hour before Discord register your bot's commands
-
+  
 ### 2.5.0
 - Fix `rl!new` showing unsuccessful reaction when the message creation was actually successful
 - Add support for translations. To translate the bot's responses make a copy of [en-gb.json](https://github.com/eibex/reaction-light/blob/master/files/i18n/en-gb.json) and translate the associated strings. Consider sharing your translation as a pull request ([#74](https://github.com/eibex/reaction-light/issues/74) closed by [#77](https://github.com/eibex/reaction-light/pull/77) by [eibex](https://github.com/eibex), [Edwinexd](https://github.com/Edwinexd), and [d7415](https://github.com/d7415)).
