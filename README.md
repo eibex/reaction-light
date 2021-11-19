@@ -41,7 +41,7 @@ This bot requires [enhanced-discord.py](https://github.com/iDevision/enhanced-di
 
 You can get enhanced-discord.py via PyPI or GitHub:
 ```
-python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py
+python3 -m pip install -r requirements.txt
 ```
 
 ## Setup
