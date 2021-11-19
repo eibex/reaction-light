@@ -5,7 +5,7 @@
 - README:
   - What you need to do to make the bot work BEFORE updating:
     - `python3 -m pip uninstall discord.py`
-    - `python3 -m pip install -U git+https://github.com/iDevision/enhanced-discord.py`
+    - `python3 -m pip install -r requirements.txt`
   - What you need to do to make the bot work AFTER updating:
     - Kick the bot from your instance
     - Reauthorize it with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415929408` (replace CLIENT_ID)
