@@ -39,7 +39,7 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 ## Requirements
 This bot requires [enhanced-discord.py](https://github.com/iDevision/enhanced-discord.py) and Python 3.8+.
 
-You can get enhanced-discord.py via PyPI or GitHub:
+You can get the required dependencies using PyPI:
 ```
 python3 -m pip install -r requirements.txt
 ```
