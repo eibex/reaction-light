@@ -24,7 +24,7 @@ SOFTWARE.
 
 
 import sqlite3
-import discord
+import disnake
 
 
 class SchemaHandler:
@@ -95,7 +95,7 @@ class SchemaHandler:
             for guild in self.client.guilds:
                 guilds[guild.id] = []
                 for admin_id in admins:
-                    role = discord.utils.get(guild.roles, id=admin_id)
+                    role = disnake.utils.get(guild.roles, id=admin_id)
                     if role is not None:
                         guilds[guild.id].append(role.id)
 

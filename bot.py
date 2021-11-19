@@ -56,7 +56,7 @@ TOKEN = str(config.get("server", "token"))
 botname = str(config.get("server", "name", fallback="Reaction Light"))
 prefix = str(config.get("server", "prefix", fallback="rl!"))
 language = str(config.get("server", "language", fallback="en-gb"))
-botcolour = discord.Colour(int(config.get("server", "colour", fallback="0xffff00"), 16))
+botcolour = disnake.Colour(int(config.get("server", "colour", fallback="0xffff00"), 16))
 system_channel = (
     int(config.get("server", "system_channel"))
     if config.get("server", "system_channel")
@@ -65,7 +65,7 @@ system_channel = (
 
 response = i18n.Response(f"{folder}/i18n", language, prefix)
 
-intents = discord.Intents.none()
+intents = disnake.Intents.none()
 intents.guild_messages = True
 intents.guild_reactions = True
 intents.guilds = True
@@ -204,7 +204,7 @@ async def system_notification(guild_id, text, embed=None):
                 else:
                     await target_channel.send(text)
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await system_notification(None, text)
 
         else:
@@ -221,10 +221,10 @@ async def system_notification(guild_id, text, embed=None):
             else:
                 await target_channel.send(text)
 
-        except discord.NotFound:
+        except disnake.NotFound:
             print(response.get("systemchannel-404"))
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             print(response.get("systemchannel-403"))
 
     else:
@@ -246,7 +246,7 @@ async def formatted_channel_list(channel):
         try:
             old_msg = await channel.fetch_message(int(msg_id))
 
-        except discord.NotFound:
+        except disnake.NotFound:
             # Skipping reaction-role messages that might have been deleted without updating CSVs
             continue
 
@@ -264,7 +264,7 @@ async def formatted_channel_list(channel):
 async def maintain_presence():
     # Loops through the activities specified in activities.csv
     current_activity = activities.get()
-    await bot.change_presence(activity=discord.Game(name=current_activity))
+    await bot.change_presence(activity=disnake.Game(name=current_activity))
 
 
 @tasks.loop(hours=24)
@@ -273,7 +273,7 @@ async def updates():
     new_version = await github.check_for_updates(__version__)
     if new_version:
         changelog = await github.latest_changelog()
-        em = discord.Embed(
+        em = disnake.Embed(
             title=f"Reaction Light v{new_version} - Changes",
             description=changelog,
             colour=botcolour,
@@ -308,7 +308,7 @@ async def cleandb():
 
             await channel.fetch_message(message[0])
 
-        except discord.NotFound as e:
+        except disnake.NotFound as e:
             # If unknown channel or unknown message
             if e.code == 10003 or e.code == 10008:
                 delete = db.delete(message[0])
@@ -329,7 +329,7 @@ async def cleandb():
                     ),
                 )
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
             await system_notification(
                 message[3],
@@ -351,7 +351,7 @@ async def cleandb():
             if guild_id in cleanup_guild_ids:
                 db.remove_cleanup_guild(guild_id)
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             # If unknown guild
             if guild_id in cleanup_guild_ids:
                 continue
@@ -380,7 +380,7 @@ async def cleandb():
                 db.remove_cleanup_guild(guild[0])
                 continue
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 delete = db.remove_guild(guild[0])
                 delete2 = db.remove_cleanup_guild(guild[0])
                 if isinstance(delete, Exception):
@@ -410,7 +410,7 @@ async def check_cleanup_queued_guilds():
             await bot.fetch_guild(guild_id)
             db.remove_cleanup_guild(guild_id)
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             continue
 
 
@@ -472,7 +472,7 @@ async def on_raw_reaction_add(payload):
                 role_id = reactions[reaction]
                 guild = await getguild(guild_id)
                 member = await getmember(guild, user_id)
-                role = discord.utils.get(guild.roles, id=role_id)
+                role = disnake.utils.get(guild.roles, id=role_id)
                 if user_id != bot.user.id:
                     unique = db.isunique(msg_id)
                     if unique:
@@ -502,7 +502,7 @@ async def on_raw_reaction_add(payload):
                                 response.get("new-role-dm").format(role_name=role.name)
                             )
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         await system_notification(
                             guild_id, response.get("permission-error-add")
                         )
@@ -537,7 +537,7 @@ async def on_raw_reaction_remove(payload):
             guild = await getguild(guild_id)
             member = await getmember(guild, user_id)
 
-            role = discord.utils.get(guild.roles, id=role_id)
+            role = disnake.utils.get(guild.roles, id=role_id)
             try:
                 await member.remove_roles(role)
                 notify = db.notify(guild_id)
@@ -555,7 +555,7 @@ async def on_raw_reaction_remove(payload):
                         response.get("removed-role-dm").format(role_name=role.name)
                     )
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await system_notification(
                     guild_id, response.get("permission-error-remove")
                 )
@@ -622,7 +622,7 @@ async def new(ctx):
                             try:
                                 await reactions_message.add_reaction(reaction)
                                 rl_object["reactions"][reaction] = role
-                            except discord.HTTPException:
+                            except disnake.HTTPException:
                                 error_messages.append(
                                     (
                                         await ctx.send(
@@ -728,25 +728,25 @@ async def new(ctx):
                                 channel = await getchannel(
                                     oldmessage_response_payload.channel_id
                                 )
-                            except discord.InvalidData:
+                            except disnake.InvalidData:
                                 channel = None
-                            except discord.HTTPException:
+                            except disnake.HTTPException:
                                 channel = None
 
                             if channel is None:
-                                raise discord.NotFound
+                                raise disnake.NotFound
                             try:
                                 message = await channel.fetch_message(
                                     oldmessage_response_payload.message_id
                                 )
-                            except discord.HTTPException:
-                                raise discord.NotFound
+                            except disnake.HTTPException:
+                                raise disnake.NotFound
                             try:
                                 await message.add_reaction("👌")
                                 await message.remove_reaction("👌", message.guild.me)
                                 await message.remove_reaction("🔧", ctx.author)
-                            except discord.HTTPException:
-                                raise discord.NotFound
+                            except disnake.HTTPException:
+                                raise disnake.NotFound
                             if db.exists(message.id):
                                 raise ValueError
                             rl_object["message"] = dict(
@@ -756,7 +756,7 @@ async def new(ctx):
                             )
                             final_message = message
                             break
-                        except discord.NotFound:
+                        except disnake.NotFound:
                             error_messages.append(
                                 (
                                     await ctx.send(
@@ -813,7 +813,7 @@ async def new(ctx):
 
         if not cancelled and "target_channel" in rl_object:
             error_messages = []
-            selector_embed = discord.Embed(
+            selector_embed = disnake.Embed(
                 title="Embed_title",
                 description="Embed_content",
                 colour=botcolour,
@@ -838,7 +838,7 @@ async def new(ctx):
                     selector_msg_body = (
                         msg_values[0] if msg_values[0].lower() != "none" else None
                     )
-                    selector_embed = discord.Embed(colour=botcolour)
+                    selector_embed = disnake.Embed(colour=botcolour)
                     selector_embed.set_footer(text=f"{botname}", icon_url=logo)
 
                     if len(msg_values) > 1:
@@ -868,7 +868,7 @@ async def new(ctx):
                             )
                             final_message = sent_final_message
                             break
-                        except discord.Forbidden:
+                        except disnake.Forbidden:
                             error_messages.append(
                                 (
                                     await message.channel.send(
@@ -915,7 +915,7 @@ async def new(ctx):
 @message_group.command(name="edit", brief=response.get("brief-message-edit"))
 async def edit_selector(
     ctx,
-    channel: discord.TextChannel = commands.Option(
+    channel: disnake.TextChannel = commands.Option(
         description=response.get("message-edit-option-channel")
     ),
     number: int = commands.Option(
@@ -991,7 +991,7 @@ async def edit_selector(
                     return
                 await old_msg.edit(suppress=False)
                 selector_msg_new_body = message if message.lower() != "none" else None
-                selector_embed = discord.Embed()
+                selector_embed = disnake.Embed()
 
                 if title.lower() != "none":
                     selector_embed.title = title
@@ -1013,10 +1013,10 @@ async def edit_selector(
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
                     await ctx.send(response.get("message-edited"))
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     await ctx.send(response.get("other-author-error"))
                     return
-                except discord.HTTPException as e:
+                except disnake.HTTPException as e:
                     if e.code == 50006:
                         await ctx.send(response.get("empty-message-error"))
 
@@ -1027,7 +1027,7 @@ async def edit_selector(
             except IndexError:
                 await ctx.send(response.get("invalid-target-channel"))
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await ctx.send(response.get("edit-permission-error"))
 
     else:
@@ -1037,7 +1037,7 @@ async def edit_selector(
 @message_group.command(name="reaction", brief=response.get("brief-message-reaction"))
 async def edit_reaction(
     ctx,
-    channel: discord.TextChannel = commands.Option(
+    channel: disnake.TextChannel = commands.Option(
         description=response.get("message-reaction-option-channel")
     ),
     action: str = commands.Option(
@@ -1049,7 +1049,7 @@ async def edit_reaction(
     reaction: str = commands.Option(
         None, description=response.get("message-reaction-option-reaction")
     ),
-    role: discord.Role = commands.Option(
+    role: disnake.Role = commands.Option(
         None, description=response.get("message-reaction-option-role")
     ),
 ):
@@ -1122,7 +1122,7 @@ async def edit_reaction(
                 # Check that the bot can actually use the emoji
                 await message_to_edit.add_reaction(reaction)
 
-            except discord.HTTPException:
+            except disnake.HTTPException:
                 await ctx.send(response.get("new-reactionrole-emoji-403"))
                 return
 
@@ -1146,7 +1146,7 @@ async def edit_reaction(
             try:
                 await message_to_edit.clear_reaction(reaction)
 
-            except discord.HTTPException:
+            except disnake.HTTPException:
                 await ctx.send(response.get("reaction-edit-invalid-reaction"))
                 return
 
@@ -1174,7 +1174,7 @@ async def set_systemchannel(
     channel_type: str = commands.Option(
         None, description=response.get("settings-systemchannel-option-type")
     ),
-    channel: discord.TextChannel = commands.Option(
+    channel: disnake.TextChannel = commands.Option(
         None, description=response.get("settings-systemchannel-option-channel")
     ),
 ):
@@ -1295,13 +1295,13 @@ async def set_colour(
 ):
     global botcolour
     try:
-        botcolour = discord.Colour(int(colour, 16))
+        botcolour = disnake.Colour(int(colour, 16))
 
         config["server"]["colour"] = colour
         with open(f"{directory}/config.ini", "w") as configfile:
             config.write(configfile)
 
-        example = discord.Embed(
+        example = disnake.Embed(
             title=response.get("example-embed"),
             description=response.get("example-embed-new-colour"),
             colour=botcolour,
@@ -1395,7 +1395,7 @@ async def hlp(ctx):
 async def admin(
     ctx,
     action: str = commands.Option(description=response.get("admin-option-action")),
-    role: discord.Role = commands.Option(
+    role: disnake.Role = commands.Option(
         None, description=response.get("admin-option-role")
     ),
 ):
@@ -1413,7 +1413,7 @@ async def admin(
         adminrole_objects = []
         for admin_id in admin_ids:
             adminrole_objects.append(
-                discord.utils.get(ctx.guild.roles, id=admin_id).mention
+                disnake.utils.get(ctx.guild.roles, id=admin_id).mention
             )
 
         if adminrole_objects:
@@ -1463,7 +1463,7 @@ async def print_version(ctx):
     if isadmin(ctx.message.author, ctx.guild.id):
         latest = await github.get_latest()
         changelog = await github.latest_changelog()
-        em = discord.Embed(
+        em = disnake.Embed(
             title=f"Reaction Light v{latest} - Changes",
             description=changelog,
             colour=botcolour,
@@ -1529,8 +1529,8 @@ async def on_command_error(ctx, error):
 try:
     bot.run(TOKEN)
 
-except discord.PrivilegedIntentsRequired:
+except disnake.PrivilegedIntentsRequired:
     print(response.get("login-failure-intents"))
 
-except discord.errors.LoginFailure:
+except disnake.errors.LoginFailure:
     print(response.get("login-failure-token"))
