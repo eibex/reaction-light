@@ -72,8 +72,7 @@ intents.guilds = True
 
 bot = commands.Bot(
     command_prefix=prefix,
-    intents=intents,
-    test_guilds=[293178252741050368]
+    intents=intents
 )
 
 bot.remove_command("help")
