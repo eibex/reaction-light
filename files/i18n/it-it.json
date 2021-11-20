@@ -109,7 +109,7 @@
     "help-restart": "- `/bot restart` riavvia il bot. Funziona solo su GNU/Linux.\n",
     "help-update": "- `/bot update` aggiorna e riavvia il bot. Funziona solo su installazioni `git clone` su GNU/Linux.\n",
     "help-version": "- `/bot version` mostra la versione attuale del bot insieme all'ultimo changelog e patch.\n\n",
-    "help-footer": "I am running version {version} of Reaction Light. You can find more resources, submit feedback, and report bugs at: <https://github.com/eibex/reaction-light>",
+    "help-footer": "Sto utilizzando la versione {version} di Reaction Light. Puoi trovare altre risorse, fornire feedback e segnalare bug su: <https://github.com/eibex/reaction-light>",
     "brief-message-new": "Crea un nuovo messaggio per associare le reazioni ai ruoli",
     "brief-message-edit": "Modifica un messaggio per associare le reazioni ai ruoli esistente",
     "brief-message-reaction": "Aggiunge o rimuove una reazione da un messaggio Reaction Light esistente",
