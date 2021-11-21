@@ -121,6 +121,8 @@ def isadmin(member, guild_id):
         return False
 
 
+# Set of functions to get objects from cache, if not present they are fetched via an API call
+
 async def getchannel(channel_id):
     channel = bot.get_channel(channel_id)
 
@@ -165,6 +167,7 @@ def restart():
 
 
 async def database_updates():
+    # Handles database schema updates
     handler = schema.SchemaHandler(db_file, bot)
     if handler.version == 0:
         handler.zero_to_one()
@@ -234,6 +237,7 @@ async def system_notification(guild_id, text, embed=None):
 
 
 async def formatted_channel_list(channel):
+    # Returns a formatted numbered list of reaction roles message present in a given channel
     all_messages = db.fetch_messages(channel.id)
     if isinstance(all_messages, Exception):
         await system_notification(
@@ -406,6 +410,7 @@ async def cleandb():
 
 @tasks.loop(hours=6)
 async def check_cleanup_queued_guilds():
+    # Checks if an unreachable guild has become available again and removes it from the cleanup queue
     cleanup_guild_ids = db.fetch_cleanup_guilds(guild_ids_only=True)
     for guild_id in cleanup_guild_ids:
         try:
@@ -562,6 +567,8 @@ async def on_raw_reaction_remove(payload):
                     guild_id, response.get("permission-error-remove")
                 )
 
+
+# Command groups
 
 @bot.slash_command(name="message")
 async def message_group(inter):
@@ -792,6 +799,7 @@ async def new(inter):
                         channel_message = await bot.wait_for(
                             "message", timeout=120, check=check
                         )
+                        user_messages.append(channel_message)
                         if channel_message.channel_mentions:
                             rl_object[
                                 "target_channel"
@@ -810,11 +818,12 @@ async def new(inter):
                     cancelled = True
                 finally:
                     await sent_channel_message.delete()
-                    for message in error_messages:
+                    for message in error_messages + user_messages:
                         await message.delete()
 
         if not cancelled and "target_channel" in rl_object:
             error_messages = []
+            user_messages = []
             selector_embed = disnake.Embed(
                 title="Embed_title",
                 description="Embed_content",
@@ -831,8 +840,7 @@ async def new(inter):
                     message_message = await bot.wait_for(
                         "message", timeout=120, check=check
                     )
-                    # I would usually end up deleting message_message in the end but users usually want to be able to access the
-                    # format they once used incase they want to make any minor changes
+                    user_messages.append(message_message)
                     msg_values = message_message.content.split(" // ")
                     # This whole system could also be re-done using wait_for to make the syntax easier for the user
                     # But it would be a breaking change that would be annoying for thoose who have saved their message commands
@@ -885,7 +893,7 @@ async def new(inter):
                 cancelled = True
             finally:
                 await sent_message_message.delete()
-                for message in error_messages:
+                for message in error_messages + user_messages:
                     await message.delete()
 
         if not cancelled:
