@@ -50,5 +50,4 @@ class Response:
             print(
                 f"Could not find a translation ({self.language}) for the requested i18n item: {item}. Please file an issue on GitHub."
             )
-        response = response.replace("{prefix}", self.prefix)
         return response
