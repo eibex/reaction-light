@@ -28,10 +28,9 @@ import json
 
 
 class Response:
-    def __init__(self, directory, language, prefix):
+    def __init__(self, directory, language):
         self.directory = directory
         self.language = language
-        self.prefix = prefix
         self.responses = self.load()
 
     def load(self):

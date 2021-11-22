@@ -54,6 +54,7 @@ logo = str(
 )
 TOKEN = str(config.get("server", "token"))
 botname = str(config.get("server", "name", fallback="Reaction Light"))
+# We are leaving prefix as a dummy variable for now since it is still a positional argument of commands.Bot
 prefix = str(config.get("server", "prefix", fallback="rl!"))
 language = str(config.get("server", "language", fallback="en-gb"))
 botcolour = disnake.Colour(int(config.get("server", "colour", fallback="0xffff00"), 16))
@@ -63,7 +64,7 @@ system_channel = (
     else None
 )
 
-response = i18n.Response(f"{folder}/i18n", language, prefix)
+response = i18n.Response(f"{folder}/i18n", language)
 
 intents = disnake.Intents.none()
 intents.guild_messages = True
