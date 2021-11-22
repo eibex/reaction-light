@@ -1,4 +1,5 @@
 {
+    "LANGUAGE": "Italiano",
     "new-reactionrole-init": "Benvenuto/a nel programma di creazione di Reaction Light. Per favore, fornisci le informazioni necessarie quando richieste. Nel caso tu voglia interrompere la creazione, sarà sufficiente smettere di rispondere al bot fino a che non andrà in time-out.",
     "new-reactionrole-roles-emojis": "Collega i ruoli e le emoji separati da uno spazio (un collegamento per messaggio). Quando hai finito scrivi `done`. Esempio:\n:smile: `@Ruolo`",
     "new-reactionrole-error": "Menziona un ruolo dopo la reazione. Esempio:\n:smile: `@Ruolo`",

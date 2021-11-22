@@ -1,4 +1,5 @@
 {
+    "LANGUAGE": "English",
     "new-reactionrole-init": "Welcome to the Reaction Light creation program. Please provide the required information once requested. If you would like to abort the creation, do not respond and the program will time out.",
     "new-reactionrole-roles-emojis": "Attach roles and emojis separated by one space (one combination per message). When you are done type `done`. Example:\n:smile: `@Role`",
     "new-reactionrole-error": "Mention a role after the reaction. Example:\n:smile: `@Role`",

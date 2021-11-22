@@ -42,6 +42,13 @@ class Response:
                     data[file.replace(".json", "")] = json.load(f)
         return data
 
+    def languages(self):
+        available_languages = {}
+        for language in self.responses:
+            long_language = self.responses[language]["LANGUAGE"]
+            available_languages[long_language] = language
+        return available_languages
+
     def get(self, item):
         try:
             response = self.responses[self.language][item]

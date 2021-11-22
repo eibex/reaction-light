@@ -69,20 +69,10 @@ intents = disnake.Intents.none()
 intents.guild_messages = True
 intents.guild_reactions = True
 intents.guilds = True
-
-bot = commands.Bot(
-    command_prefix=prefix,
-    intents=intents
-)
-
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 bot.remove_command("help")
 
-
-activities_file = f"{directory}/files/activities.csv"
-activities = activity.Activities(activities_file)
-
-available_languages = os.listdir(f"{directory}/files/i18n")
-available_languages = tuple([i.replace(".json", "") for i in available_languages if i.endswith(".json")])
+activities = activity.Activities(f"{directory}/files/activities.csv")
 
 db_file = f"{directory}/files/reactionlight.db"
 db = database.Database(db_file)
@@ -122,6 +112,7 @@ def isadmin(member, guild_id):
 
 
 # Set of functions to get objects from cache, if not present they are fetched via an API call
+
 
 async def getchannel(channel_id):
     channel = bot.get_channel(channel_id)
@@ -570,6 +561,7 @@ async def on_raw_reaction_remove(payload):
 
 # Command groups
 
+
 @bot.slash_command(name="message")
 async def message_group(inter):
     pass
@@ -614,7 +606,11 @@ async def new(inter):
                             role = reactions_message.role_mentions[0].id
                         except IndexError:
                             error_messages.append(
-                                (await inter.channel.send(response.get("new-reactionrole-error")))
+                                (
+                                    await inter.channel.send(
+                                        response.get("new-reactionrole-error")
+                                    )
+                                )
                             )
                             continue
 
@@ -901,7 +897,9 @@ async def new(inter):
             try:
                 r = db.add_reaction_role(rl_object)
             except database.DuplicateInstance:
-                await inter.channel.send(response.get("new-reactionrole-already-exists"))
+                await inter.channel.send(
+                    response.get("new-reactionrole-already-exists")
+                )
                 return
 
             if isinstance(r, Exception):
@@ -932,16 +930,13 @@ async def edit_selector(
         description=response.get("message-edit-option-number")
     ),
     message: str = commands.Param(
-        description=response.get("message-edit-option-message"),
-        default="none"
+        description=response.get("message-edit-option-message"), default="none"
     ),
     title: str = commands.Param(
-        description=response.get("message-edit-option-title"),
-        default="none"
+        description=response.get("message-edit-option-title"), default="none"
     ),
     description: str = commands.Param(
-        description=response.get("message-edit-option-description"),
-        default="none"
+        description=response.get("message-edit-option-description"), default="none"
     ),
 ):
     if isadmin(inter.author, inter.guild.id):
@@ -965,7 +960,9 @@ async def edit_selector(
                 )
 
             else:
-                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(
+                    content=response.get("no-reactionrole-messages")
+                )
 
         else:
             try:
@@ -1030,31 +1027,43 @@ async def edit_selector(
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await inter.edit_original_message(content=response.get("message-edited"))
+                    await inter.edit_original_message(
+                        content=response.get("message-edited")
+                    )
 
                 except disnake.Forbidden:
-                    await inter.edit_original_message(content=response.get("other-author-error"))
+                    await inter.edit_original_message(
+                        content=response.get("other-author-error")
+                    )
                     return
 
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await inter.edit_original_message(content=response.get("empty-message-error"))
+                        await inter.edit_original_message(
+                            content=response.get("empty-message-error")
+                        )
 
                     else:
                         guild_id = inter.guild.id
                         await system_notification(guild_id, str(e))
 
             except IndexError:
-                await inter.edit_original_message(content=response.get("invalid-target-channel"))
+                await inter.edit_original_message(
+                    content=response.get("invalid-target-channel")
+                )
 
             except disnake.Forbidden:
-                await inter.edit_original_message(content=response.get("edit-permission-error"))
+                await inter.edit_original_message(
+                    content=response.get("edit-permission-error")
+                )
 
     else:
         await inter.send(response.get("not-admin"))
 
 
-@message_group.sub_command(name="reaction", description=response.get("brief-message-reaction"))
+@message_group.sub_command(
+    name="reaction", description=response.get("brief-message-reaction")
+)
 async def edit_reaction(
     inter,
     channel: disnake.TextChannel = commands.Param(
@@ -1062,18 +1071,16 @@ async def edit_reaction(
     ),
     action: str = commands.Param(
         description=response.get("message-reaction-option-action"),
-        choices=("add", "remove")
+        choices=("add", "remove"),
     ),
     number: int = commands.Param(
         description=response.get("message-reaction-option-number")
     ),
     reaction: str = commands.Param(
-        description=response.get("message-reaction-option-reaction"),
-        default=None
+        description=response.get("message-reaction-option-reaction"), default=None
     ),
     role: disnake.Role = commands.Param(
-        description=response.get("message-reaction-option-role"),
-        default=None
+        description=response.get("message-reaction-option-role"), default=None
     ),
 ):
     if isadmin(inter.author, inter.guild.id):
@@ -1082,7 +1089,9 @@ async def edit_reaction(
             all_messages = await formatted_channel_list(channel)
             if len(all_messages) == 1:
                 await inter.edit_original_message(
-                    content=response.get("reaction-edit-one").format(channel_name=channel.name)
+                    content=response.get("reaction-edit-one").format(
+                        channel_name=channel.name
+                    )
                 )
                 return
 
@@ -1097,12 +1106,16 @@ async def edit_reaction(
                 return
 
             else:
-                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(
+                    content=response.get("no-reactionrole-messages")
+                )
                 return
 
         if action == "add":
             if not role:
-                await inter.edit_original_message(content=response.get("no-role-mentioned"))
+                await inter.edit_original_message(
+                    content=response.get("no-role-mentioned")
+                )
                 return
 
         all_messages = db.fetch_messages(channel.id)
@@ -1127,14 +1140,18 @@ async def edit_reaction(
                 counter += 1
 
         else:
-            await inter.edit_original_message(content=response.get("reactionrole-not-exists"))
+            await inter.edit_original_message(
+                content=response.get("reactionrole-not-exists")
+            )
             return
 
         if message_to_edit_id:
             message_to_edit = await channel.fetch_message(int(message_to_edit_id))
 
         else:
-            await inter.edit_original_message(content=response.get("select-valid-reactionrole"))
+            await inter.edit_original_message(
+                content=response.get("select-valid-reactionrole")
+            )
             return
 
         if action == "add":
@@ -1143,7 +1160,9 @@ async def edit_reaction(
                 await message_to_edit.add_reaction(reaction)
 
             except disnake.HTTPException:
-                await inter.edit_original_message(content=response.get("new-reactionrole-emoji-403"))
+                await inter.edit_original_message(
+                    content=response.get("new-reactionrole-emoji-403")
+                )
                 return
 
             react = db.add_reaction(message_to_edit.id, role.id, reaction)
@@ -1157,17 +1176,23 @@ async def edit_reaction(
                 return
 
             if not react:
-                await inter.edit_original_message(content=response.get("reaction-edit-already-exists"))
+                await inter.edit_original_message(
+                    content=response.get("reaction-edit-already-exists")
+                )
                 return
 
-            await inter.edit_original_message(content=response.get("reaction-edit-add-success"))
+            await inter.edit_original_message(
+                content=response.get("reaction-edit-add-success")
+            )
 
         elif action == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
 
             except disnake.HTTPException:
-                await inter.edit_original_message(content=response.get("reaction-edit-invalid-reaction"))
+                await inter.edit_original_message(
+                    content=response.get("reaction-edit-invalid-reaction")
+                )
                 return
 
             react = db.remove_reaction(message_to_edit.id, reaction)
@@ -1180,7 +1205,9 @@ async def edit_reaction(
                 )
                 return
 
-            await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))
+            await inter.edit_original_message(
+                content=response.get("reaction-edit-remove-success")
+            )
 
     else:
         await inter.send(response.get("not-admin"))
@@ -1193,11 +1220,10 @@ async def set_systemchannel(
     inter,
     channel_type: str = commands.Param(
         description=response.get("settings-systemchannel-option-type"),
-        choices=("main", "server", "explanation")
+        choices=("main", "server", "explanation"),
     ),
     channel: disnake.TextChannel = commands.Param(
-        description=response.get("settings-systemchannel-option-channel"),
-        default=None
+        description=response.get("settings-systemchannel-option-channel"), default=None
     ),
 ):
     if isadmin(inter.author, inter.guild.id):
@@ -1235,7 +1261,9 @@ async def set_systemchannel(
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
-            await inter.edit_original_message(content=response.get("permission-error-channel"))
+            await inter.edit_original_message(
+                content=response.get("permission-error-channel")
+            )
             return
 
         if channel_type == "main":
@@ -1256,13 +1284,17 @@ async def set_systemchannel(
                 )
                 return
 
-        await inter.edit_original_message(content=response.get("systemchannels-success"))
+        await inter.edit_original_message(
+            content=response.get("systemchannels-success")
+        )
 
     else:
         await inter.edit_original_message(content=response.get("not-admin"))
 
 
-@settings_group.sub_command(name="notify", description=response.get("brief-settings-notify"))
+@settings_group.sub_command(
+    name="notify", description=response.get("brief-settings-notify")
+)
 async def toggle_notify(inter):
     if isadmin(inter.author, inter.guild.id):
         await inter.response.defer()
@@ -1274,13 +1306,15 @@ async def toggle_notify(inter):
 
 
 @commands.is_owner()
-@settings_group.sub_command(name="language", description=response.get("brief-settings-language"))
+@settings_group.sub_command(
+    name="language", description=response.get("brief-settings-language")
+)
 async def set_language(
     inter,
     new_language: str = commands.Param(
         name="language",
         description=response.get("settings-language-option-language"),
-        choices=available_languages
+        choices=response.languages(),
     ),
 ):
     await inter.response.defer()
@@ -1295,7 +1329,9 @@ async def set_language(
 
 
 @commands.is_owner()
-@settings_group.sub_command(name="colour", description=response.get("brief-settings-colour"))
+@settings_group.sub_command(
+    name="colour", description=response.get("brief-settings-colour")
+)
 async def set_colour(
     inter,
     colour: str = commands.Param(
@@ -1316,23 +1352,26 @@ async def set_colour(
             description=response.get("example-embed-new-colour"),
             colour=botcolour,
         )
-        await inter.edit_original_message(content=response.get("colour-changed"), embed=example)
+        await inter.edit_original_message(
+            content=response.get("colour-changed"), embed=example
+        )
 
     except ValueError:
         await inter.edit_original_message(content=response.get("colour-hex-error"))
 
 
 @commands.is_owner()
-@settings_group.sub_command(name="activity", description=response.get("brief-settings-activity"))
+@settings_group.sub_command(
+    name="activity", description=response.get("brief-settings-activity")
+)
 async def change_activity(
     inter,
     action: str = commands.Param(
         description=response.get("settings-activity-option-action"),
-        choices=("add", "remove", "list")
+        choices=("add", "remove", "list"),
     ),
     activity: str = commands.Param(
-        description=response.get("settings-activity-option-activity"),
-        default=None
+        description=response.get("settings-activity-option-activity"), default=None
     ),
 ):
     await inter.response.defer()
@@ -1408,10 +1447,12 @@ async def hlp(inter):
 @commands.has_permissions(administrator=True)
 async def admin(
     inter,
-    action: str = commands.Param(description=response.get("admin-option-action"), choices=("add", "remove", "list")),
+    action: str = commands.Param(
+        description=response.get("admin-option-action"),
+        choices=("add", "remove", "list"),
+    ),
     role: disnake.Role = commands.Param(
-        description=response.get("admin-option-role"),
-        default=None
+        description=response.get("admin-option-role"), default=None
     ),
 ):
     await inter.response.defer()
@@ -1439,7 +1480,9 @@ async def admin(
                 )
             )
         else:
-            await inter.edit_original_message(content=response.get("adminlist-local-empty"))
+            await inter.edit_original_message(
+                content=response.get("adminlist-local-empty")
+            )
 
     elif action == "add":
         # Adds an admin role ID to the database
@@ -1481,7 +1524,9 @@ async def print_version(inter):
         )
         em.set_footer(text=f"{botname}", icon_url=logo)
         await inter.edit_original_message(
-            content=response.get("version").format(version=__version__, latest_version=latest),
+            content=response.get("version").format(
+                version=__version__, latest_version=latest
+            ),
             embed=em,
         )
 
