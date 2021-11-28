@@ -56,9 +56,9 @@ class Help(commands.Cog):
                 + response.get("help-version")
                 + response.get("help-footer").format(version=self.bot.version)
             )
-
         else:
             await inter.send(content=response.get("not-admin"))
+
 
 def setup(bot):
     bot.add_cog(Help(bot))

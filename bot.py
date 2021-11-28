@@ -38,8 +38,9 @@ extensions = (
     "cogs.message",
     "cogs.ready",
     "cogs.roles",
-    "cogs.settings"
+    "cogs.settings",
 )
+
 
 class ReactionLight(commands.Bot):
     def __init__(self):
@@ -49,14 +50,9 @@ class ReactionLight(commands.Bot):
         self.db = database.Database(f"{self.directory}/files/reactionlight.db")
         self.version = version.get(self.directory)
         intents = disnake.Intents(
-            guild_messages=True,
-            guild_reactions=True,
-            guilds=True
+            guild_messages=True, guild_reactions=True, guilds=True
         )
-        super().__init__(
-            command_prefix=self.config.prefix,
-            intents=intents
-        )
+        super().__init__(command_prefix=self.config.prefix, intents=intents)
 
         for extension in extensions:
             self.load_extension(extension)
@@ -118,16 +114,13 @@ class ReactionLight(commands.Bot):
                         await target_channel.send(text, embed=embed)
                     else:
                         await target_channel.send(text)
-
                 except disnake.Forbidden:
                     await self.system_notification(None, text)
-
             else:
                 if embed:
                     await self.system_notification(None, text, embed=embed)
                 else:
                     await self.system_notification(None, text)
-
         elif self.system_channel:
             try:
                 target_channel = await self.getchannel(self.system_channel)
@@ -135,13 +128,10 @@ class ReactionLight(commands.Bot):
                     await target_channel.send(text, embed=embed)
                 else:
                     await target_channel.send(text)
-
             except disnake.NotFound:
                 print(response.get("systemchannel-404"))
-
             except disnake.Forbidden:
                 print(response.get("systemchannel-403"))
-
         else:
             print(text)
 
@@ -172,11 +162,12 @@ class ReactionLight(commands.Bot):
 
     async def getmember(self, guild, user_id):
         member = guild.get_member(user_id)
+
         if not member:
             member = await guild.fetch_member(user_id)
 
         return member
-            
+
 
 rl = ReactionLight()
 

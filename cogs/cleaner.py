@@ -81,7 +81,6 @@ class Cleaner(commands.Cog):
                             message_id=message, channel=channel.mention
                         ),
                     )
-
             except disnake.Forbidden:
                 # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
                 await self.bot.system_notification(
@@ -94,7 +93,9 @@ class Cleaner(commands.Cog):
         if isinstance(guilds, Exception):
             await self.bot.system_notification(
                 None,
-                response.get("db-error-fetching-cleaning-guild").format(exception=guilds),
+                response.get("db-error-fetching-cleaning-guild").format(
+                    exception=guilds
+                ),
             )
             return
 
@@ -103,7 +104,6 @@ class Cleaner(commands.Cog):
                 await self.bot.fetch_guild(guild_id)
                 if guild_id in cleanup_guild_ids:
                     self.bot.db.remove_cleanup_guild(guild_id)
-
             except disnake.Forbidden:
                 # If unknown guild
                 if guild_id in cleanup_guild_ids:
@@ -125,6 +125,7 @@ class Cleaner(commands.Cog):
             return
 
         current_timestamp = round(datetime.utcnow().timestamp())
+
         for guild in cleanup_guilds:
             if int(guild[1]) - current_timestamp <= -86400:
                 # The guild has been invalid / unreachable for more than 24 hrs, try one more fetch then give up and purge the guilds database entries
@@ -132,7 +133,6 @@ class Cleaner(commands.Cog):
                     await self.bot.fetch_guild(guild[0])
                     self.bot.db.remove_cleanup_guild(guild[0])
                     continue
-
                 except disnake.Forbidden:
                     delete = self.bot.db.remove_guild(guild[0])
                     delete2 = self.bot.db.remove_cleanup_guild(guild[0])
@@ -144,7 +144,6 @@ class Cleaner(commands.Cog):
                             ),
                         )
                         return
-
                     elif isinstance(delete2, Exception):
                         await self.bot.system_notification(
                             None,
@@ -153,7 +152,6 @@ class Cleaner(commands.Cog):
                             ),
                         )
                         return
-
 
     @tasks.loop(hours=6)
     async def check_cleanup_queued_guilds(self):
@@ -167,6 +165,7 @@ class Cleaner(commands.Cog):
 
             except disnake.Forbidden:
                 continue
+
 
 def setup(bot):
     bot.add_cog(Cleaner(bot))

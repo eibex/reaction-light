@@ -48,6 +48,7 @@ class Control(commands.Cog):
         await self.bot.wait_until_ready()
         # Sends a reminder once a day if there are updates available
         new_version = await github.check_for_updates(self.bot.version)
+
         if new_version:
             changelog = await github.latest_changelog()
             em = disnake.Embed(
@@ -55,7 +56,9 @@ class Control(commands.Cog):
                 description=changelog,
                 colour=self.bot.config.botcolour,
             )
-            em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+            em.set_footer(
+                text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo
+            )
             await self.bot.system_notification(
                 None,
                 response.get("update-notification").format(new_version=new_version),
@@ -66,7 +69,9 @@ class Control(commands.Cog):
     async def controlbot_group(self, inter):
         pass
 
-    @controlbot_group.sub_command(name="version", description=response.get("brief-version"))
+    @controlbot_group.sub_command(
+        name="version", description=response.get("brief-version")
+    )
     async def print_version(self, inter):
         if self.bot.isadmin(inter.author, inter.guild.id):
             await inter.response.defer()
@@ -77,17 +82,17 @@ class Control(commands.Cog):
                 description=changelog,
                 colour=self.bot.config.botcolour,
             )
-            em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+            em.set_footer(
+                text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo
+            )
             await inter.edit_original_message(
                 content=response.get("version").format(
                     version=self.bot.version, latest_version=latest
                 ),
                 embed=em,
             )
-
         else:
             await inter.edit_original_message(content=response.get("not-admin"))
-
 
     @commands.is_owner()
     @controlbot_group.sub_command(name="kill", description=response.get("brief-kill"))
@@ -96,22 +101,23 @@ class Control(commands.Cog):
         await inter.edit_original_message(content=response.get("shutdown"))
         await self.bot.close()
 
-
     @commands.is_owner()
-    @controlbot_group.sub_command(name="restart", description=response.get("brief-restart"))
+    @controlbot_group.sub_command(
+        name="restart", description=response.get("brief-restart")
+    )
     async def restart_cmd(self, inter):
         if platform != "win32":
             self.restart()
             await inter.response.defer()
             await inter.edit_original_message(content=response.get("restart"))
             await self.bot.close()
-
         else:
             await inter.send(response.get("windows-error"))
 
-
     @commands.is_owner()
-    @controlbot_group.sub_command(name="update", description=response.get("brief-update"))
+    @controlbot_group.sub_command(
+        name="update", description=response.get("brief-update")
+    )
     async def update(self, inter):
         if platform != "win32":
             await inter.response.defer()
@@ -122,13 +128,16 @@ class Control(commands.Cog):
             cmd = os.popen("git pull")
             cmd.close()
             await inter.edit_original_message(content=response.get("database-backup"))
-            copy(f"{self.directory}/files/reactionlight.db", f"{self.directory}/files/reactionlight.db.bak")
+            copy(
+                f"{self.directory}/files/reactionlight.db",
+                f"{self.directory}/files/reactionlight.db.bak",
+            )
             self.restart()
             await inter.edit_original_message(content=response.get("restart"))
             await self.bot.close()
-
         else:
             await inter.send(response.get("windows-error"))
+
 
 def setup(bot):
     bot.add_cog(Control(bot))

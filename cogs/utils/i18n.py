@@ -59,6 +59,7 @@ class Response:
             )
         return response
 
+
 directory = Path(__file__).parents[2]
 
 config = configparser.ConfigParser()

@@ -35,5 +35,6 @@ class Ready(commands.Cog):
         print("Reaction Light ready!")
         await self.bot.database_updates()
 
+
 def setup(bot):
     bot.add_cog(Ready(bot))

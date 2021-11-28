@@ -38,5 +38,4 @@ class Locks:
             return self.locks[user_id]
 
 
-
 lock_manager = Locks()

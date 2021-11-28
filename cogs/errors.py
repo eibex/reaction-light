@@ -40,5 +40,6 @@ class Errors(commands.Cog):
             traceback.print_tb(error.__traceback__)
             print(error)
 
+
 def setup(bot):
     bot.add_cog(Errors(bot))

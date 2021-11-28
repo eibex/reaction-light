@@ -40,7 +40,9 @@ class Message(commands.Cog):
         if isinstance(all_messages, Exception):
             await self.bot.system_notification(
                 channel.guild.id,
-                response.get("db-error-fetching-messages").format(exception=all_messages),
+                response.get("db-error-fetching-messages").format(
+                    exception=all_messages
+                ),
             )
             return
 
@@ -67,7 +69,9 @@ class Message(commands.Cog):
     async def message_group(self, inter):
         pass
 
-    @message_group.sub_command(name="new", description=response.get("brief-message-new"))
+    @message_group.sub_command(
+        name="new", description=response.get("brief-message-new")
+    )
     async def new(self, inter):
         if self.bot.isadmin(inter.author, inter.guild.id):
             await inter.send(response.get("new-reactionrole-init"))
@@ -108,7 +112,9 @@ class Message(commands.Cog):
                                 error_messages.append(
                                     (
                                         await inter.channel.send(
-                                            response.get("new-reactionrole-already-used")
+                                            response.get(
+                                                "new-reactionrole-already-used"
+                                            )
                                         )
                                     )
                                 )
@@ -121,7 +127,9 @@ class Message(commands.Cog):
                                     error_messages.append(
                                         (
                                             await inter.channel.send(
-                                                response.get("new-reactionrole-emoji-403")
+                                                response.get(
+                                                    "new-reactionrole-emoji-403"
+                                                )
                                             )
                                         )
                                     )
@@ -265,12 +273,16 @@ class Message(commands.Cog):
                                 error_messages.append(
                                     (
                                         await inter.channel.send(
-                                            response.get("new-reactionrole-already-exists")
+                                            response.get(
+                                                "new-reactionrole-already-exists"
+                                            )
                                         )
                                     )
                                 )
                     except asyncio.TimeoutError:
-                        await inter.author.send(response.get("new-reactionrole-timeout"))
+                        await inter.author.send(
+                            response.get("new-reactionrole-timeout")
+                        )
                         cancelled = True
                     finally:
                         await sent_oldmessage_message.delete()
@@ -300,7 +312,9 @@ class Message(commands.Cog):
                                     )
                                 )
                     except asyncio.TimeoutError:
-                        await inter.author.send(response.get("new-reactionrole-timeout"))
+                        await inter.author.send(
+                            response.get("new-reactionrole-timeout")
+                        )
                         cancelled = True
                     finally:
                         await sent_channel_message.delete()
@@ -315,7 +329,9 @@ class Message(commands.Cog):
                     description="Embed_content",
                     colour=self.bot.config.botcolour,
                 )
-                selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                selector_embed.set_footer(
+                    text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo
+                )
 
                 sent_message_message = await message.channel.send(
                     response.get("new-reactionrole-message-contents"),
@@ -335,7 +351,10 @@ class Message(commands.Cog):
                             msg_values[0] if msg_values[0].lower() != "none" else None
                         )
                         selector_embed = disnake.Embed(colour=self.bot.config.botcolour)
-                        selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                        selector_embed.set_footer(
+                            text=f"{self.bot.config.botname}",
+                            icon_url=self.bot.config.logo,
+                        )
 
                         if len(msg_values) > 1:
                             if msg_values[1].lower() != "none":
@@ -370,7 +389,9 @@ class Message(commands.Cog):
                                         await message.channel.send(
                                             response.get(
                                                 "new-reactionrole-message-send-permission-error"
-                                            ).format(channel_mention=target_channel.mention)
+                                            ).format(
+                                                channel_mention=target_channel.mention
+                                            )
                                         )
                                     )
                                 )
@@ -409,7 +430,9 @@ class Message(commands.Cog):
         else:
             await inter.send(response.get("new-reactionrole-noadmin"))
 
-    @message_group.sub_command(name="edit", description=response.get("brief-message-edit"))
+    @message_group.sub_command(
+        name="edit", description=response.get("brief-message-edit")
+    )
     async def edit_selector(
         self,
         inter,
@@ -439,7 +462,6 @@ class Message(commands.Cog):
                             channel_name=channel.name
                         )
                     )
-
                 elif len(all_messages) > 1:
                     await inter.edit_original_message(
                         content=response.get("edit-reactionrole-instructions").format(
@@ -448,12 +470,10 @@ class Message(commands.Cog):
                             message_list="\n".join(all_messages),
                         )
                     )
-
                 else:
                     await inter.edit_original_message(
                         content=response.get("no-reactionrole-messages")
                     )
-
             else:
                 try:
                     # Tries to edit the reaction-role message
@@ -482,14 +502,12 @@ class Message(commands.Cog):
                                 break
 
                             counter += 1
-
                     else:
                         await inter.send(response.get("reactionrole-not-exists"))
                         return
 
                     if message_to_edit_id:
                         old_msg = await channel.fetch_message(int(message_to_edit_id))
-
                     else:
                         await inter.send(response.get("select-valid-reactionrole"))
                         return
@@ -500,12 +518,18 @@ class Message(commands.Cog):
                     if title:
                         selector_embed.title = title
                         selector_embed.colour = self.bot.config.botcolour
-                        selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                        selector_embed.set_footer(
+                            text=f"{self.bot.config.botname}",
+                            icon_url=self.bot.config.logo,
+                        )
 
                     if description:
                         selector_embed.description = description
                         selector_embed.colour = self.bot.config.botcolour
-                        selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                        selector_embed.set_footer(
+                            text=f"{self.bot.config.botname}",
+                            icon_url=self.bot.config.logo,
+                        )
 
                     try:
 
@@ -513,40 +537,35 @@ class Message(commands.Cog):
                             await old_msg.edit(
                                 content=selector_msg_new_body, embed=selector_embed
                             )
-
                         else:
-                            await old_msg.edit(content=selector_msg_new_body, embed=None)
+                            await old_msg.edit(
+                                content=selector_msg_new_body, embed=None
+                            )
 
                         await inter.edit_original_message(
                             content=response.get("message-edited")
                         )
-
                     except disnake.Forbidden:
                         await inter.edit_original_message(
                             content=response.get("other-author-error")
                         )
                         return
-
                     except disnake.HTTPException as e:
                         if e.code == 50006:
                             await inter.edit_original_message(
                                 content=response.get("empty-message-error")
                             )
-
                         else:
                             guild_id = inter.guild.id
                             await self.bot.system_notification(guild_id, str(e))
-
                 except IndexError:
                     await inter.edit_original_message(
                         content=response.get("invalid-target-channel")
                     )
-
                 except disnake.Forbidden:
                     await inter.edit_original_message(
                         content=response.get("edit-permission-error")
                     )
-
         else:
             await inter.send(response.get("not-admin"))
 
@@ -584,7 +603,6 @@ class Message(commands.Cog):
                         )
                     )
                     return
-
                 elif len(all_messages) > 1:
                     await inter.edit_original_message(
                         content=response.get("reaction-edit-multi").format(
@@ -594,7 +612,6 @@ class Message(commands.Cog):
                         )
                     )
                     return
-
                 else:
                     await inter.edit_original_message(
                         content=response.get("no-reactionrole-messages")
@@ -628,7 +645,6 @@ class Message(commands.Cog):
                         break
 
                     counter += 1
-
             else:
                 await inter.edit_original_message(
                     content=response.get("reactionrole-not-exists")
@@ -637,7 +653,6 @@ class Message(commands.Cog):
 
             if message_to_edit_id:
                 message_to_edit = await channel.fetch_message(int(message_to_edit_id))
-
             else:
                 await inter.edit_original_message(
                     content=response.get("select-valid-reactionrole")
@@ -648,7 +663,6 @@ class Message(commands.Cog):
                 try:
                     # Check that the bot can actually use the emoji
                     await message_to_edit.add_reaction(reaction)
-
                 except disnake.HTTPException:
                     await inter.edit_original_message(
                         content=response.get("new-reactionrole-emoji-403")
@@ -660,7 +674,8 @@ class Message(commands.Cog):
                     await self.bot.system_notification(
                         inter.guild.id,
                         response.get("db-error-add-reaction").format(
-                            channel_mention=message_to_edit.channel.mention, exception=react
+                            channel_mention=message_to_edit.channel.mention,
+                            exception=react,
                         ),
                     )
                     return
@@ -674,7 +689,6 @@ class Message(commands.Cog):
                 await inter.edit_original_message(
                     content=response.get("reaction-edit-add-success")
                 )
-
             elif action == "remove":
                 try:
                     await message_to_edit.clear_reaction(reaction)
@@ -686,11 +700,13 @@ class Message(commands.Cog):
                     return
 
                 react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
+
                 if isinstance(react, Exception):
                     await self.bot.system_notification(
                         inter.guild.id,
                         response.get("db-error-remove-reaction").format(
-                            channel_mention=message_to_edit.channel.mention, exception=react
+                            channel_mention=message_to_edit.channel.mention,
+                            exception=react,
                         ),
                     )
                     return
@@ -698,9 +714,9 @@ class Message(commands.Cog):
                 await inter.edit_original_message(
                     content=response.get("reaction-edit-remove-success")
                 )
-
         else:
             await inter.send(response.get("not-admin"))
+
 
 def setup(bot):
     bot.add_cog(Message(bot))

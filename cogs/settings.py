@@ -54,7 +54,8 @@ class Settings(commands.Cog):
             choices=("main", "server", "explanation"),
         ),
         channel: disnake.TextChannel = commands.Param(
-            description=response.get("settings-systemchannel-option-channel"), default=None
+            description=response.get("settings-systemchannel-option-channel"),
+            default=None,
         ),
     ):
         if self.bot.isadmin(inter.author, inter.guild.id):
@@ -75,10 +76,14 @@ class Settings(commands.Cog):
                     server_channel = server_channel[0][0]
 
                 main_text = (
-                    (await self.bot.getchannel(self.bot.config.system_channel)).mention if self.bot.config.system_channel else "none"
+                    (await self.bot.getchannel(self.bot.config.system_channel)).mention
+                    if self.bot.config.system_channel
+                    else "none"
                 )
                 server_text = (
-                    (await self.bot.getchannel(server_channel)).mention if server_channel else "none"
+                    (await self.bot.getchannel(server_channel)).mention
+                    if server_channel
+                    else "none"
                 )
                 await inter.edit_original_message(
                     content=response.get("systemchannels-info").format(
@@ -99,7 +104,6 @@ class Settings(commands.Cog):
 
             if channel_type == "main":
                 self.bot.config.update("server", "system_channel", str(channel.id))
-
             elif channel_type == "server":
                 add_channel = self.bot.db.add_systemchannel(inter.guild.id, channel.id)
 
@@ -115,10 +119,8 @@ class Settings(commands.Cog):
             await inter.edit_original_message(
                 content=response.get("systemchannels-success")
             )
-
         else:
             await inter.edit_original_message(content=response.get("not-admin"))
-
 
     @settings_group.sub_command(
         name="notify", description=response.get("brief-settings-notify")
@@ -128,10 +130,13 @@ class Settings(commands.Cog):
             await inter.response.defer()
             notify = self.bot.db.toggle_notify(inter.guild.id)
             if notify:
-                await inter.edit_original_message(content=response.get("notifications-on"))
+                await inter.edit_original_message(
+                    content=response.get("notifications-on")
+                )
             else:
-                await inter.edit_original_message(content=response.get("notifications-off"))
-
+                await inter.edit_original_message(
+                    content=response.get("notifications-off")
+                )
 
     @commands.is_owner()
     @settings_group.sub_command(
@@ -149,7 +154,6 @@ class Settings(commands.Cog):
         self.bot.config.update("server", "language", language)
         response.language = language
         await inter.edit_original_message(content=response.get("language-success"))
-
 
     @commands.is_owner()
     @settings_group.sub_command(
@@ -178,7 +182,6 @@ class Settings(commands.Cog):
         except ValueError:
             await inter.edit_original_message(content=response.get("colour-hex-error"))
 
-
     @commands.is_owner()
     @settings_group.sub_command(
         name="activity", description=response.get("brief-settings-activity")
@@ -204,7 +207,6 @@ class Settings(commands.Cog):
                 await inter.send(
                     response.get("activity-success").format(new_activity=activity)
                 )
-
         elif action == "list":
             if self.bot.activities.activity_list:
                 formatted_list = []
@@ -219,19 +221,19 @@ class Settings(commands.Cog):
 
             else:
                 await inter.send(response.get("no-current-activities"))
-
         elif action == "remove" and activity:
             removed = self.bot.activities.remove(activity)
             if removed:
                 await inter.send(
-                    response.get("rm-activity-success").format(activity_to_delete=activity)
+                    response.get("rm-activity-success").format(
+                        activity_to_delete=activity
+                    )
                 )
-
             else:
                 await inter.send(response.get("rm-activity-not-exists"))
-
         else:
             await inter.send(response.get("activity-add-list-remove"))
+
 
 def setup(bot):
     bot.add_cog(Settings(bot))

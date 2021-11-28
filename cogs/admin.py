@@ -52,7 +52,9 @@ class Admin(commands.Cog):
             if isinstance(admin_ids, Exception):
                 await self.bot.system_notification(
                     inter.guild.id,
-                    response.get("db-error-fetching-admins").format(exception=admin_ids),
+                    response.get("db-error-fetching-admins").format(
+                        exception=admin_ids
+                    ),
                 )
                 return
 
@@ -97,7 +99,10 @@ class Admin(commands.Cog):
                 )
                 return
 
-            await inter.edit_original_message(content=response.get("admin-remove-success"))
+            await inter.edit_original_message(
+                content=response.get("admin-remove-success")
+            )
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))
