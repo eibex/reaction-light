@@ -22,9 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
 import os
+from pathlib import Path
 import json
+import configparser
 
 
 class Response:
@@ -57,3 +58,12 @@ class Response:
                 f"Could not find a translation ({self.language}) for the requested i18n item: {item}. Please file an issue on GitHub."
             )
         return response
+
+directory = Path(__file__).parents[2]
+
+config = configparser.ConfigParser()
+config.read(f"{directory}/config.ini")
+
+language = str(config.get("server", "language", fallback="en-gb"))
+
+response = Response(f"{directory}/files/i18n", language)
