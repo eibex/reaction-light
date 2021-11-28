@@ -58,85 +58,83 @@ class Settings(commands.Cog):
             default=None,
         ),
     ):
-        if self.bot.isadmin(inter.author, inter.guild.id):
-            global system_channel
-            await inter.response.defer()
-            if not channel or channel_type not in ("main", "server"):
-                server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
-                if isinstance(server_channel, Exception):
-                    await self.bot.system_notification(
-                        None,
-                        response.get("db-error-fetching-systemchannels").format(
-                            exception=server_channel
-                        ),
-                    )
-                    return
+        if not self.bot.isadmin(inter.author, inter.guild.id):
+            await inter.send(content=response.get("not-admin"))
+            return
 
-                if server_channel:
-                    server_channel = server_channel[0][0]
-
-                main_text = (
-                    (await self.bot.getchannel(self.bot.config.system_channel)).mention
-                    if self.bot.config.system_channel
-                    else "none"
-                )
-                server_text = (
-                    (await self.bot.getchannel(server_channel)).mention
-                    if server_channel
-                    else "none"
-                )
-                await inter.edit_original_message(
-                    content=response.get("systemchannels-info").format(
-                        main_channel=main_text, server_channel=server_text
-                    )
+        await inter.response.defer()
+        if not channel or channel_type not in ("main", "server"):
+            server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
+            if isinstance(server_channel, Exception):
+                await self.bot.system_notification(
+                    None,
+                    response.get("db-error-fetching-systemchannels").format(
+                        exception=server_channel
+                    ),
                 )
                 return
 
-            bot_user = inter.guild.get_member(self.bot.user.id)
-            bot_permissions = channel.permissions_for(bot_user)
-            writable = bot_permissions.read_messages
-            readable = bot_permissions.view_channel
-            if not writable or not readable:
-                await inter.edit_original_message(
-                    content=response.get("permission-error-channel")
-                )
-                return
+            if server_channel:
+                server_channel = server_channel[0][0]
 
-            if channel_type == "main":
-                self.bot.config.update("server", "system_channel", str(channel.id))
-            elif channel_type == "server":
-                add_channel = self.bot.db.add_systemchannel(inter.guild.id, channel.id)
-
-                if isinstance(add_channel, Exception):
-                    await self.bot.system_notification(
-                        inter.guild.id,
-                        response.get("db-error-adding-systemchannels").format(
-                            exception=add_channel
-                        ),
-                    )
-                    return
-
-            await inter.edit_original_message(
-                content=response.get("systemchannels-success")
+            main_text = (
+                (await self.bot.getchannel(self.bot.config.system_channel)).mention
+                if self.bot.config.system_channel
+                else "none"
             )
-        else:
-            await inter.edit_original_message(content=response.get("not-admin"))
+            server_text = (
+                (await self.bot.getchannel(server_channel)).mention
+                if server_channel
+                else "none"
+            )
+            await inter.edit_original_message(
+                content=response.get("systemchannels-info").format(
+                    main_channel=main_text, server_channel=server_text
+                )
+            )
+            return
+
+        bot_user = inter.guild.get_member(self.bot.user.id)
+        bot_permissions = channel.permissions_for(bot_user)
+        writable = bot_permissions.read_messages
+        readable = bot_permissions.view_channel
+        if not writable or not readable:
+            await inter.edit_original_message(
+                content=response.get("permission-error-channel")
+            )
+            return
+
+        if channel_type == "main":
+            self.bot.config.update("server", "system_channel", str(channel.id))
+        elif channel_type == "server":
+            add_channel = self.bot.db.add_systemchannel(inter.guild.id, channel.id)
+
+            if isinstance(add_channel, Exception):
+                await self.bot.system_notification(
+                    inter.guild.id,
+                    response.get("db-error-adding-systemchannels").format(
+                        exception=add_channel
+                    ),
+                )
+                return
+
+        await inter.edit_original_message(
+            content=response.get("systemchannels-success")
+        )
 
     @settings_group.sub_command(
         name="notify", description=response.get("brief-settings-notify")
     )
     async def toggle_notify(self, inter):
-        if self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.response.defer()
-            notify = self.bot.db.toggle_notify(inter.guild.id)
-            if notify:
-                await inter.edit_original_message(
-                    content=response.get("notifications-on")
-                )
-            else:
-                await inter.edit_original_message(
-                    content=response.get("notifications-off")
-                )
+        if not self.bot.isadmin(inter.author, inter.guild.id):
+            return
+
+        await inter.response.defer()
+        notify = self.bot.db.toggle_notify(inter.guild.id)
+        if notify:
+            await inter.edit_original_message(content=response.get("notifications-on"))
+        else:
+            await inter.edit_original_message(content=response.get("notifications-off"))
 
     @commands.is_owner()
     @settings_group.sub_command(

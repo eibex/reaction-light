@@ -73,26 +73,25 @@ class Control(commands.Cog):
         name="version", description=response.get("brief-version")
     )
     async def print_version(self, inter):
-        if self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.response.defer()
-            latest = await github.get_latest()
-            changelog = await github.latest_changelog()
-            em = disnake.Embed(
-                title=f"Reaction Light v{latest} - Changes",
-                description=changelog,
-                colour=self.bot.config.botcolour,
-            )
-            em.set_footer(
-                text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo
-            )
-            await inter.edit_original_message(
-                content=response.get("version").format(
-                    version=self.bot.version, latest_version=latest
-                ),
-                embed=em,
-            )
-        else:
+        if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.edit_original_message(content=response.get("not-admin"))
+            return
+
+        await inter.response.defer()
+        latest = await github.get_latest()
+        changelog = await github.latest_changelog()
+        em = disnake.Embed(
+            title=f"Reaction Light v{latest} - Changes",
+            description=changelog,
+            colour=self.bot.config.botcolour,
+        )
+        em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+        await inter.edit_original_message(
+            content=response.get("version").format(
+                version=self.bot.version, latest_version=latest
+            ),
+            embed=em,
+        )
 
     @commands.is_owner()
     @controlbot_group.sub_command(name="kill", description=response.get("brief-kill"))
