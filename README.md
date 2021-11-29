@@ -41,28 +41,21 @@ This bot requires [disnake](https://github.com/DisnakeDev/disnake) and Python 3.
 
 You can get disnake via PyPI or GitHub:
 ```
-python3 -m pip install -U disnake
+python3 -m pip install -r requirements.txt
 ```
 
 ## Setup
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
-- Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
+- Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) or edit it manually
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
-    - Make sure you enabled the message intent on your bot developer page
-  - Set a name to appear in embed footers (default: Reaction Light)
-  - URL of the footer logo (default: same as picture above)
-  - Hexadecimal value of embeds (default: 0xffff00 (yellow))
-- **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
-  - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
-  - If you want a static activity just add one line.
-  - Do not use commas `,`.
-- Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
-  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
+  - You can set most of the other values via commands later (set manually `name` and `logo`, which appear in the footer of each embed)
+- Activate the message content intent for your bot (found at: https://discord.com/developers/applications/ under the bot section)
+- Invite the bot to your server(s) with enough permissions using the following link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
 ```
 https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560
 ```
-- On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+- On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` (or your bot's name) in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `/admin add @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
 ## Running the bot
@@ -139,7 +132,7 @@ Type `/bot update` to update the bot and restart it.
 - Start the bot again
 
 ### Manually updating a zip install
-This is not the recommended way to manage the bot files, consider moving to git. You can copy your `files` folder and the `config.ini` file to maintain the bot functionality with older reaction-role messages. 
+This is not the recommended way to manage the bot files, consider moving to git. You can copy your `files` folder and the `config.ini` file to maintain the bot functionality with older reaction-role messages.
 
 If you downloaded the bot as a zip archive:
 

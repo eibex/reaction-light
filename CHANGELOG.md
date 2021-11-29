@@ -1,15 +1,15 @@
 # Reaction Light - Changelog
 ### 3.0.0
-- Support slash commands and drop prefixes ([#83](https://github.com/eibex/reaction-light/issues/83) closed by [#87](https://github.com/eibex/reaction-light/pull/87) by [eibex](https://github.com/eibex))
-- This version is breaking. Version 2.5.0 will continue working until Discord supports the old API (April 2022)
-- README:
+- Support slash commands and drop prefixes, refactor into cogs ([#13](https://github.com/eibex/reaction-light/issues/13), [#82](https://github.com/eibex/reaction-light/issues/82), [#83](https://github.com/eibex/reaction-light/issues/83) closed by [#88](https://github.com/eibex/reaction-light/pull/88) by [eibex](https://github.com/eibex))
+- This version is **BREAKING**. Version 2.5.0 will continue working until Discord supports the old API (April 2022).
+- **README**:
   - What you need to do to make the bot work BEFORE updating:
     - `python3 -m pip uninstall discord.py`
-    - `python3 -m pip install -U disnake`
+    - `python3 -m pip install -U disnake` (or `python3 -m pip install -r requirements.txt` while in the bot directory)
   - What you need to do to make the bot work AFTER updating:
     - Reauthorize your bot with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
-    - On https://discord.com/developers select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
-    - Wait ~1 hour before Discord register your bot's commands
+    - On https://discord.com/developers/applications select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
+    - Wait ~1 hour before Discord register your bot's commands (kicking and re-inviting the bot *might* speed the process up)
   
 ### 2.5.0
 - Fix `rl!new` showing unsuccessful reaction when the message creation was actually successful
