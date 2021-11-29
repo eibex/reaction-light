@@ -1,4 +1,5 @@
 # Reaction Light - Discord Role Bot
+[![Reaction Light Discord Server](https://discord.com/api/guilds/914952998109716531/widget.png)](https://discord.gg/cqxZQkhhHm)
 [![Reaction Light 3.0.0](https://img.shields.io/badge/Reaction%20Light-3.0.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
 [![disnake 2.2.2+](https://img.shields.io/badge/disnake-2.2.2+-blue.svg)](#)
@@ -157,6 +158,7 @@ Run `/admin add @Role` to give all users with that role permission to manage Rea
 
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
+You can also join our [Discord server](https://discord.gg/cqxZQkhhHm).
 
 ## Contribute
 If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting is preferred. 

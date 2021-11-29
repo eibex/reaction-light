@@ -10,6 +10,7 @@
     - Reauthorize your bot with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
     - On https://discord.com/developers/applications select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
     - Wait ~1 hour before Discord register your bot's commands (kicking and re-inviting the bot *might* speed the process up)
+- We now also have a Discord server which you can join [here](https://discord.gg/cqxZQkhhHm)
   
 ### 2.5.0
 - Fix `rl!new` showing unsuccessful reaction when the message creation was actually successful
