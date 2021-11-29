@@ -21,12 +21,14 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 
 ## Contents
 - [Requirements](#requirements)
-- [Setup](#setup)
-- [Running the bot](#running-the-bot)
+- [Deployment](#deployment)
+  - [Docker](#docker)
+  - [Git and Zip](#git-and-zip)
 - [Commands](#commands)
   - [Usage Example](#usage-example)
 - [Updating](#updating)
   - [Update a git install with a command](#update-a-git-install-with-a-command)
+  - [Manually updating a docker installation](#manually-updating-a-docker-installation)
   - [Manually updating a git install](#manually-updating-a-git-install)
   - [Manually updating a zip install](#manually-updating-a-zip-install)
 - [Roadmap](#roadmap)
@@ -43,7 +45,37 @@ You can get discord.py (and other dependencies) via PyPI:
 python3 -m pip install -U discord.py
 ```
 
-## Setup
+## Deployment
+## Docker 
+- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
+  - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
+  - Create a bot and retrive its token on https://discord.com/developers/applications/
+    - Make sure you enabled the **messages members intent** on your bot developer page
+- **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
+  - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
+  - If you want a static activity just add one line.
+  - Do not use commas `,`.
+- Build the Docker image using `docker build -t reaction-light .`
+- Create and start a container using 
+```bash
+docker run -d \
+  --name reaction-light \
+  --restart always \
+  -e TOKEN=<TOKEN> \
+  -e NAME="Reaction Light" \
+  -e SYSTEM_CHANNEL=<SYSTEM_CHANNEL_ID> \
+  -e LOGO="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg" \
+  -e COLOUR="0xffff00" \
+  -e LANGUAGE="en-gb" \
+  -v /path/to/reaction-light/files:/bot/files \
+  reaction-light
+```
+- Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
+  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=8`
+- On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+- Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
+## Git and Zip
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) and edit it manually:
@@ -63,16 +95,14 @@ python3 -m pip install -U discord.py
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
-## Running the bot
-The bot can be run by using:
-```
-python3 bot.py
-```
-
-To run it as a background task (recommended unless debugging):
-```
-nohup python3 bot.py &
-```
+- The bot can be run by using:
+  ```
+  python3 bot.py
+  ```
+- To run it as a background task (recommended unless debugging):
+  ```
+  nohup python3 bot.py &
+  ```
 
 ## Commands
 All commands require an admin role which you can set by using `rl!admin` (requires administrator permissions on the server). The bot will reply with missing permissions otherwise. Executing a command without any argument will prompt the bot to provide you with instructions on how to use the command effectively. In the following list the default prefix `rl!` is used, but it can be freely changed in the `config.ini` file.
@@ -133,6 +163,26 @@ If you set a system channel in `config.ini`, your bot will check for new version
 
 ### Update a git install with a command
 Type `rl!update` to update the bot and restart it.
+
+### Manually updating a docker installation
+- Navigate to the reaction-light directory
+- Run `git pull origin master`
+- Stop and delete the reaction-light container using `docker stop reaction-light && docker rm reaction-light`
+- Rebuild the Docker image using `docker build -t reaction-light .`
+- Create and start a new container using 
+```bash
+docker run -d \
+  --name reaction-light \
+  --restart always \
+  -e TOKEN=<TOKEN> \
+  -e NAME="Reaction Light" \
+  -e SYSTEM_CHANNEL=<SYSTEM_CHANNEL_ID> \
+  -e LOGO="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg" \
+  -e COLOUR="0xffff00" \
+  -e LANGUAGE="en-gb" \
+  -v /path/to/reaction-light/files:/bot/files \
+  reaction-light
+```
 
 ### Manually updating a git install
 - Navigate to the reaction-light directory
