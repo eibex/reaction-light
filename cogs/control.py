@@ -126,13 +126,13 @@ class Control(commands.Cog):
             cmd.close()
             cmd = os.popen("git pull")
             cmd.close()
-            await inter.edit_original_message(content=response.get("database-backup"))
+            await inter.channel.send(response.get("database-backup"))
             copy(
                 f"{self.directory}/files/reactionlight.db",
                 f"{self.directory}/files/reactionlight.db.bak",
             )
             self.restart()
-            await inter.edit_original_message(content=response.get("restart"))
+            await inter.channel.send(response.get("restart"))
             await self.bot.close()
         else:
             await inter.send(response.get("windows-error"))
