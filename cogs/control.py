@@ -128,8 +128,8 @@ class Control(commands.Cog):
             cmd.close()
             await inter.channel.send(response.get("database-backup"))
             copy(
-                f"{self.directory}/files/reactionlight.db",
-                f"{self.directory}/files/reactionlight.db.bak",
+                f"{self.bot.directory}/files/reactionlight.db",
+                f"{self.bot.directory}/files/reactionlight.db.bak",
             )
             self.restart()
             await inter.channel.send(response.get("restart"))
