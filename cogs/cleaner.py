@@ -36,7 +36,7 @@ class Cleaner(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        self.bot.db.remove_guild(guild.id)
+        self.bot.db.add_cleanup_guild(guild.id, round(datetime.utcnow().timestamp()))
 
     @tasks.loop(hours=24)
     async def cleandb(self):
@@ -160,7 +160,7 @@ class Cleaner(commands.Cog):
         cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
         for guild_id in cleanup_guild_ids:
             try:
-                await self.bot.bot.fetch_guild(guild_id)
+                await self.bot.fetch_guild(guild_id)
                 self.bot.db.remove_cleanup_guild(guild_id)
 
             except disnake.Forbidden:
