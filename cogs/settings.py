@@ -43,19 +43,15 @@ class Settings(commands.Cog):
     async def settings_group(self, inter):
         pass
 
-    @settings_group.sub_command(
-        name="systemchannel", description=response.get("brief-settings-systemchannel")
-    )
+    @settings_group.sub_command(name="systemchannel", description=response.get("brief-settings-systemchannel"))
     async def set_systemchannel(
         self,
         inter,
         channel_type: str = commands.Param(
-            description=response.get("settings-systemchannel-option-type"),
-            choices=("main", "server", "explanation"),
+            description=response.get("settings-systemchannel-option-type"), choices=("main", "server", "explanation")
         ),
         channel: disnake.TextChannel = commands.Param(
-            description=response.get("settings-systemchannel-option-channel"),
-            default=None,
+            description=response.get("settings-systemchannel-option-channel"), default=None
         ),
     ):
         if not self.bot.isadmin(inter.author, inter.guild.id):
@@ -67,10 +63,7 @@ class Settings(commands.Cog):
             server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
             if isinstance(server_channel, Exception):
                 await self.bot.system_notification(
-                    None,
-                    response.get("db-error-fetching-systemchannels").format(
-                        exception=server_channel
-                    ),
+                    None, response.get("db-error-fetching-systemchannels").format(exception=server_channel)
                 )
                 return
 
@@ -78,19 +71,11 @@ class Settings(commands.Cog):
                 server_channel = server_channel[0][0]
 
             main_text = (
-                (await self.bot.getchannel(self.bot.config.system_channel)).mention
-                if self.bot.config.system_channel
-                else "none"
+                (await self.bot.getchannel(self.bot.config.system_channel)).mention if self.bot.config.system_channel else "none"
             )
-            server_text = (
-                (await self.bot.getchannel(server_channel)).mention
-                if server_channel
-                else "none"
-            )
+            server_text = (await self.bot.getchannel(server_channel)).mention if server_channel else "none"
             await inter.edit_original_message(
-                content=response.get("systemchannels-info").format(
-                    main_channel=main_text, server_channel=server_text
-                )
+                content=response.get("systemchannels-info").format(main_channel=main_text, server_channel=server_text)
             )
             return
 
@@ -99,9 +84,7 @@ class Settings(commands.Cog):
         writable = bot_permissions.read_messages
         readable = bot_permissions.view_channel
         if not writable or not readable:
-            await inter.edit_original_message(
-                content=response.get("permission-error-channel")
-            )
+            await inter.edit_original_message(content=response.get("permission-error-channel"))
             return
 
         if channel_type == "main":
@@ -111,20 +94,13 @@ class Settings(commands.Cog):
 
             if isinstance(add_channel, Exception):
                 await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-adding-systemchannels").format(
-                        exception=add_channel
-                    ),
+                    inter.guild.id, response.get("db-error-adding-systemchannels").format(exception=add_channel)
                 )
                 return
 
-        await inter.edit_original_message(
-            content=response.get("systemchannels-success")
-        )
+        await inter.edit_original_message(content=response.get("systemchannels-success"))
 
-    @settings_group.sub_command(
-        name="notify", description=response.get("brief-settings-notify")
-    )
+    @settings_group.sub_command(name="notify", description=response.get("brief-settings-notify"))
     async def toggle_notify(self, inter):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             return
@@ -137,15 +113,12 @@ class Settings(commands.Cog):
             await inter.edit_original_message(content=response.get("notifications-off"))
 
     @commands.is_owner()
-    @settings_group.sub_command(
-        name="language", description=response.get("brief-settings-language")
-    )
+    @settings_group.sub_command(name="language", description=response.get("brief-settings-language"))
     async def set_language(
         self,
         inter,
         language: str = commands.Param(
-            description=response.get("settings-language-option-language"),
-            choices=response.languages(),
+            description=response.get("settings-language-option-language"), choices=response.languages()
         ),
     ):
         await inter.response.defer()
@@ -154,16 +127,8 @@ class Settings(commands.Cog):
         await inter.edit_original_message(content=response.get("language-success"))
 
     @commands.is_owner()
-    @settings_group.sub_command(
-        name="colour", description=response.get("brief-settings-colour")
-    )
-    async def set_colour(
-        self,
-        inter,
-        colour: str = commands.Param(
-            description=response.get("settings-colour-option-colour")
-        ),
-    ):
+    @settings_group.sub_command(name="colour", description=response.get("brief-settings-colour"))
+    async def set_colour(self, inter, colour: str = commands.Param(description=response.get("settings-colour-option-colour"))):
         await inter.response.defer()
         try:
             self.bot.config.botcolour = disnake.Colour(int(colour, 16))
@@ -173,27 +138,20 @@ class Settings(commands.Cog):
                 description=response.get("example-embed-new-colour"),
                 colour=self.bot.config.botcolour,
             )
-            await inter.edit_original_message(
-                content=response.get("colour-changed"), embed=example
-            )
+            await inter.edit_original_message(content=response.get("colour-changed"), embed=example)
 
         except ValueError:
             await inter.edit_original_message(content=response.get("colour-hex-error"))
 
     @commands.is_owner()
-    @settings_group.sub_command(
-        name="activity", description=response.get("brief-settings-activity")
-    )
+    @settings_group.sub_command(name="activity", description=response.get("brief-settings-activity"))
     async def change_activity(
         self,
         inter,
         action: str = commands.Param(
-            description=response.get("settings-activity-option-action"),
-            choices=("add", "remove", "list"),
+            description=response.get("settings-activity-option-action"), choices=("add", "remove", "list")
         ),
-        activity: str = commands.Param(
-            description=response.get("settings-activity-option-activity"), default=None
-        ),
+        activity: str = commands.Param(description=response.get("settings-activity-option-activity"), default=None),
     ):
         await inter.response.defer()
         if action == "add" and activity:
@@ -202,31 +160,21 @@ class Settings(commands.Cog):
 
             else:
                 self.bot.activities.add(activity)
-                await inter.send(
-                    response.get("activity-success").format(new_activity=activity)
-                )
+                await inter.send(response.get("activity-success").format(new_activity=activity))
         elif action == "list":
             if self.bot.activities.activity_list:
                 formatted_list = []
                 for item in self.bot.activities.activity_list:
                     formatted_list.append(f"`{item}`")
 
-                await inter.send(
-                    response.get("current-activities").format(
-                        activity_list="\n- ".join(formatted_list)
-                    )
-                )
+                await inter.send(response.get("current-activities").format(activity_list="\n- ".join(formatted_list)))
 
             else:
                 await inter.send(response.get("no-current-activities"))
         elif action == "remove" and activity:
             removed = self.bot.activities.remove(activity)
             if removed:
-                await inter.send(
-                    response.get("rm-activity-success").format(
-                        activity_to_delete=activity
-                    )
-                )
+                await inter.send(response.get("rm-activity-success").format(activity_to_delete=activity))
             else:
                 await inter.send(response.get("rm-activity-not-exists"))
         else:

@@ -38,9 +38,7 @@ class Config:
         self.botname = str(self.config.get("server", "name", fallback="Reaction Light"))
         # We are leaving prefix as a dummy variable for now since it is still a positional argument of commands.Bot
         self.prefix = str(self.config.get("server", "prefix", fallback="rl!"))
-        self.botcolour = disnake.Colour(
-            int(self.config.get("server", "colour", fallback="0xffff00"), 16)
-        )
+        self.botcolour = disnake.Colour(int(self.config.get("server", "colour", fallback="0xffff00"), 16))
         system_channel = self.config.get("server", "system_channel", fallback=None)
         self.system_channel = int(system_channel) if system_channel else None
         self.logo = str(self.config.get("server", "logo", fallback=None))
