@@ -9,7 +9,7 @@
     - `python3 -m pip install -U disnake` (or `python3 -m pip install -r requirements.txt` while in the bot directory)
     - Reauthorize your bot with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
     - On https://discord.com/developers/applications select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
-    - Wait ~1 hour before Discord register your bot's commands (kicking and re-inviting the bot *might* speed the process up)
+    - Wait ~1 hour before Discord register your bot's commands (do not kick the bot to speed the process up without first shutting it down)
 - If you need help with the transition feel free to ask on Reaction Light's Discord server which you can join [here](https://discord.gg/cqxZQkhhHm)
   
 ### 2.5.0
