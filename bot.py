@@ -121,9 +121,9 @@ class ReactionLight(commands.Bot):
                     await self.system_notification(None, text, embed=embed)
                 else:
                     await self.system_notification(None, text)
-        elif self.system_channel:
+        elif self.config.system_channel:
             try:
-                target_channel = await self.getchannel(self.system_channel)
+                target_channel = await self.getchannel(self.config.system_channel)
                 if embed:
                     await target_channel.send(text, embed=embed)
                 else:
