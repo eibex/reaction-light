@@ -37,10 +37,7 @@ print(f"Version: {__version__}")
 print("License: MIT\n")
 
 print("### ### Reaction Light Setup ### ###")
-print(
-    "If you would like more information about any of the steps, type 'help' as an"
-    " answer."
-)
+print("If you would like more information about any of the steps, type 'help' as an answer.")
 print(
     "If you would like to abort the configuration close the program. No input will be"
     " written to file until the setup is complete."
@@ -52,15 +49,9 @@ print(
 
 
 while True:
-    token = input(
-        "\nPaste the token of your bot user (you can create one at:"
-        " https://discord.com/developers/applications/)  "
-    )
+    token = input("\nPaste the token of your bot user (you can create one at: https://discord.com/developers/applications/)  ")
     if token.lower() == "help":
-        print(
-            "\nThe bot token looks like this:"
-            " NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n"
-        )
+        print("\nThe bot token looks like this: NDYzODUwNzM2OTk3MTA1NjY2.XSH7WA.w0WPO4tafLJ9rZoitBq1Q43AgnQ\n")
 
     elif token == "":
         continue
@@ -83,10 +74,7 @@ while True:
 
 
 while True:
-    logo = input(
-        "\nPaste the URL to your preferred logo file (should end in *.png, *.jpg,"
-        " *.webp, ...)  [readme.md logo]  "
-    )
+    logo = input("\nPaste the URL to your preferred logo file (should end in *.png, *.jpg, *.webp, ...)  [readme.md logo]  ")
     if logo.lower() == "help":
         print("\nThe logo is the picture shown in the footer of the embeds.\n")
 
@@ -116,14 +104,9 @@ while True:
 
 
 while True:
-    colour = input(
-        "Insert the hexadecimal value of the embed colour you prefer [0xffff00]  "
-    )
+    colour = input("Insert the hexadecimal value of the embed colour you prefer [0xffff00]  ")
     if colour.lower() == "help":
-        print(
-            "\nThe default is yellow. You can use a colour hex picker. You can change"
-            " the colour later with a command\n"
-        )
+        print("\nThe default is yellow. You can use a colour hex picker. You can change the colour later with a command\n")
 
     elif colour.lower() == "":
         colour = "0xffff00"

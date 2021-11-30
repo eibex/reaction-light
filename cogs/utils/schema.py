@@ -52,9 +52,7 @@ class SchemaHandler:
         cursor = conn.cursor()
         if version > 0:
             previous = version - 1
-            cursor.execute(
-                "UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous)
-            )
+            cursor.execute("UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous))
 
         else:
             cursor.execute("INSERT INTO dbinfo(version) values(?);", (version,))
@@ -103,16 +101,11 @@ class SchemaHandler:
             conn.commit()
             for guild in guilds:
                 for admin_id in guilds[guild]:
-                    cursor.execute(
-                        "UPDATE admins SET guild_id = ? WHERE role_id = ?;",
-                        (guild, admin_id),
-                    )
+                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
 
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';"
-        )
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';")
         systemchannels_table = cursor.fetchall()
         if systemchannels_table:
             cursor.execute("SELECT * FROM systemchannels;")
@@ -140,9 +133,7 @@ class SchemaHandler:
         columns = [value[1] for value in result]
         if "limit_to_one" not in columns:
             cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
-            cursor.execute(
-                "UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;"
-            )
+            cursor.execute("UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;")
             conn.commit()
 
         cursor.close()

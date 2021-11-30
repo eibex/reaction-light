@@ -36,13 +36,8 @@ class Admin(commands.Cog):
     async def admin(
         self,
         inter,
-        action: str = commands.Param(
-            description=response.get("admin-option-action"),
-            choices=("add", "remove", "list"),
-        ),
-        role: disnake.Role = commands.Param(
-            description=response.get("admin-option-role"), default=None
-        ),
+        action: str = commands.Param(description=response.get("admin-option-action"), choices=("add", "remove", "list")),
+        role: disnake.Role = commands.Param(description=response.get("admin-option-role"), default=None),
     ):
         await inter.response.defer()
         if role is None or action == "list":
@@ -51,39 +46,27 @@ class Admin(commands.Cog):
 
             if isinstance(admin_ids, Exception):
                 await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-fetching-admins").format(
-                        exception=admin_ids
-                    ),
+                    inter.guild.id, response.get("db-error-fetching-admins").format(exception=admin_ids)
                 )
                 return
 
             adminrole_objects = []
             for admin_id in admin_ids:
-                adminrole_objects.append(
-                    disnake.utils.get(inter.guild.roles, id=admin_id).mention
-                )
+                adminrole_objects.append(disnake.utils.get(inter.guild.roles, id=admin_id).mention)
 
             if adminrole_objects:
                 await inter.edit_original_message(
-                    content=response.get("adminlist-local").format(
-                        admin_list="\n- ".join(adminrole_objects)
-                    )
+                    content=response.get("adminlist-local").format(admin_list="\n- ".join(adminrole_objects))
                 )
             else:
-                await inter.edit_original_message(
-                    content=response.get("adminlist-local-empty")
-                )
+                await inter.edit_original_message(content=response.get("adminlist-local-empty"))
 
         elif action == "add":
             # Adds an admin role ID to the database
             add = self.bot.db.add_admin(role.id, inter.guild.id)
 
             if isinstance(add, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-admin-add").format(exception=add),
-                )
+                await self.bot.system_notification(inter.guild.id, response.get("db-error-admin-add").format(exception=add))
                 return
 
             await inter.edit_original_message(content=response.get("admin-add-success"))
@@ -93,15 +76,10 @@ class Admin(commands.Cog):
             remove = self.bot.db.remove_admin(role.id, inter.guild.id)
 
             if isinstance(remove, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-admin-remove").format(exception=remove),
-                )
+                await self.bot.system_notification(inter.guild.id, response.get("db-error-admin-remove").format(exception=remove))
                 return
 
-            await inter.edit_original_message(
-                content=response.get("admin-remove-success")
-            )
+            await inter.edit_original_message(content=response.get("admin-remove-success"))
 
 
 def setup(bot):
