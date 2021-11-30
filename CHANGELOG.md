@@ -5,6 +5,7 @@
 - **README**:
   - DO NOT RUN `rl!update`
   - BEFORE updating you need to replace discord.py since it's [no longer developed](https://gist.github.com/Rapptz/4a2f62751b9600a31a0d3c78100287f1) and update your bot permissions:
+    - Make sure your Python version is 3.8 or greater
     - `python3 -m pip uninstall discord.py`
     - `python3 -m pip install -U disnake` (or `python3 -m pip install -r requirements.txt` while in the bot directory)
     - Reauthorize your bot with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
