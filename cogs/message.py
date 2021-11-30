@@ -82,7 +82,7 @@ class Message(commands.Cog):
         cancelled = False
 
         def check(message):
-            return message.author.id == inter.author.id and message.content != ""
+            return message.author.id == inter.author.id and message.content != "" and message.channel.id == inter.channel.id
 
         if not cancelled:
             error_messages = []
