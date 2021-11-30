@@ -108,7 +108,7 @@ class Control(commands.Cog):
             cmd = os.popen("git pull")
             cmd.close()
             await inter.channel.send(response.get("database-backup"))
-            copy(f"{self.directory}/files/reactionlight.db", f"{self.directory}/files/reactionlight.db.bak")
+            copy(f"{self.bot.directory}/files/reactionlight.db", f"{self.bot.directory}/files/reactionlight.db.bak")
             self.restart()
             await inter.channel.send(response.get("restart"))
             await self.bot.close()

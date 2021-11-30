@@ -34,7 +34,7 @@ def initialize(database):
         "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
         " 'reactionrole_id' INT, 'guild_id' INT, 'limit_to_one' INT);"
     )
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction'" " NVCARCHAR, 'role_id' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
@@ -108,7 +108,7 @@ class Database:
             cursor = conn.cursor()
             cursor.execute("SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,))
             reactionrole_id = cursor.fetchall()[0][0]
-            cursor.execute("SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id" " = ?;", (reactionrole_id,))
+            cursor.execute("SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
             combos = {}
             for row in cursor:
                 reaction = row[0]
@@ -270,7 +270,7 @@ class Database:
         notify = 0
         channel_id = 0
         cursor.execute(
-            "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel')" " values(?, ?, ?);",
+            "INSERT OR IGNORE INTO guild_settings ('guild_id', 'notify', 'systemchannel') values(?, ?, ?);",
             (guild_id, notify, channel_id),
         )
         conn.commit()
@@ -360,7 +360,7 @@ class Database:
                 return False
 
             cursor.execute(
-                "INSERT INTO reactionroles ('reactionrole_id', 'reaction', 'role_id')" " values(?, ?, ?);",
+                "INSERT INTO reactionroles ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);",
                 (reactionrole_id, reaction, role_id),
             )
             conn.commit()
