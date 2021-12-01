@@ -143,7 +143,7 @@ If you downloaded the bot as a zip archive:
 - Start the bot again
 
 ## Roadmap
-Upcoming features can be found in the open issues and PRs tagged with **new feature**. They can be found [here](https://github.com/eibex/reaction-light/issues?q=is%3Aopen+label%3A%22new+feature%22).
+Upcoming features can be found in the open issues and PRs tagged with **new feature** or **enhancement**. They can be found [here](https://github.com/eibex/reaction-light/issues?q=is%3Aopen).
 
 Open a new issue if you would like to see a feature implemented, and/or open a pull request implementing it.
 
