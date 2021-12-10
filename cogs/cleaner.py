@@ -66,13 +66,20 @@ class Cleaner(commands.Cog):
                     try:
                         self.bot.db.delete(message[0])
                     except DatabaseError as error:
-                        await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=error), channel.guild.id)
+                        await self.bot.report(
+                            response.get("db-error-fetching-cleaning").format(exception=error), channel.guild.id
+                        )
                         return
 
-                    await self.bot.report(response.get("db-message-delete-success").format(message_id=message, channel=channel.mention), channel.guild.id)
+                    await self.bot.report(
+                        response.get("db-message-delete-success").format(message_id=message, channel=channel.mention),
+                        channel.guild.id,
+                    )
             except disnake.Forbidden:
                 # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
-                await self.bot.report(response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]), message[3])
+                await self.bot.report(
+                    response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]), message[3]
+                )
 
         try:
             guilds = self.bot.db.fetch_all_guilds()

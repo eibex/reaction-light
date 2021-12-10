@@ -120,7 +120,6 @@ class Database:
         conn.close()
         return unique
 
-
     def fetch_messages(self, channel):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()

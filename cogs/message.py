@@ -207,7 +207,9 @@ class Message(commands.Cog):
                             try:
                                 message_already_exists = self.bot.db.exists(message.id)
                             except DatabaseError as error:
-                                await self.bot.report(response.get("db-error-message-exists").format(exception=error), inter.guild.id)
+                                await self.bot.report(
+                                    response.get("db-error-message-exists").format(exception=error), inter.guild.id
+                                )
                                 return
                             if message_already_exists:
                                 raise ValueError
@@ -500,7 +502,12 @@ class Message(commands.Cog):
             try:
                 react = self.bot.db.add_reaction(message_to_edit.id, role.id, reaction)
             except DatabaseError as error:
-                await self.bot.report(response.get("db-error-add-reaction").format(channel_mention=message_to_edit.channel.mention, exception=error), inter.guild.id)
+                await self.bot.report(
+                    response.get("db-error-add-reaction").format(
+                        channel_mention=message_to_edit.channel.mention, exception=error
+                    ),
+                    inter.guild.id,
+                )
                 return
 
             if not react:
@@ -519,7 +526,12 @@ class Message(commands.Cog):
             try:
                 react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
             except DatabaseError as error:
-                await self.bot.report(response.get("db-error-remove-reaction").format(channel_mention=message_to_edit.channel.mention, exception=error), inter.guild.id)
+                await self.bot.report(
+                    response.get("db-error-remove-reaction").format(
+                        channel_mention=message_to_edit.channel.mention, exception=error
+                    ),
+                    inter.guild.id,
+                )
                 return
 
             await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))
