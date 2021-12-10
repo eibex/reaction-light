@@ -1,4 +1,11 @@
 # Reaction Light - Changelog
+### 3.0.1
+- Make sure to read [v3.0.0 patch notes](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md#300) if you are updating from v2.x.x
+- Fixed an issue with `/bot update` not restarting the bot: you might need to `/bot restart` after using `/bot update` to update from v3.0.0
+- Fixed an issue with database cleaning and added a 6 hours delay between the bot being kicked from a guild and the removal of all the guild's data, if the bot is re-invited, the data won't be deleted ([#89](https://github.com/eibex/reaction-light/pull/89) by [eibex](https://github.com/eibex))
+- The bot will now only listen to `/message new` answers in the channel the interaction was started ([#90](https://github.com/eibex/reaction-light/pull/90) by [Edwinexd](https://github.com/Edwinexd))
+- Better error reporting ([#92](https://github.com/eibex/reaction-light/issues/92) closed by [#97](https://github.com/eibex/reaction-light/pull/97) by [eibex](https://github.com/eibex))
+
 ### 3.0.0
 - Support slash commands and drop prefixes, refactor into cogs ([#13](https://github.com/eibex/reaction-light/issues/13), [#82](https://github.com/eibex/reaction-light/issues/82), [#83](https://github.com/eibex/reaction-light/issues/83) closed by [#88](https://github.com/eibex/reaction-light/pull/88) by [eibex](https://github.com/eibex))
 - This version is **BREAKING**. Version 2.5.0 will continue working until Discord supports the old API (April 2022).
