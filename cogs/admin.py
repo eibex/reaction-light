@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
 from cogs.utils.i18n import response
@@ -42,10 +43,10 @@ class Admin(commands.Cog):
         await inter.response.defer()
         if role is None or action == "list":
             # Lists all admin IDs in the database, mentioning them if possible
-            admin_ids = self.bot.db.get_admins(inter.guild.id)
-
-            if isinstance(admin_ids, Exception):
-                await self.bot.report(response.get("db-error-fetching-admins").format(exception=admin_ids), inter.guild.id)
+            try:
+                admin_ids = self.bot.db.get_admins(inter.guild.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-fetching-admins").format(exception=error), inter.guild.id)
                 return
 
             adminrole_objects = []
@@ -61,20 +62,20 @@ class Admin(commands.Cog):
 
         elif action == "add":
             # Adds an admin role ID to the database
-            add = self.bot.db.add_admin(role.id, inter.guild.id)
-
-            if isinstance(add, Exception):
-                await self.bot.report(response.get("db-error-admin-add").format(exception=add), inter.guild.id)
+            try:
+                self.bot.db.add_admin(role.id, inter.guild.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-admin-add").format(exception=error), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("admin-add-success"))
 
         elif action == "remove":
             # Removes an admin role ID from the database
-            remove = self.bot.db.remove_admin(role.id, inter.guild.id)
-
-            if isinstance(remove, Exception):
-                await self.bot.report(response.get("db-error-admin-remove").format(exception=remove), inter.guild.id)
+            try:
+                self.bot.db.remove_admin(role.id, inter.guild.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-admin-remove").format(exception=error), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("admin-remove-success"))

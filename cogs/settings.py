@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands, tasks
 from cogs.utils.i18n import response
@@ -60,9 +61,10 @@ class Settings(commands.Cog):
 
         await inter.response.defer()
         if not channel or channel_type not in ("main", "server"):
-            server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
-            if isinstance(server_channel, Exception):
-                await self.bot.report(response.get("db-error-fetching-systemchannels").format(exception=server_channel))
+            try:
+                server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-fetching-systemchannels").format(exception=error))
                 return
 
             if server_channel:
@@ -88,10 +90,10 @@ class Settings(commands.Cog):
         if channel_type == "main":
             self.bot.config.update("server", "system_channel", str(channel.id))
         elif channel_type == "server":
-            add_channel = self.bot.db.add_systemchannel(inter.guild.id, channel.id)
-
-            if isinstance(add_channel, Exception):
-                await self.bot.report(response.get("db-error-adding-systemchannels").format(exception=add_channel), inter.guild.id)
+            try:
+                self.bot.db.add_systemchannel(inter.guild.id, channel.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-adding-systemchannels").format(exception=error), inter.guild.id)
                 return
 
         await inter.edit_original_message(content=response.get("systemchannels-success"))
@@ -102,7 +104,11 @@ class Settings(commands.Cog):
             return
 
         await inter.response.defer()
-        notify = self.bot.db.toggle_notify(inter.guild.id)
+        try:
+            notify = self.bot.db.toggle_notify(inter.guild.id)
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-toggle-notify").format(exception=error), inter.guild.id)
+            return
         if notify:
             await inter.edit_original_message(content=response.get("notifications-on"))
         else:

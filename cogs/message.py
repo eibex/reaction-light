@@ -24,6 +24,7 @@ SOFTWARE.
 
 
 import asyncio
+from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
 from cogs.utils.i18n import response
@@ -36,9 +37,10 @@ class Message(commands.Cog):
 
     async def formatted_channel_list(self, channel):
         # Returns a formatted numbered list of reaction roles message present in a given channel
-        all_messages = self.bot.db.fetch_messages(channel.id)
-        if isinstance(all_messages, Exception):
-            await self.bot.report(response.get("db-error-fetching-messages").format(exception=all_messages), channel.guild.id)
+        try:
+            all_messages = self.bot.db.fetch_messages(channel.id)
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-messages").format(exception=error), channel.guild.id)
             return
 
         formatted_list = []
@@ -201,7 +203,13 @@ class Message(commands.Cog):
                                 await message.remove_reaction("🔧", inter.author)
                             except disnake.HTTPException:
                                 raise disnake.NotFound
-                            if self.bot.db.exists(message.id):
+
+                            try:
+                                message_already_exists = self.bot.db.exists(message.id)
+                            except DatabaseError as error:
+                                await self.bot.report(response.get("db-error-message-exists").format(exception=error), inter.guild.id)
+                                return
+                            if message_already_exists:
                                 raise ValueError
                             rl_object["message"] = dict(
                                 message_id=message.id, channel_id=message.channel.id, guild_id=message.guild.id
@@ -309,13 +317,12 @@ class Message(commands.Cog):
         if not cancelled:
             # Ait we are (almost) all done, now we just need to insert that into the database and add the reactions 💪
             try:
-                r = self.bot.db.add_reaction_role(rl_object)
+                self.bot.db.add_reaction_role(rl_object)
             except database.DuplicateInstance:
                 await inter.channel.send(response.get("new-reactionrole-already-exists"))
                 return
-
-            if isinstance(r, Exception):
-                await self.bot.report(response.get("db-error-new-reactionrole").format(exception=r), inter.guild.id)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-new-reactionrole").format(exception=error), inter.guild.id)
                 return
 
             for reaction, _ in rl_object["reactions"].items():
@@ -357,15 +364,14 @@ class Message(commands.Cog):
             try:
                 # Tries to edit the reaction-role message
                 # Raises errors if the channel sent was invalid or if the bot cannot edit the message
-                all_messages = self.bot.db.fetch_messages(channel.id)
+                try:
+                    all_messages = self.bot.db.fetch_messages(channel.id)
+                except DatabaseError as error:
+                    await self.bot.report(response.get("db-error-fetching-messages").format(message_ids=error), inter.guild.id)
+                    return
                 message = message if message.lower() != "none" else None
                 title = title if title.lower() != "none" else None
                 description = description if description.lower() != "none" else None
-
-                if isinstance(all_messages, Exception):
-                    await self.bot.report(response.get("db-error-fetching-messages").format(message_ids=all_messages), inter.guild.id)
-                    return
-
                 counter = 1
                 if all_messages:
                     message_to_edit_id = None
@@ -457,9 +463,10 @@ class Message(commands.Cog):
                 await inter.edit_original_message(content=response.get("no-role-mentioned"))
                 return
 
-        all_messages = self.bot.db.fetch_messages(channel.id)
-        if isinstance(all_messages, Exception):
-            await self.bot.report(response.get("db-error-fetching-messages").format(exception=all_messages), inter.guild.id)
+        try:
+            all_messages = self.bot.db.fetch_messages(channel.id)
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-messages").format(exception=error), inter.guild.id)
             return
 
         counter = 1
@@ -490,9 +497,10 @@ class Message(commands.Cog):
                 await inter.edit_original_message(content=response.get("new-reactionrole-emoji-403"))
                 return
 
-            react = self.bot.db.add_reaction(message_to_edit.id, role.id, reaction)
-            if isinstance(react, Exception):
-                await self.bot.report(response.get("db-error-add-reaction").format(channel_mention=message_to_edit.channel.mention, exception=react), inter.guild.id)
+            try:
+                react = self.bot.db.add_reaction(message_to_edit.id, role.id, reaction)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-add-reaction").format(channel_mention=message_to_edit.channel.mention, exception=error), inter.guild.id)
                 return
 
             if not react:
@@ -508,10 +516,10 @@ class Message(commands.Cog):
                 await inter.edit_original_message(content=response.get("reaction-edit-invalid-reaction"))
                 return
 
-            react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
-
-            if isinstance(react, Exception):
-                await self.bot.report(response.get("db-error-remove-reaction").format(channel_mention=message_to_edit.channel.mention, exception=react), inter.guild.id)
+            try:
+                react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-remove-reaction").format(channel_mention=message_to_edit.channel.mention, exception=error), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))

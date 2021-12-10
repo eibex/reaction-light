@@ -23,6 +23,7 @@ SOFTWARE.
 """
 
 from datetime import datetime
+from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands, tasks
 from cogs.utils.i18n import response
@@ -36,19 +37,20 @@ class Cleaner(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        self.bot.db.add_cleanup_guild(guild.id, round(datetime.utcnow().timestamp()))
+        try:
+            self.bot.db.add_cleanup_guild(guild.id, round(datetime.utcnow().timestamp()))
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-add-cleanup-removal").format(exception=error))
+            return
 
     @tasks.loop(hours=24)
     async def cleandb(self):
         await self.bot.wait_until_ready()
-        # Cleans the database by deleting rows of reaction role messages that don't exist anymore
-        messages = self.bot.db.fetch_all_messages()
-        guilds = self.bot.db.fetch_all_guilds()
-        # Get the cleanup queued guilds
-        cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
-
-        if isinstance(messages, Exception):
-            await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=messages))
+        try:
+            # Cleans the database by deleting rows of reaction role messages that don't exist anymore
+            messages = self.bot.db.fetch_all_messages()
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=error))
             return
 
         for message in messages:
@@ -61,10 +63,10 @@ class Cleaner(commands.Cog):
             except disnake.NotFound as e:
                 # If unknown channel or unknown message
                 if e.code == 10003 or e.code == 10008:
-                    delete = self.bot.db.delete(message[0])
-
-                    if isinstance(delete, Exception):
-                        await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=delete), channel.guild.id)
+                    try:
+                        self.bot.db.delete(message[0])
+                    except DatabaseError as error:
+                        await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=error), channel.guild.id)
                         return
 
                     await self.bot.report(response.get("db-message-delete-success").format(message_id=message, channel=channel.mention), channel.guild.id)
@@ -72,26 +74,41 @@ class Cleaner(commands.Cog):
                 # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
                 await self.bot.report(response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]), message[3])
 
-        if isinstance(guilds, Exception):
-            await self.bot.report(response.get("db-error-fetching-cleaning-guild").format(exception=guilds))
+        try:
+            guilds = self.bot.db.fetch_all_guilds()
+            # Get the cleanup queued guilds
+            cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-cleaning-guild").format(exception=error))
             return
 
         for guild_id in guilds:
             try:
                 await self.bot.fetch_guild(guild_id)
                 if guild_id in cleanup_guild_ids:
-                    self.bot.db.remove_cleanup_guild(guild_id)
+                    try:
+                        self.bot.db.remove_cleanup_guild(guild_id)
+                    except DatabaseError as error:
+                        await self.bot.report(response.get("db-error-removing-cleanup").format(exception=error))
+                        return
             except disnake.Forbidden:
                 # If unknown guild
                 if guild_id in cleanup_guild_ids:
                     continue
                 else:
-                    self.bot.db.add_cleanup_guild(guild_id, round(datetime.utcnow().timestamp()))
+                    try:
+                        self.bot.db.add_cleanup_guild(guild_id, round(datetime.utcnow().timestamp()))
+                    except DatabaseError as error:
+                        await self.bot.report(response.get("db-error-add-cleanup").format(exception=error))
+                        return
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-fetching-guild").format(exception=error))
+                return
 
-        cleanup_guilds = self.bot.db.fetch_cleanup_guilds()
-
-        if isinstance(cleanup_guilds, Exception):
-            await self.bot.report(response.get("db-error-fetching-cleanup-guild").format(exception=cleanup_guilds))
+        try:
+            cleanup_guilds = self.bot.db.fetch_cleanup_guilds()
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-cleanup-guild").format(exception=error))
             return
 
         current_timestamp = round(datetime.utcnow().timestamp())
@@ -104,27 +121,38 @@ class Cleaner(commands.Cog):
                     self.bot.db.remove_cleanup_guild(guild[0])
                     continue
                 except disnake.Forbidden:
-                    delete = self.bot.db.remove_guild(guild[0])
-                    delete2 = self.bot.db.remove_cleanup_guild(guild[0])
-                    if isinstance(delete, Exception):
-                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=delete))
+                    try:
+                        self.bot.db.remove_guild(guild[0])
+                    except DatabaseError as error:
+                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=error))
                         return
-                    elif isinstance(delete2, Exception):
-                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=delete2))
+                    try:
+                        self.bot.db.remove_cleanup_guild(guild[0])
+                    except DatabaseError as error:
+                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=error))
                         return
+                except DatabaseError as error:
+                    await self.bot.report(response.get("db-error-removing-cleanup").format(exception=error))
+                    return
 
     @tasks.loop(hours=6)
     async def check_cleanup_queued_guilds(self):
         await self.bot.wait_until_ready()
         # Checks if an unreachable guild has become available again and removes it from the cleanup queue
-        cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
+        try:
+            cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
+        except DatabaseError as error:
+            await self.bot.report(response.get("db-error-fetching-cleaning-guild").format(exception=error))
+            return
         for guild_id in cleanup_guild_ids:
             try:
                 await self.bot.fetch_guild(guild_id)
                 self.bot.db.remove_cleanup_guild(guild_id)
-
             except disnake.Forbidden:
                 continue
+            except DatabaseError as error:
+                await self.bot.report(response.get("db-error-removing-cleanup").format(exception=error))
+                return
 
 
 def setup(bot):
