@@ -24,6 +24,7 @@ SOFTWARE.
 
 
 import os
+from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
 from cogs.utils import database, activity, version, config, schema
@@ -57,10 +58,10 @@ class ReactionLight(commands.Bot):
 
     def isadmin(self, member, guild_id):
         # Checks if command author has an admin role that was added with rl!admin
-        admins = self.db.get_admins(guild_id)
-
-        if isinstance(admins, Exception):
-            print(response.get("db-error-admin-check").format(exception=admins))
+        try:
+            admins = self.db.get_admins(guild_id)
+        except DatabaseError as error:
+            print(response.get("db-error-admin-check").format(exception=error))
             return False
 
         try:
@@ -76,11 +77,19 @@ class ReactionLight(commands.Bot):
         handler = schema.SchemaHandler(f"{self.directory}/files/reactionlight.db", self)
         if handler.version == 0:
             handler.zero_to_one()
-            messages = self.db.fetch_all_messages()
+            try:
+                messages = self.db.fetch_all_messages()
+            except DatabaseError:
+                print("Couldn't fetch messages while migrating")
+                return
             for message in messages:
                 channel_id = message[1]
                 channel = await self.getchannel(channel_id)
-                self.db.add_guild(channel.id, channel.guild.id)
+                try:
+                    self.db.add_guild(channel.id, channel.guild.id)
+                except DatabaseError:
+                    print("Couldn't add guilds while migrating")
+                    return
 
         if handler.version == 1:
             handler.one_to_two()
@@ -88,15 +97,13 @@ class ReactionLight(commands.Bot):
         if handler.version == 2:
             handler.two_to_three()
 
-    async def system_notification(self, guild_id, text, embed=None):
+    async def report(self, text, guild_id=None, embed=None):
         # Send a message to the system channel (if set)
         if guild_id:
-            server_channel = self.db.fetch_systemchannel(guild_id)
-
-            if isinstance(server_channel, Exception):
-                await self.system_notification(
-                    None, response.get("db-error-fetching-systemchannels-server").format(exception=server_channel, text=text)
-                )
+            try:
+                server_channel = self.db.fetch_systemchannel(guild_id)
+            except DatabaseError as error:
+                await self.report(response.get("db-error-fetching-systemchannels-server").format(exception=error, text=text))
                 return
 
             if server_channel:
@@ -110,12 +117,12 @@ class ReactionLight(commands.Bot):
                     else:
                         await target_channel.send(text)
                 except disnake.Forbidden:
-                    await self.system_notification(None, text)
+                    await self.report(text)
             else:
                 if embed:
-                    await self.system_notification(None, text, embed=embed)
+                    await self.report(text, embed=embed)
                 else:
-                    await self.system_notification(None, text)
+                    await self.report(text)
         elif self.config.system_channel:
             try:
                 target_channel = await self.getchannel(self.config.system_channel)
