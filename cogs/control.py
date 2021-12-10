@@ -55,9 +55,7 @@ class Control(commands.Cog):
                 title=f"Reaction Light v{new_version} - Changes", description=changelog, colour=self.bot.config.botcolour
             )
             em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
-            await self.bot.system_notification(
-                None, response.get("update-notification").format(new_version=new_version), embed=em
-            )
+            await self.bot.report(response.get("update-notification").format(new_version=new_version), embed=em)
 
     @commands.slash_command(name="bot")
     async def controlbot_group(self, inter):

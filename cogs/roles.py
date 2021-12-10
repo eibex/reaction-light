@@ -43,13 +43,13 @@ class Roles(commands.Cog):
 
         async with (await lock_manager.get_lock(user_id)):
             if isinstance(exists, Exception):
-                await self.bot.system_notification(guild_id, response.get("db-error-reaction-add").format(exception=exists))
+                await self.bot.report(guild_id, response.get("db-error-reaction-add").format(exception=exists))
             elif exists:
                 # Checks that the message that was reacted to is a reaction-role message managed by the bot
                 reactions = self.bot.db.get_reactions(msg_id)
 
                 if isinstance(reactions, Exception):
-                    await self.bot.system_notification(
+                    await self.bot.report(
                         guild_id, response.get("db-error-reaction-get").format(exception=reactions)
                     )
                     return
@@ -82,7 +82,7 @@ class Roles(commands.Cog):
                             await member.add_roles(role)
                             notify = self.bot.db.notify(guild_id)
                             if isinstance(notify, Exception):
-                                await self.bot.system_notification(
+                                await self.bot.report(
                                     guild_id, response.get("db-error-notification-check").format(exception=notify)
                                 )
                                 return
@@ -90,7 +90,7 @@ class Roles(commands.Cog):
                             if notify:
                                 await user.send(response.get("new-role-dm").format(role_name=role.name))
                         except disnake.Forbidden:
-                            await self.bot.system_notification(guild_id, response.get("permission-error-add"))
+                            await self.bot.report(guild_id, response.get("permission-error-add"))
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -101,13 +101,13 @@ class Roles(commands.Cog):
         exists = self.bot.db.exists(msg_id)
 
         if isinstance(exists, Exception):
-            await self.bot.system_notification(guild_id, response.get("db-error-reaction-remove").format(exception=exists))
+            await self.bot.report(guild_id, response.get("db-error-reaction-remove").format(exception=exists))
         elif exists:
             # Checks that the message that was unreacted to is a reaction-role message managed by the bot
             reactions = self.bot.db.get_reactions(msg_id)
 
             if isinstance(reactions, Exception):
-                await self.bot.system_notification(guild_id, response.get("db-error-reaction-get").format(exception=reactions))
+                await self.bot.report(guild_id, response.get("db-error-reaction-get").format(exception=reactions))
             elif reaction in reactions:
                 role_id = reactions[reaction]
                 # Removes role if it has permissions, else 403 error is raised
@@ -119,15 +119,13 @@ class Roles(commands.Cog):
                     await member.remove_roles(role)
                     notify = self.bot.db.notify(guild_id)
                     if isinstance(notify, Exception):
-                        await self.bot.system_notification(
-                            guild_id, response.get("db-error-notification-check").format(exception=notify)
-                        )
+                        await self.bot.report(response.get("db-error-notification-check").format(exception=notify), guild_id)
                         return
 
                     if notify:
                         await member.send(response.get("removed-role-dm").format(role_name=role.name))
                 except disnake.Forbidden:
-                    await self.bot.system_notification(guild_id, response.get("permission-error-remove"))
+                    await self.bot.report(response.get("permission-error-remove"), guild_id)
 
 
 def setup(bot):

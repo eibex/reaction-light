@@ -88,15 +88,13 @@ class ReactionLight(commands.Bot):
         if handler.version == 2:
             handler.two_to_three()
 
-    async def system_notification(self, guild_id, text, embed=None):
+    async def report(self, text, guild_id=None, embed=None):
         # Send a message to the system channel (if set)
         if guild_id:
             server_channel = self.db.fetch_systemchannel(guild_id)
 
             if isinstance(server_channel, Exception):
-                await self.system_notification(
-                    None, response.get("db-error-fetching-systemchannels-server").format(exception=server_channel, text=text)
-                )
+                await self.report(response.get("db-error-fetching-systemchannels-server").format(exception=server_channel, text=text))
                 return
 
             if server_channel:
@@ -110,12 +108,12 @@ class ReactionLight(commands.Bot):
                     else:
                         await target_channel.send(text)
                 except disnake.Forbidden:
-                    await self.system_notification(None, text)
+                    await self.report(text)
             else:
                 if embed:
-                    await self.system_notification(None, text, embed=embed)
+                    await self.report(text, embed=embed)
                 else:
-                    await self.system_notification(None, text)
+                    await self.report(text)
         elif self.config.system_channel:
             try:
                 target_channel = await self.getchannel(self.config.system_channel)

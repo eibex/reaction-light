@@ -38,9 +38,7 @@ class Message(commands.Cog):
         # Returns a formatted numbered list of reaction roles message present in a given channel
         all_messages = self.bot.db.fetch_messages(channel.id)
         if isinstance(all_messages, Exception):
-            await self.bot.system_notification(
-                channel.guild.id, response.get("db-error-fetching-messages").format(exception=all_messages)
-            )
+            await self.bot.report(response.get("db-error-fetching-messages").format(exception=all_messages), channel.guild.id)
             return
 
         formatted_list = []
@@ -317,7 +315,7 @@ class Message(commands.Cog):
                 return
 
             if isinstance(r, Exception):
-                await self.bot.system_notification(inter.guild.id, response.get("db-error-new-reactionrole").format(exception=r))
+                await self.bot.report(response.get("db-error-new-reactionrole").format(exception=r), inter.guild.id)
                 return
 
             for reaction, _ in rl_object["reactions"].items():
@@ -365,9 +363,7 @@ class Message(commands.Cog):
                 description = description if description.lower() != "none" else None
 
                 if isinstance(all_messages, Exception):
-                    await self.bot.system_notification(
-                        inter.guild.id, response.get("db-error-fetching-messages").format(message_ids=all_messages)
-                    )
+                    await self.bot.report(response.get("db-error-fetching-messages").format(message_ids=all_messages), inter.guild.id)
                     return
 
                 counter = 1
@@ -419,7 +415,7 @@ class Message(commands.Cog):
                         await inter.edit_original_message(content=response.get("empty-message-error"))
                     else:
                         guild_id = inter.guild.id
-                        await self.bot.system_notification(guild_id, str(e))
+                        await self.bot.report(str(e), guild_id)
             except IndexError:
                 await inter.edit_original_message(content=response.get("invalid-target-channel"))
             except disnake.Forbidden:
@@ -463,9 +459,7 @@ class Message(commands.Cog):
 
         all_messages = self.bot.db.fetch_messages(channel.id)
         if isinstance(all_messages, Exception):
-            await self.bot.system_notification(
-                inter.guild.id, response.get("db-error-fetching-messages").format(exception=all_messages)
-            )
+            await self.bot.report(response.get("db-error-fetching-messages").format(exception=all_messages), inter.guild.id)
             return
 
         counter = 1
@@ -498,12 +492,7 @@ class Message(commands.Cog):
 
             react = self.bot.db.add_reaction(message_to_edit.id, role.id, reaction)
             if isinstance(react, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-add-reaction").format(
-                        channel_mention=message_to_edit.channel.mention, exception=react
-                    ),
-                )
+                await self.bot.report(response.get("db-error-add-reaction").format(channel_mention=message_to_edit.channel.mention, exception=react), inter.guild.id)
                 return
 
             if not react:
@@ -522,12 +511,7 @@ class Message(commands.Cog):
             react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
 
             if isinstance(react, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id,
-                    response.get("db-error-remove-reaction").format(
-                        channel_mention=message_to_edit.channel.mention, exception=react
-                    ),
-                )
+                await self.bot.report(response.get("db-error-remove-reaction").format(channel_mention=message_to_edit.channel.mention, exception=react), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))

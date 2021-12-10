@@ -45,9 +45,7 @@ class Admin(commands.Cog):
             admin_ids = self.bot.db.get_admins(inter.guild.id)
 
             if isinstance(admin_ids, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id, response.get("db-error-fetching-admins").format(exception=admin_ids)
-                )
+                await self.bot.report(response.get("db-error-fetching-admins").format(exception=admin_ids), inter.guild.id)
                 return
 
             adminrole_objects = []
@@ -66,7 +64,7 @@ class Admin(commands.Cog):
             add = self.bot.db.add_admin(role.id, inter.guild.id)
 
             if isinstance(add, Exception):
-                await self.bot.system_notification(inter.guild.id, response.get("db-error-admin-add").format(exception=add))
+                await self.bot.report(response.get("db-error-admin-add").format(exception=add), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("admin-add-success"))
@@ -76,7 +74,7 @@ class Admin(commands.Cog):
             remove = self.bot.db.remove_admin(role.id, inter.guild.id)
 
             if isinstance(remove, Exception):
-                await self.bot.system_notification(inter.guild.id, response.get("db-error-admin-remove").format(exception=remove))
+                await self.bot.report(response.get("db-error-admin-remove").format(exception=remove), inter.guild.id)
                 return
 
             await inter.edit_original_message(content=response.get("admin-remove-success"))

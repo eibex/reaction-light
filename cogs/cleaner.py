@@ -48,7 +48,7 @@ class Cleaner(commands.Cog):
         cleanup_guild_ids = self.bot.db.fetch_cleanup_guilds(guild_ids_only=True)
 
         if isinstance(messages, Exception):
-            await self.bot.system_notification(None, response.get("db-error-fetching-cleaning").format(exception=messages))
+            await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=messages))
             return
 
         for message in messages:
@@ -64,23 +64,16 @@ class Cleaner(commands.Cog):
                     delete = self.bot.db.delete(message[0])
 
                     if isinstance(delete, Exception):
-                        await self.bot.system_notification(
-                            channel.guild.id, response.get("db-error-fetching-cleaning").format(exception=delete)
-                        )
+                        await self.bot.report(response.get("db-error-fetching-cleaning").format(exception=delete), channel.guild.id)
                         return
 
-                    await self.bot.system_notification(
-                        channel.guild.id,
-                        response.get("db-message-delete-success").format(message_id=message, channel=channel.mention),
-                    )
+                    await self.bot.report(response.get("db-message-delete-success").format(message_id=message, channel=channel.mention), channel.guild.id)
             except disnake.Forbidden:
                 # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
-                await self.bot.system_notification(
-                    message[3], response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1])
-                )
+                await self.bot.report(response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]), message[3])
 
         if isinstance(guilds, Exception):
-            await self.bot.system_notification(None, response.get("db-error-fetching-cleaning-guild").format(exception=guilds))
+            await self.bot.report(response.get("db-error-fetching-cleaning-guild").format(exception=guilds))
             return
 
         for guild_id in guilds:
@@ -98,9 +91,7 @@ class Cleaner(commands.Cog):
         cleanup_guilds = self.bot.db.fetch_cleanup_guilds()
 
         if isinstance(cleanup_guilds, Exception):
-            await self.bot.system_notification(
-                None, response.get("db-error-fetching-cleanup-guild").format(exception=cleanup_guilds)
-            )
+            await self.bot.report(response.get("db-error-fetching-cleanup-guild").format(exception=cleanup_guilds))
             return
 
         current_timestamp = round(datetime.utcnow().timestamp())
@@ -116,14 +107,10 @@ class Cleaner(commands.Cog):
                     delete = self.bot.db.remove_guild(guild[0])
                     delete2 = self.bot.db.remove_cleanup_guild(guild[0])
                     if isinstance(delete, Exception):
-                        await self.bot.system_notification(
-                            None, response.get("db-error-deleting-cleaning-guild").format(exception=delete)
-                        )
+                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=delete))
                         return
                     elif isinstance(delete2, Exception):
-                        await self.bot.system_notification(
-                            None, response.get("db-error-deleting-cleaning-guild").format(exception=delete2)
-                        )
+                        await self.bot.report(response.get("db-error-deleting-cleaning-guild").format(exception=delete2))
                         return
 
     @tasks.loop(hours=6)

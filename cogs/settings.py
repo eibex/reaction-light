@@ -62,9 +62,7 @@ class Settings(commands.Cog):
         if not channel or channel_type not in ("main", "server"):
             server_channel = self.bot.db.fetch_systemchannel(inter.guild.id)
             if isinstance(server_channel, Exception):
-                await self.bot.system_notification(
-                    None, response.get("db-error-fetching-systemchannels").format(exception=server_channel)
-                )
+                await self.bot.report(response.get("db-error-fetching-systemchannels").format(exception=server_channel))
                 return
 
             if server_channel:
@@ -93,9 +91,7 @@ class Settings(commands.Cog):
             add_channel = self.bot.db.add_systemchannel(inter.guild.id, channel.id)
 
             if isinstance(add_channel, Exception):
-                await self.bot.system_notification(
-                    inter.guild.id, response.get("db-error-adding-systemchannels").format(exception=add_channel)
-                )
+                await self.bot.report(response.get("db-error-adding-systemchannels").format(exception=add_channel), inter.guild.id)
                 return
 
         await inter.edit_original_message(content=response.get("systemchannels-success"))
