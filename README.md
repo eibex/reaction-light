@@ -156,6 +156,10 @@ Ensure that you moved the `Reaction Light` role to a position that is hierarchic
 
 Run `/admin add @Role` to give all users with that role permission to manage Reaction Light. This is done to have server staff use the bot without giving them unnecessary server rights. The only server admin command is `/admin`.
 
+**I have updated from v2 to v3 and I do not see any slash commands**
+
+Ensure that you followed the update steps as outlined in the changelog for v3.0.0. If this still doesn't fix the issue, try to shutdown the bot and re-inviting it to your server with the link provided in this readme or in the changelog.
+
 ## Help
 If you need help with the bot or need to report bugs, post an issue [here](https://github.com/eibex/reaction-light/issues).
 You can also join our [Discord server](https://discord.gg/cqxZQkhhHm).
