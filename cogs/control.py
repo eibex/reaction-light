@@ -63,11 +63,11 @@ class Control(commands.Cog):
 
     @controlbot_group.sub_command(name="version", description=response.get("brief-version"))
     async def print_version(self, inter):
+        await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.edit_original_message(content=response.get("not-admin"))
             return
 
-        await inter.response.defer()
         latest = await github.get_latest()
         changelog = await github.latest_changelog()
         em = disnake.Embed(title=f"Reaction Light v{latest} - Changes", description=changelog, colour=self.bot.config.botcolour)
