@@ -129,7 +129,7 @@ Type `/bot update` to update the bot and restart it.
 ### Manually updating a git install
 - Navigate to the reaction-light directory
 - Run `git pull origin master`
-- Shutdown the bot by using the `/bot kill` command
+- Shutdown the bot by using the `/bot kill` command. You can also use `/bot restart` on Linux-based systems.
 - Start the bot again
 
 ### Manually updating a zip install
@@ -139,7 +139,7 @@ If you downloaded the bot as a zip archive:
 
 - Download the new zip
 - Extract it into the current reaction-light folder and replace old files with new ones if prompted to
-- Shutdown the bot by using the `/bot kill` command
+- Shutdown the bot by using the `/bot kill` command. You can also use `/bot restart` on Linux-based systems.
 - Start the bot again
 
 ## Roadmap
