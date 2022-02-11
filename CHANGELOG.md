@@ -1,4 +1,8 @@
 # Reaction Light - Changelog
+### 3.0.2
+- Fix `/bot version`
+- Bump disnake requirement to v2.3.2 (necessary to update disnake manually)
+
 ### 3.0.1
 - Make sure to read [v3.0.0 patch notes](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md#300) if you are updating from v2.x.x
 - Fixed an issue with `/bot update` not restarting the bot: you might need to `/bot restart` after using `/bot update` to update from v3.0.0
