@@ -1,6 +1,6 @@
 # Reaction Light - Changelog
 ### 3.0.3
-- Allow (once again) new lines via modals [#101](https://github.com/eibex/reaction-light/issues/101) closed by [#103](https://github.com/eibex/reaction-light/pull/103) by [eibex](https://github.com/eibex)
+- Allow (once again) new lines via modals ([#101](https://github.com/eibex/reaction-light/issues/101) closed by [#103](https://github.com/eibex/reaction-light/pull/103) by [eibex](https://github.com/eibex))
 - Bump disnake requirement to v2.4.0 (necessary to update disnake manually)
 
 
