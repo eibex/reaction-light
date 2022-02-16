@@ -423,8 +423,9 @@ class Message(commands.Cog):
                     # This is done since Discord doesn't dispatch any event for when a modal is closed/dismissed.
                     return
 
+                await selector_modal_inter.response.defer()
                 selector_embed = disnake.Embed()
-
+                selector_msg_new_body = None
                 for custom_id, value in selector_modal_inter.text_values.items():
                         if custom_id == "title" and value:
                             selector_embed.title = value
@@ -440,19 +441,18 @@ class Message(commands.Cog):
                             selector_msg_new_body = value
 
                 try:
-
                     if selector_embed.title or selector_embed.description:
                         await old_msg.edit(content=selector_msg_new_body, embed=selector_embed)
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await selector_modal_inter.response.send_message(content=response.get("message-edited"))
+                    await selector_modal_inter.edit_original_message(content=response.get("message-edited"))
                 except disnake.Forbidden:
-                    await selector_modal_inter.response.send_message(content=response.get("other-author-error"))
+                    await selector_modal_inter.edit_original_message(content=response.get("other-author-error"))
                     return
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await selector_modal_inter.response.send_message(content=response.get("empty-message-error"))
+                        await selector_modal_inter.edit_original_message(content=response.get("empty-message-error"))
                     else:
                         guild_id = inter.guild.id
                         await self.bot.report(str(e), guild_id)
