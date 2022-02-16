@@ -388,7 +388,7 @@ class Message(commands.Cog):
                     return
                 await old_msg.edit(suppress=False)
 
-                inter.send_modal(
+                await inter.response.send_modal(
                     title=response.get("modal-edit-title"),
                     custom_id=("edit_reactionrole"),
                     components=[
@@ -443,13 +443,13 @@ class Message(commands.Cog):
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await selector_modal_inter.send_message(content=response.get("message-edited"))
+                    await selector_modal_inter.response.send_message(content=response.get("message-edited"))
                 except disnake.Forbidden:
-                    await selector_modal_inter.send_message(content=response.get("other-author-error"))
+                    await selector_modal_inter.response.send_message(content=response.get("other-author-error"))
                     return
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await selector_modal_inter.send_message(content=response.get("empty-message-error"))
+                        await selector_modal_inter.response.send_message(content=response.get("empty-message-error"))
                     else:
                         guild_id = inter.guild.id
                         await self.bot.report(str(e), guild_id)
