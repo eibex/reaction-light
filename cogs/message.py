@@ -396,19 +396,19 @@ class Message(commands.Cog):
                             label=response.get("message-edit-option-message"),
                             required=False,
                             custom_id="message",
-                            style=disnake.TextInputStyle(2)
+                            style=disnake.TextInputStyle.paragraph
                         ),
                         disnake.ui.TextInput(
                             label=response.get("message-edit-option-title"),
                             required=False,
                             custom_id="title",
-                            style=disnake.TextInputStyle(2)
+                            style=disnake.TextInputStyle.paragraph
                         ),
                         disnake.ui.TextInput(
                             label=response.get("message-edit-option-description"),
                             required=False,
                             custom_id="description",
-                            style=disnake.TextInputStyle(2)
+                            style=disnake.TextInputStyle.paragraph
                         ),
                     ]
                 )
