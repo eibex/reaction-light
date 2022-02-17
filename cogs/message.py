@@ -53,7 +53,7 @@ class Message(commands.Cog):
                 # Skipping reaction-role messages that might have been deleted without updating CSVs
                 continue
 
-            entry = f"`{counter}`" f" {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
+            entry = f"`{counter}` {old_msg.embeds[0].title if old_msg.embeds else old_msg.content}"
             formatted_list.append(entry)
             counter += 1
 
