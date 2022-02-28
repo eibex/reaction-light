@@ -165,7 +165,11 @@ If you need help with the bot or need to report bugs, post an issue [here](https
 You can also join our [Discord server](https://discord.gg/cqxZQkhhHm).
 
 ## Contribute
-If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. Black formatting with a line length of 130 is preferred.
+If you would like to contribute to this project, fork it and then create a pull request. Please ensure that you have thoroughly tested all your changes. We use Black formatting with a line length of 130, and spaces (no tabs).
+
+```
+black --line-length=130 .
+```
 
 Even if you are not a Python programmer, you can contribute to this project by reporting bugs, requesting new features, or translating the bot in your language. To translate the bot simply copy the [English file](https://github.com/eibex/reaction-light/blob/master/files/i18n/en-gb.json) and replace the text inside the second quotes of each line. Do not replace the text within `{}`. Click [here](https://github.com/eibex/reaction-light/blob/master/files/i18n/it-it.json) for an example.
 

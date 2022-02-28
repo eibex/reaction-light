@@ -340,7 +340,7 @@ class Message(commands.Cog):
         self,
         inter,
         channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
-        number: int = commands.Param(description=response.get("message-edit-option-number"))
+        number: int = commands.Param(description=response.get("message-edit-option-number")),
     ):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.send(response.get("not-admin"))
@@ -396,25 +396,26 @@ class Message(commands.Cog):
                             label=response.get("message-edit-option-message"),
                             required=False,
                             custom_id="message",
-                            style=disnake.TextInputStyle.paragraph
+                            style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
                             label=response.get("message-edit-option-title"),
                             required=False,
                             custom_id="title",
-                            style=disnake.TextInputStyle.paragraph
+                            style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
                             label=response.get("message-edit-option-description"),
                             required=False,
                             custom_id="description",
-                            style=disnake.TextInputStyle.paragraph
+                            style=disnake.TextInputStyle.paragraph,
                         ),
-                    ]
+                    ],
                 )
 
                 try:
-                    selector_modal_inter: disnake.ModalInteraction = await self.bot.wait_for("modal_submit",
+                    selector_modal_inter: disnake.ModalInteraction = await self.bot.wait_for(
+                        "modal_submit",
                         check=lambda i: i.custom_id == "edit_reactionrole" and i.author.id == inter.author.id,
                         timeout=300,
                     )
@@ -427,18 +428,18 @@ class Message(commands.Cog):
                 selector_embed = disnake.Embed()
                 selector_msg_new_body = None
                 for custom_id, value in selector_modal_inter.text_values.items():
-                        if custom_id == "title" and value:
-                            selector_embed.title = value
-                            selector_embed.colour = self.bot.config.botcolour
-                            selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                    if custom_id == "title" and value:
+                        selector_embed.title = value
+                        selector_embed.colour = self.bot.config.botcolour
+                        selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
 
-                        elif custom_id == "description" and value:
-                            selector_embed.description = value
-                            selector_embed.colour = self.bot.config.botcolour
-                            selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
+                    elif custom_id == "description" and value:
+                        selector_embed.description = value
+                        selector_embed.colour = self.bot.config.botcolour
+                        selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
 
-                        elif custom_id == "message" and value:
-                            selector_msg_new_body = value
+                    elif custom_id == "message" and value:
+                        selector_msg_new_body = value
 
                 try:
                     if selector_embed.title or selector_embed.description:
