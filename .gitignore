@@ -18,6 +18,3 @@ __pycache__/
 
 # Other
 *.out
-
-# Environment
-env
