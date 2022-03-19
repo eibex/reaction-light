@@ -82,6 +82,7 @@ class ReactionLight(commands.Bot):
             except DatabaseError:
                 print("Couldn't fetch messages while migrating")
                 return
+
             for message in messages:
                 channel_id = message[1]
                 channel = await self.getchannel(channel_id)
@@ -140,34 +141,26 @@ class ReactionLight(commands.Bot):
     # Set of functions to get objects from cache, if not present they are fetched via an API call
     async def getchannel(self, channel_id):
         channel = self.get_channel(channel_id)
-
         if not channel:
             channel = await self.fetch_channel(channel_id)
-
         return channel
 
     async def getguild(self, guild_id):
         guild = self.get_guild(guild_id)
-
         if not guild:
             guild = await self.fetch_guild(guild_id)
-
         return guild
 
     async def getuser(self, user_id):
         user = self.get_user(user_id)
-
         if not user:
             user = await self.fetch_user(user_id)
-
         return user
 
     async def getmember(self, guild, user_id):
         member = guild.get_member(user_id)
-
         if not member:
             member = await guild.fetch_member(user_id)
-
         return member
 
 
