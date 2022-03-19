@@ -148,7 +148,7 @@ class SchemaHandler:
 
         cursor.execute("SELECT reactionrole_id, reaction, role_id FROM reactionroles;")
         result = cursor.fetchall()
-        
+
         targets = []
         for reaction_role in result:
             reaction: str = reaction_role[1]
@@ -157,7 +157,7 @@ class SchemaHandler:
                 reaction_role = list(reaction_role)
                 reaction_role[1] = sanitized_reaction
                 targets.append(reaction_role)
-        
+
         if targets:
             # Repack targets for query
             # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id

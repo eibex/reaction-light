@@ -105,7 +105,9 @@ class Message(commands.Cog):
                                 error_messages.append((await inter.channel.send(response.get("new-reactionrole-emoji-403"))))
                                 continue
                     else:
-                        rl_object["reactions"] = dict((sanitize_emoji(reaction), role_id) for reaction, role_id in (rl_object["reactions"].items()))
+                        rl_object["reactions"] = dict(
+                            (sanitize_emoji(reaction), role_id) for reaction, role_id in (rl_object["reactions"].items())
+                        )
                         break
             except asyncio.TimeoutError:
                 await inter.author.send(response.get("new-reactionrole-timeout"))

@@ -97,7 +97,7 @@ class ReactionLight(commands.Bot):
 
         if handler.version == 2:
             handler.two_to_three()
-        
+
         if handler.version == 3:
             handler.three_to_four()
 
