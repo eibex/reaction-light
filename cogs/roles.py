@@ -25,6 +25,7 @@ SOFTWARE.
 from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
+
 from cogs.utils.i18n import response
 from cogs.utils.locks import lock_manager
 
@@ -34,8 +35,9 @@ class Roles(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload: disnake.RawReactionActionEvent):
         reaction = str(payload.emoji)
+        sanitized_reaction = str(payload.emoji.id) if payload.emoji.is_custom_emoji() else payload.emoji.name
         msg_id = payload.message_id
         ch_id = payload.channel_id
         user_id = payload.user_id
@@ -58,12 +60,12 @@ class Roles(commands.Cog):
             ch = await self.bot.getchannel(ch_id)
             msg = await ch.fetch_message(msg_id)
             user = await self.bot.getuser(user_id)
-            if reaction not in reactions:
+            if sanitized_reaction not in reactions:
                 # Removes reactions added to the reaction-role message that are not connected to any role
                 await msg.remove_reaction(reaction, user)
             else:
                 # Gives role if it has permissions, else 403 error is raised
-                role_id = reactions[reaction]
+                role_id = reactions[sanitized_reaction]
                 guild = await self.bot.getguild(guild_id)
                 member = await self.bot.getmember(guild, user_id)
                 role = disnake.utils.get(guild.roles, id=role_id)
@@ -97,8 +99,8 @@ class Roles(commands.Cog):
                         await self.bot.report(guild_id, response.get("permission-error-add"))
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
-        reaction = str(payload.emoji)
+    async def on_raw_reaction_remove(self, payload: disnake.RawReactionActionEvent):
+        sanitized_reaction = str(payload.emoji.id) if payload.emoji.is_custom_emoji() else payload.emoji.name
         msg_id = payload.message_id
         user_id = payload.user_id
         guild_id = payload.guild_id
@@ -114,8 +116,8 @@ class Roles(commands.Cog):
         except DatabaseError as error:
             await self.bot.report(guild_id, response.get("db-error-reaction-get").format(exception=error))
             return
-        if reaction in reactions:
-            role_id = reactions[reaction]
+        if sanitized_reaction in reactions:
+            role_id = reactions[sanitized_reaction]
             # Removes role if it has permissions, else 403 error is raised
             guild = await self.bot.getguild(guild_id)
             member = await self.bot.getmember(guild, user_id)

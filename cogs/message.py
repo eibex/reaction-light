@@ -29,6 +29,7 @@ import disnake
 from disnake.ext import commands
 from cogs.utils.i18n import response
 from cogs.utils import database
+from cogs.utils.sanitizing import sanitize_emoji
 
 
 class Message(commands.Cog):
@@ -104,6 +105,7 @@ class Message(commands.Cog):
                                 error_messages.append((await inter.channel.send(response.get("new-reactionrole-emoji-403"))))
                                 continue
                     else:
+                        rl_object["reactions"] = dict((sanitize_emoji(reaction), role_id) for reaction, role_id in (rl_object["reactions"].items()))
                         break
             except asyncio.TimeoutError:
                 await inter.author.send(response.get("new-reactionrole-timeout"))
@@ -533,7 +535,7 @@ class Message(commands.Cog):
                 return
 
             try:
-                react = self.bot.db.add_reaction(message_to_edit.id, role.id, reaction)
+                react = self.bot.db.add_reaction(message_to_edit.id, role.id, sanitize_emoji(reaction))
             except DatabaseError as error:
                 await self.bot.report(
                     response.get("db-error-add-reaction").format(
@@ -557,7 +559,7 @@ class Message(commands.Cog):
                 return
 
             try:
-                react = self.bot.db.remove_reaction(message_to_edit.id, reaction)
+                react = self.bot.db.remove_reaction(message_to_edit.id, sanitize_emoji(reaction))
             except DatabaseError as error:
                 await self.bot.report(
                     response.get("db-error-remove-reaction").format(
