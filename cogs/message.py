@@ -267,7 +267,7 @@ class Message(commands.Cog):
             )
             try:
                 while True:
-                    message_message = await self.bot.wait_for("message", timeout=120, check=check)
+                    message_message = await self.bot.wait_for("message", timeout=300, check=check)
                     user_messages.append(message_message)
                     msg_values = message_message.content.split(" // ")
                     # This whole system could also be re-done using wait_for to make the syntax easier for the user
