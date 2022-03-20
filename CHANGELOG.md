@@ -1,6 +1,6 @@
 # Reaction Light - Changelog
 ### 3.0.4
-- Rework reactions storage ([#105](https://github.com/eibex/reaction-light/pull/105) by [Edwinexd](https://github.com/Edwinexd))
+- Rework reaction storage and fix reactionroles with animated emojis ([#105](https://github.com/eibex/reaction-light/pull/105) by [Edwinexd](https://github.com/Edwinexd))
 - Bump timeout for message contents from 2 to 5 minutes ([cad818b](https://github.com/eibex/reaction-light/commit/cad818ba231a63acddb0dffc606abf7959d4fb11) by [eibex](https://github.com/eibex))
 
 ### 3.0.3
