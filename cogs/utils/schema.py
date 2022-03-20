@@ -26,6 +26,8 @@ SOFTWARE.
 import sqlite3
 import disnake
 
+from cogs.utils.sanitizing import sanitize_emoji
+
 
 class SchemaHandler:
     def __init__(self, database, client):
@@ -139,3 +141,31 @@ class SchemaHandler:
         cursor.close()
         conn.close()
         self.set_version(3)
+
+    def three_to_four(self):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT reactionrole_id, reaction, role_id FROM reactionroles;")
+        result = cursor.fetchall()
+
+        targets = []
+        for reaction_role in result:
+            reaction: str = reaction_role[1]
+            sanitized_reaction = sanitize_emoji(reaction)
+            if reaction != sanitized_reaction:
+                reaction_role = list(reaction_role)
+                reaction_role[1] = sanitized_reaction
+                targets.append(reaction_role)
+
+        if targets:
+            # Repack targets for query
+            # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id
+            targets = [(i[1], i[0], i[2]) for i in targets]
+            cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?", targets)
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        self.set_version(4)

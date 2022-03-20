@@ -1,8 +1,11 @@
 # Reaction Light - Changelog
+### 3.0.4
+- Rework reactions storage ([#105](https://github.com/eibex/reaction-light/pull/105) by [Edwinexd](https://github.com/Edwinexd))
+- Bump timeout for message contents from 2 to 5 minutes ([cad818b](https://github.com/eibex/reaction-light/commit/cad818ba231a63acddb0dffc606abf7959d4fb11) by [eibex](https://github.com/eibex))
+
 ### 3.0.3
 - Allow (once again) new lines via modals ([#101](https://github.com/eibex/reaction-light/issues/101) closed by [#103](https://github.com/eibex/reaction-light/pull/103) by [eibex](https://github.com/eibex))
 - Bump disnake requirement to v2.4.0 (necessary to update disnake manually)
-
 
 ### 3.0.2
 - Fix `/bot version`
