@@ -31,8 +31,7 @@ def initialize(database):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
-        " 'guild_id' INT, 'limit_to_one' INT);"
+        "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);"
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
@@ -64,8 +63,7 @@ class Database:
         if self.exists(rl_dict["message"]["message_id"]):
             raise DuplicateInstance("The message id is already in use!")
         cursor.execute(
-            "INSERT INTO 'messages' ('message_id', 'channel',"
-            " 'guild_id', 'limit_to_one') values(?, ?, ?, ?);",
+            "INSERT INTO 'messages' ('message_id', 'channel', 'guild_id', 'limit_to_one') values(?, ?, ?, ?);",
             (
                 rl_dict["message"]["message_id"],
                 rl_dict["message"]["channel_id"],

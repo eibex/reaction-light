@@ -183,7 +183,9 @@ class SchemaHandler:
             for reaction_role in result:
                 reactionrole_id: int = reaction_role[0]
                 message_id: int = reaction_role[1]
-                cursor.execute("UPDATE reactionroles SET message_id = ? WHERE reactionrole_id = ?;", (message_id, reactionrole_id))
+                cursor.execute(
+                    "UPDATE reactionroles SET message_id = ? WHERE reactionrole_id = ?;", (message_id, reactionrole_id)
+                )
 
             cursor.execute("SELECT message_id, reaction, role_id FROM reactionroles;")
             reactionroles = cursor.fetchall()
@@ -193,8 +195,12 @@ class SchemaHandler:
             cursor.execute("ALTER TABLE messages RENAME TO messages_old;")
             cursor.execute("CREATE TABLE 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
             cursor.execute("CREATE TABLE 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);")
-            cursor.executemany("INSERT INTO 'reactionroles' ('message_id', 'reaction', 'role_id') values(?, ?, ?);", reactionroles)
-            cursor.executemany("INSERT INTO 'messages' ('message_id', 'channel', 'guild_id', 'limit_to_one') values(?, ?, ?, ?);", messages)
+            cursor.executemany(
+                "INSERT INTO 'reactionroles' ('message_id', 'reaction', 'role_id') values(?, ?, ?);", reactionroles
+            )
+            cursor.executemany(
+                "INSERT INTO 'messages' ('message_id', 'channel', 'guild_id', 'limit_to_one') values(?, ?, ?, ?);", messages
+            )
             cursor.execute("DROP TABLE reactionroles_old;")
             cursor.execute("DROP TABLE messages_old;")
             conn.commit()
@@ -203,5 +209,3 @@ class SchemaHandler:
         conn.close()
 
         self.set_version(5)
-
-
