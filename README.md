@@ -51,8 +51,10 @@ python3 -m pip install -r requirements.txt
 ## Docker 
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
-  - Create a bot and retrive its token on https://discord.com/developers/applications/
-    - Make sure you enabled the **messages members intent** on your bot developer page
+- Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) or edit it manually
+  - Insert the token of your bot (found at: https://discord.com/developers/applications/)
+  - You can set most of the other values via commands later (set manually `name` and `logo`, which appear in the footer of each embed)
+- Activate the message content intent for your bot (found at: https://discord.com/developers/applications/ under the bot section)
 - **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
   - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
   - If you want a static activity just add one line.
@@ -63,18 +65,13 @@ python3 -m pip install -r requirements.txt
 docker run -d \
   --name reaction-light \
   --restart always \
-  -e TOKEN=<TOKEN> \
-  -e NAME="Reaction Light" \
-  -e SYSTEM_CHANNEL=<SYSTEM_CHANNEL_ID> \
-  -e LOGO="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg" \
-  -e COLOUR="0xffff00" \
-  -e LANGUAGE="en-gb" \
   -v /path/to/reaction-light/files:/bot/files \
+  -v /path/to/reaction-light/config.ini:/bot/config.ini \
   reaction-light
 ```
 - Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
   - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
-  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=8`
+  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560`
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 ## Git and Zip
