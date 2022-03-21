@@ -191,8 +191,8 @@ class SchemaHandler:
             reactionroles = cursor.fetchall()
             cursor.execute("SELECT message_id, channel, guild_id, limit_to_one FROM messages;")
             messages = cursor.fetchall()
-            cursor.execute("ALTER TABLE reactionroles RENAME TO reactionroles_old;")
-            cursor.execute("ALTER TABLE messages RENAME TO messages_old;")
+            cursor.execute("DROP TABLE reactionroles;")
+            cursor.execute("DROP TABLE messages;")
             cursor.execute("CREATE TABLE 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
             cursor.execute("CREATE TABLE 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);")
             cursor.executemany(
@@ -201,8 +201,6 @@ class SchemaHandler:
             cursor.executemany(
                 "INSERT INTO 'messages' ('message_id', 'channel', 'guild_id', 'limit_to_one') values(?, ?, ?, ?);", messages
             )
-            cursor.execute("DROP TABLE reactionroles_old;")
-            cursor.execute("DROP TABLE messages_old;")
             conn.commit()
 
         cursor.close()
