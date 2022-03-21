@@ -162,10 +162,46 @@ class SchemaHandler:
             # Repack targets for query
             # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id
             targets = [(i[1], i[0], i[2]) for i in targets]
-            cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?", targets)
+            cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?;", targets)
             conn.commit()
 
         cursor.close()
         conn.close()
 
         self.set_version(4)
+
+    def four_to_five(self):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(reactionroles);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "message_id" not in columns:
+            cursor.execute("ALTER TABLE reactionroles ADD COLUMN 'message_id' INT;")
+            cursor.execute("SELECT reactionrole_id, message_id FROM messages;")
+            result = cursor.fetchall()
+            for reaction_role in result:
+                reactionrole_id: int = reaction_role[0]
+                message_id: int = reaction_role[1]
+                cursor.execute("UPDATE reactionroles SET message_id = ? WHERE reactionrole_id = ?;", (message_id, reactionrole_id))
+
+            cursor.execute("SELECT message_id, reaction, role_id FROM reactionroles;")
+            reactionroles = cursor.fetchall()
+            cursor.execute("SELECT message_id, channel, guild_id, limit_to_one FROM messages;")
+            messages = cursor.fetchall()
+            cursor.execute("ALTER TABLE reactionroles RENAME TO reactionroles_old;")
+            cursor.execute("ALTER TABLE messages RENAME TO messages_old;")
+            cursor.execute("CREATE TABLE 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
+            cursor.execute("CREATE TABLE 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);")
+            cursor.executemany("INSERT INTO 'reactionroles' ('message_id', 'reaction', 'role_id') values(?, ?, ?);", reactionroles)
+            cursor.executemany("INSERT INTO 'messages' ('message_id', 'channel', 'guild_id', 'limit_to_one') values(?, ?, ?, ?);", messages)
+            cursor.execute("DROP TABLE reactionroles_old;")
+            cursor.execute("DROP TABLE messages_old;")
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        self.set_version(5)
+
+

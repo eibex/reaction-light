@@ -101,6 +101,9 @@ class ReactionLight(commands.Bot):
         if handler.version == 3:
             handler.three_to_four()
 
+        if handler.version == 4:
+            handler.four_to_five()
+
     async def report(self, text, guild_id=None, embed=None):
         # Send a message to the system channel (if set)
         if guild_id:

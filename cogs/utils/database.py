@@ -32,15 +32,15 @@ def initialize(database):
     cursor = conn.cursor()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT,"
-        " 'reactionrole_id' INT, 'guild_id' INT, 'limit_to_one' INT);"
+        " 'guild_id' INT, 'limit_to_one' INT);"
     )
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('reactionrole_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON guild_settings (guild_id);")
-    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS reactionrole_idx ON messages (reactionrole_id);")
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS message_idx ON messages (message_id);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);")
     conn.commit()
     cursor.close()
@@ -63,25 +63,18 @@ class Database:
         cursor = conn.cursor()
         if self.exists(rl_dict["message"]["message_id"]):
             raise DuplicateInstance("The message id is already in use!")
-        while True:
-            try:
-                reactionrole_id = randint(0, 100000)
-                cursor.execute(
-                    "INSERT INTO 'messages' ('message_id', 'channel', 'reactionrole_id',"
-                    " 'guild_id', 'limit_to_one') values(?, ?, ?, ?, ?);",
-                    (
-                        rl_dict["message"]["message_id"],
-                        rl_dict["message"]["channel_id"],
-                        reactionrole_id,
-                        rl_dict["message"]["guild_id"],
-                        rl_dict["limit_to_one"],
-                    ),
-                )
-                break
-            except sqlite3.IntegrityError:
-                continue
-        combos = [(reactionrole_id, reaction, role_id) for reaction, role_id in rl_dict["reactions"].items()]
-        cursor.executemany("INSERT INTO 'reactionroles' ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);", combos)
+        cursor.execute(
+            "INSERT INTO 'messages' ('message_id', 'channel',"
+            " 'guild_id', 'limit_to_one') values(?, ?, ?, ?);",
+            (
+                rl_dict["message"]["message_id"],
+                rl_dict["message"]["channel_id"],
+                rl_dict["message"]["guild_id"],
+                rl_dict["limit_to_one"],
+            ),
+        )
+        combos = [(rl_dict["message"]["message_id"], reaction, role_id) for reaction, role_id in rl_dict["reactions"].items()]
+        cursor.executemany("INSERT INTO 'reactionroles' ('message_id', 'reaction', 'role_id') values(?, ?, ?);", combos)
         conn.commit()
         cursor.close()
         conn.close()
@@ -98,9 +91,7 @@ class Database:
     def get_reactions(self, message_id):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
-        cursor.execute("SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,))
-        reactionrole_id = cursor.fetchall()[0][0]
-        cursor.execute("SELECT reaction, role_id FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
+        cursor.execute("SELECT reaction, role_id FROM reactionroles WHERE message_id = ?;", (message_id,))
         combos = {}
         for row in cursor:
             reaction = row[0]
@@ -155,13 +146,13 @@ class Database:
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
         # Deleting the guilds reaction-role database entries
-        cursor.execute("SELECT reactionrole_id FROM messages WHERE guild_id = ?;", (guild_id,))
+        cursor.execute("SELECT message_id FROM messages WHERE guild_id = ?;", (guild_id,))
         results = cursor.fetchall()
         if results:
             for result in results:
-                reactionrole_id = result[0]
-                cursor.execute("DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,))
-                cursor.execute("DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
+                message_id = result[0]
+                cursor.execute("DELETE FROM messages WHERE message_id = ?;", (message_id,))
+                cursor.execute("DELETE FROM reactionroles WHERE message_id = ?;", (message_id,))
         # Deleting the guilds guild_settings database entries
         cursor.execute("DELETE FROM guild_settings WHERE guild_id = ?;", (guild_id,))
         # Delete the guilds admin roles
@@ -176,16 +167,9 @@ class Database:
     def delete(self, message_id):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
-
-        cursor.execute("SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,))
-
-        result = cursor.fetchone()
-        if result:
-            reactionrole_id = result[0]
-            cursor.execute("DELETE FROM messages WHERE reactionrole_id = ?;", (reactionrole_id,))
-            cursor.execute("DELETE FROM reactionroles WHERE reactionrole_id = ?;", (reactionrole_id,))
-            conn.commit()
-
+        cursor.execute("DELETE FROM messages WHERE message_id = ?;", (message_id,))
+        cursor.execute("DELETE FROM reactionroles WHERE message_id = ?;", (message_id,))
+        conn.commit()
         cursor.close()
         conn.close()
 
@@ -287,9 +271,7 @@ class Database:
     def add_reaction(self, message_id, role_id, reaction):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
-        cursor.execute("SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,))
-        reactionrole_id = cursor.fetchall()[0][0]
-        cursor.execute("SELECT * FROM reactionroles WHERE reactionrole_id = ? AND reaction = ?;", (reactionrole_id, reaction))
+        cursor.execute("SELECT * FROM reactionroles WHERE message_id = ? AND reaction = ?;", (message_id, reaction))
         exists = cursor.fetchall()
         if exists:
             cursor.close()
@@ -297,8 +279,8 @@ class Database:
             return False
 
         cursor.execute(
-            "INSERT INTO reactionroles ('reactionrole_id', 'reaction', 'role_id') values(?, ?, ?);",
-            (reactionrole_id, reaction, role_id),
+            "INSERT INTO reactionroles ('message_id', 'reaction', 'role_id') values(?, ?, ?);",
+            (message_id, reaction, role_id),
         )
         conn.commit()
         cursor.close()
@@ -308,9 +290,7 @@ class Database:
     def remove_reaction(self, message_id, reaction):
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
-        cursor.execute("SELECT reactionrole_id FROM messages WHERE message_id = ?;", (message_id,))
-        reactionrole_id = cursor.fetchall()[0][0]
-        cursor.execute("DELETE FROM reactionroles WHERE reactionrole_id = ? AND reaction = ?;", (reactionrole_id, reaction))
+        cursor.execute("DELETE FROM reactionroles WHERE message_id = ? AND reaction = ?;", (message_id, reaction))
         conn.commit()
         cursor.close()
         conn.close()
