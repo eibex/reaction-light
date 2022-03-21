@@ -1,8 +1,7 @@
 [server]
 token =
-prefix = rl!
 name = Reaction Light
 system_channel =
-logo = https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg
+logo = https://cdn.discordapp.com/attachments/915013456749543525/915372094785716275/reactionlight.png
 colour = 0xffff00
 language = en-gb

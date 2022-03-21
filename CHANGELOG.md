@@ -1,5 +1,37 @@
 # Reaction Light - Changelog
+### 3.0.4
+- Rework reaction storage and fix reactionroles with animated emojis ([#105](https://github.com/eibex/reaction-light/pull/105) by [Edwinexd](https://github.com/Edwinexd))
+- Bump timeout for message contents from 2 to 5 minutes ([cad818b](https://github.com/eibex/reaction-light/commit/cad818ba231a63acddb0dffc606abf7959d4fb11) by [eibex](https://github.com/eibex))
 
+### 3.0.3
+- Allow (once again) new lines via modals ([#101](https://github.com/eibex/reaction-light/issues/101) closed by [#103](https://github.com/eibex/reaction-light/pull/103) by [eibex](https://github.com/eibex))
+- Bump disnake requirement to v2.4.0 (necessary to update disnake manually)
+
+### 3.0.2
+- Fix `/bot version`
+- Bump disnake requirement to v2.3.2 (necessary to update disnake manually)
+
+### 3.0.1
+- Make sure to read [v3.0.0 patch notes](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md#300) if you are updating from v2.x.x
+- Fixed an issue with `/bot update` not restarting the bot: you might need to `/bot restart` after using `/bot update` to update from v3.0.0
+- Fixed an issue with database cleaning and added a 6 hours delay between the bot being kicked from a guild and the removal of all the guild's data, if the bot is re-invited, the data won't be deleted ([#89](https://github.com/eibex/reaction-light/pull/89) by [eibex](https://github.com/eibex))
+- The bot will now only listen to `/message new` answers in the channel the interaction was started ([#90](https://github.com/eibex/reaction-light/pull/90) by [Edwinexd](https://github.com/Edwinexd))
+- Better error reporting ([#92](https://github.com/eibex/reaction-light/issues/92) closed by [#97](https://github.com/eibex/reaction-light/pull/97) by [eibex](https://github.com/eibex))
+
+### 3.0.0
+- Support slash commands and drop prefixes, refactor into cogs ([#13](https://github.com/eibex/reaction-light/issues/13), [#82](https://github.com/eibex/reaction-light/issues/82), [#83](https://github.com/eibex/reaction-light/issues/83) closed by [#88](https://github.com/eibex/reaction-light/pull/88) by [eibex](https://github.com/eibex))
+- This version is **BREAKING**. Version 2.5.0 will continue working until Discord supports the old API (April 2022).
+- **README**:
+  - DO NOT RUN `rl!update`
+  - BEFORE updating you need to replace discord.py since it's [no longer developed](https://gist.github.com/Rapptz/4a2f62751b9600a31a0d3c78100287f1) and update your bot permissions:
+    - Make sure your Python version is 3.8 or greater
+    - `python3 -m pip uninstall discord.py`
+    - `python3 -m pip install -U disnake` (or `python3 -m pip install -r requirements.txt` while in the bot directory)
+    - Reauthorize your bot with the following link: `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560` (replace CLIENT_ID)
+    - On https://discord.com/developers/applications select your bot and under the "Bot" setting turn on message content intent (no need for other intents)
+    - Wait ~1 hour before Discord register your bot's commands (do not kick the bot to speed the process up without first shutting it down)
+- If you need help with the transition feel free to ask on Reaction Light's Discord server which you can join [here](https://discord.gg/cqxZQkhhHm)
+  
 ### 2.5.0
 - Fix `rl!new` showing unsuccessful reaction when the message creation was actually successful
 - Add support for translations. To translate the bot's responses make a copy of [en-gb.json](https://github.com/eibex/reaction-light/blob/master/files/i18n/en-gb.json) and translate the associated strings. Consider sharing your translation as a pull request ([#74](https://github.com/eibex/reaction-light/issues/74) closed by [#77](https://github.com/eibex/reaction-light/pull/77) by [eibex](https://github.com/eibex), [Edwinexd](https://github.com/Edwinexd), and [d7415](https://github.com/d7415)).

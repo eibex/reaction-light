@@ -19,7 +19,7 @@ If applicable, add screenshots to help explain your problem.
 
 - OS:
 - Python version:
-- discord.py version:
+- disnake version:
 
 **Traceback**
 

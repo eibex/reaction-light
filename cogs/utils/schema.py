@@ -24,7 +24,9 @@ SOFTWARE.
 
 
 import sqlite3
-import discord
+import disnake
+
+from cogs.utils.sanitizing import sanitize_emoji
 
 
 class SchemaHandler:
@@ -52,9 +54,7 @@ class SchemaHandler:
         cursor = conn.cursor()
         if version > 0:
             previous = version - 1
-            cursor.execute(
-                "UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous)
-            )
+            cursor.execute("UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous))
 
         else:
             cursor.execute("INSERT INTO dbinfo(version) values(?);", (version,))
@@ -95,7 +95,7 @@ class SchemaHandler:
             for guild in self.client.guilds:
                 guilds[guild.id] = []
                 for admin_id in admins:
-                    role = discord.utils.get(guild.roles, id=admin_id)
+                    role = disnake.utils.get(guild.roles, id=admin_id)
                     if role is not None:
                         guilds[guild.id].append(role.id)
 
@@ -103,16 +103,11 @@ class SchemaHandler:
             conn.commit()
             for guild in guilds:
                 for admin_id in guilds[guild]:
-                    cursor.execute(
-                        "UPDATE admins SET guild_id = ? WHERE role_id = ?;",
-                        (guild, admin_id),
-                    )
+                    cursor.execute("UPDATE admins SET guild_id = ? WHERE role_id = ?;", (guild, admin_id))
             cursor.execute("DELETE FROM admins WHERE guild_id IS NULL;")
             conn.commit()
 
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';"
-        )
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='systemchannels';")
         systemchannels_table = cursor.fetchall()
         if systemchannels_table:
             cursor.execute("SELECT * FROM systemchannels;")
@@ -140,11 +135,37 @@ class SchemaHandler:
         columns = [value[1] for value in result]
         if "limit_to_one" not in columns:
             cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
-            cursor.execute(
-                "UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;"
-            )
+            cursor.execute("UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;")
             conn.commit()
 
         cursor.close()
         conn.close()
         self.set_version(3)
+
+    def three_to_four(self):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT reactionrole_id, reaction, role_id FROM reactionroles;")
+        result = cursor.fetchall()
+
+        targets = []
+        for reaction_role in result:
+            reaction: str = reaction_role[1]
+            sanitized_reaction = sanitize_emoji(reaction)
+            if reaction != sanitized_reaction:
+                reaction_role = list(reaction_role)
+                reaction_role[1] = sanitized_reaction
+                targets.append(reaction_role)
+
+        if targets:
+            # Repack targets for query
+            # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id
+            targets = [(i[1], i[0], i[2]) for i in targets]
+            cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?", targets)
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        self.set_version(4)

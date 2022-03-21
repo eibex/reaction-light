@@ -22,33 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
-import os
-import json
+import asyncio
 
 
-class Response:
-    def __init__(self, directory, language, prefix):
-        self.directory = directory
-        self.language = language
-        self.prefix = prefix
-        self.responses = self.load()
+class Locks:
+    def __init__(self):
+        self.locks = {}
+        self.main_lock = asyncio.Lock()
 
-    def load(self):
-        data = {}
-        for file in os.listdir(self.directory):
-            if file.endswith(".json"):
-                with open(f"{self.directory}/{file}", encoding="utf-8") as f:
-                    data[file.replace(".json", "")] = json.load(f)
-        return data
+    async def get_lock(self, user_id):
+        async with self.main_lock:
+            if not user_id in self.locks:
+                self.locks[user_id] = asyncio.Lock()
 
-    def get(self, item):
-        try:
-            response = self.responses[self.language][item]
-        except KeyError:
-            response = self.responses["en-gb"][item]
-            print(
-                f"Could not find a translation ({self.language}) for the requested i18n item: {item}. Please file an issue on GitHub."
-            )
-        response = response.replace("{prefix}", self.prefix)
-        return response
+            return self.locks[user_id]
+
+
+lock_manager = Locks()

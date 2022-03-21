@@ -1,1 +1,1 @@
-discord.py>=1.6.0
+disnake>=2.4.0
