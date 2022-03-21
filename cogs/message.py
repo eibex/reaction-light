@@ -105,6 +105,7 @@ class Message(commands.Cog):
                                 error_messages.append((await inter.channel.send(response.get("new-reactionrole-emoji-403"))))
                                 continue
                     else:
+                        rl_object["reaction_strings"] = [reaction for reaction, _ in (rl_object["reactions"].items())]
                         rl_object["reactions"] = dict(
                             (sanitize_emoji(reaction), role_id) for reaction, role_id in (rl_object["reactions"].items())
                         )
@@ -331,7 +332,7 @@ class Message(commands.Cog):
                 await self.bot.report(response.get("db-error-new-reactionrole").format(exception=error), inter.guild.id)
                 return
 
-            for reaction, _ in rl_object["reactions"].items():
+            for reaction in rl_object["reaction_strings"]:
                 await final_message.add_reaction(reaction)
 
         await inter.delete_original_message()
