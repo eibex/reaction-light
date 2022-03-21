@@ -163,13 +163,8 @@ Type `/bot update` to update the bot and restart it.
 docker run -d \
   --name reaction-light \
   --restart always \
-  -e TOKEN=<TOKEN> \
-  -e NAME="Reaction Light" \
-  -e SYSTEM_CHANNEL=<SYSTEM_CHANNEL_ID> \
-  -e LOGO="https://cdn.discordapp.com/attachments/671738683623473163/693451064904515645/spell_holy_weaponmastery.jpg" \
-  -e COLOUR="0xffff00" \
-  -e LANGUAGE="en-gb" \
   -v /path/to/reaction-light/files:/bot/files \
+  -v /path/to/reaction-light/config.ini:/bot/config.ini \
   reaction-light
 ```
 
