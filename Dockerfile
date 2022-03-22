@@ -4,7 +4,7 @@ COPY ./ /bot/
 
 RUN python3.9 -m pip install -r /bot/requirements.txt
 
-# Remove local copies as these files gets mounted instead.
+# Remove local copies as these files get mounted instead.
 RUN rm -r /bot/files
 
 WORKDIR /bot
