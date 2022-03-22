@@ -29,7 +29,7 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
   - [Usage Example](#usage-example)
 - [Updating](#updating)
   - [Update a git install with a command](#update-a-git-install-with-a-command)
-  - [Manually updating a docker installation](#manually-updating-a-docker-installation)
+  - [Manually updating a Docker installation](#manually-updating-a-docker-installation)
   - [Manually updating a git install](#manually-updating-a-git-install)
   - [Manually updating a zip install](#manually-updating-a-zip-install)
 - [Roadmap](#roadmap)
@@ -146,7 +146,7 @@ If you set a system channel in `config.ini`, your bot will check for new version
 ### Update a git install with a command
 Type `/bot update` to update the bot and restart it.
 
-### Manually updating a docker installation
+### Manually updating a Docker installation
 - Navigate to the reaction-light directory
 - Run `git pull origin master`
 - Stop and delete the reaction-light container using `docker stop reaction-light && docker rm reaction-light`
