@@ -55,7 +55,10 @@ class Cleaner(commands.Cog):
 
         for message in messages:
             try:
+                message_id = message[0]
                 channel_id = message[1]
+                guild_id = message[2]
+                limit_to_one_status = message[3]
                 channel = await self.bot.fetch_channel(channel_id)
 
                 await channel.fetch_message(message[0])
@@ -72,13 +75,18 @@ class Cleaner(commands.Cog):
                         return
 
                     await self.bot.report(
-                        response.get("db-message-delete-success").format(message_id=message, channel=channel.mention),
-                        channel.guild.id,
+                        response.get("db-message-delete-success").format(
+                            message_id=message_id, channel_id=channel_id, guild_id=guild_id, limit_to_one_status=limit_to_one_status
+                        ),
+                        guild_id,
                     )
             except disnake.Forbidden:
                 # If we can't fetch the channel due to the bot not being in the guild or permissions we usually cant mention it or get the guilds id using the channels object
                 await self.bot.report(
-                    response.get("db-forbidden-message").format(message_id=message[0], channel_id=message[1]), message[3]
+                    response.get("db-forbidden-message").format(
+                        message_id=message_id, channel_id=channel_id, guild_id=guild_id, limit_to_one_status=limit_to_one_status
+                    ),
+                    guild_id,
                 )
 
         try:
