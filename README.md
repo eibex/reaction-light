@@ -22,13 +22,14 @@ Light yet powerful reaction role bot coded in Python.
 You can host the bot yourself by configuring the `config.ini` file (manually or via `setup.py`).
 
 ## Contents
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Running the bot](#running-the-bot)
+- [Deployment](#deployment)
+  - [Docker](#docker)
+  - [Git and Zip](#git-and-zip)
 - [Commands](#commands)
   - [Usage Example](#usage-example)
 - [Updating](#updating)
   - [Update a git install with a command](#update-a-git-install-with-a-command)
+  - [Manually updating a Docker installation](#manually-updating-a-docker-installation)
   - [Manually updating a git install](#manually-updating-a-git-install)
   - [Manually updating a zip install](#manually-updating-a-zip-install)
 - [Roadmap](#roadmap)
@@ -37,17 +38,38 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [Contribute](#contribute)
 - [License](#license)
 
-## Requirements
-This bot requires [disnake](https://github.com/DisnakeDev/disnake) and Python 3.8+.
-
-You can get disnake via PyPI or GitHub:
-```
-python3 -m pip install -r requirements.txt
-```
-
-## Setup
+## Deployment
+### Docker 
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
+- Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) or edit it manually
+  - Insert the token of your bot (found at: https://discord.com/developers/applications/)
+  - You can set most of the other values via commands later (set manually `name` and `logo`, which appear in the footer of each embed)
+- Activate the message content intent for your bot (found at: https://discord.com/developers/applications/ under the bot section)
+- **Optional**: Edit the `activities.csv` file (example provided in `activities.csv.sample`):
+  - In each row (line), add the activity the bot will display (`playing <activity>`). The bot will loop through them every 30 seconds.
+  - If you want a static activity just add one line.
+  - Do not use commas `,`.
+- Build the Docker image using `docker build -t reaction-light .`
+- Create and start a container using 
+```bash
+docker run -d \
+  --name reaction-light \
+  --restart always \
+  -v /path/to/reaction-light/files:/bot/files \
+  -v /path/to/reaction-light/config.ini:/bot/config.ini \
+  reaction-light
+```
+- Invite the bot to your server(s) with enough permissions (Manage Roles, Manage Channels, Send Messages, Manage Messages, Add Reactions)
+  - You can use this link (need to replace **CLIENT_ID** with your bot's ID, visible under the general information tab): 
+  - `https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applications.commands&permissions=2415978560`
+- On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
+- Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
+### Git and Zip
+- Download and install python 3.8+ and pip via your preferred method (e.g. `apt-get install python3 python3-pip`)
+- Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
+  - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
+- Install requirements via pip using `python3 -m pip install -r requirements.txt`
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) or edit it manually
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
   - You can set most of the other values via commands later (set manually `name` and `logo`, which appear in the footer of each embed)
@@ -59,16 +81,14 @@ https://discord.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot%20applicatio
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` (or your bot's name) in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `/admin add @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 
-## Running the bot
-The bot can be run by using:
-```
-python3 bot.py
-```
-
-To run it as a background task (recommended unless debugging):
-```
-nohup python3 bot.py &
-```
+- The bot can be run by using:
+  ```
+  python3 bot.py
+  ```
+- To run it as a background task (recommended unless debugging):
+  ```
+  nohup python3 bot.py &
+  ```
 
 ## Commands
 All commands require an admin role which you can set by using `/admin add` (requires administrator permissions on the server). The bot will reply with missing permissions otherwise. Executing a command without any argument will prompt the bot to provide you with instructions on how to use the command effectively.
@@ -126,6 +146,21 @@ If you set a system channel in `config.ini`, your bot will check for new version
 ### Update a git install with a command
 Type `/bot update` to update the bot and restart it.
 
+### Manually updating a Docker installation
+- Navigate to the reaction-light directory
+- Run `git pull origin master`
+- Stop and delete the reaction-light container using `docker stop reaction-light && docker rm reaction-light`
+- Rebuild the Docker image using `docker build -t reaction-light .`
+- Create and start a new container using 
+```bash
+docker run -d \
+  --name reaction-light \
+  --restart always \
+  -v /path/to/reaction-light/files:/bot/files \
+  -v /path/to/reaction-light/config.ini:/bot/config.ini \
+  reaction-light
+```
+
 ### Manually updating a git install
 - Navigate to the reaction-light directory
 - Run `git pull origin master`
@@ -171,7 +206,7 @@ If you would like to contribute to this project, fork it and then create a pull 
 black --line-length=130 .
 ```
 
-Even if you are not a Python programmer, you can contribute to this project by reporting bugs, requesting new features, or translating the bot in your language. To translate the bot simply copy the [English file](https://github.com/eibex/reaction-light/blob/master/files/i18n/en-gb.json) and replace the text inside the second quotes of each line. Do not replace the text within `{}`. Click [here](https://github.com/eibex/reaction-light/blob/master/files/i18n/it-it.json) for an example.
+Even if you are not a Python programmer, you can contribute to this project by reporting bugs, requesting new features, or translating the bot in your language. To translate the bot simply copy the [English file](https://github.com/eibex/reaction-light/blob/master/i18n/en-gb.json) and replace the text inside the second quotes of each line. Do not replace the text within `{}`. Click [here](https://github.com/eibex/reaction-light/blob/master/i18n/it-it.json) for an example.
 
 ## License
 [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
