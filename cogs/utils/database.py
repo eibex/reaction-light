@@ -30,9 +30,7 @@ from random import randint
 def initialize(database):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);"
-    )
+    cursor.execute("CREATE TABLE IF NOT EXISTS 'messages' ('message_id' INT, 'channel' INT, 'guild_id' INT, 'limit_to_one' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'reactionroles' ('message_id' INT, 'reaction' NVCARCHAR, 'role_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")

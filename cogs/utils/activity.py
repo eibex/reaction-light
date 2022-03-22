@@ -25,7 +25,6 @@ SOFTWARE.
 
 import csv
 from os import path
-from shutil import copy
 from itertools import cycle
 
 
@@ -37,8 +36,10 @@ class Activities:
     def load(self):
         self.activity_list = []
         if not path.isfile(self.file):
-            # Create activities.csv from the sample if it does not already exist
-            copy(f"{self.file}.sample", self.file)
+            with open(self.file, "w") as f:
+                # Create activities.csv from the sample if it does not already exist
+                w = csv.writer(f, delimiter=",", lineterminator="\n")
+                w.writerow(["with reactions"])
 
         with open(self.file, "r") as f:
             # Get activities.csv contents
