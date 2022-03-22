@@ -67,4 +67,4 @@ config.read(f"{directory}/config.ini")
 
 language = str(config.get("server", "language", fallback="en-gb"))
 
-response = Response(f"{directory}/files/i18n", language)
+response = Response(f"{directory}/i18n", language)

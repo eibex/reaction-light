@@ -213,7 +213,7 @@ If you would like to contribute to this project, fork it and then create a pull 
 black --line-length=130 .
 ```
 
-Even if you are not a Python programmer, you can contribute to this project by reporting bugs, requesting new features, or translating the bot in your language. To translate the bot simply copy the [English file](https://github.com/eibex/reaction-light/blob/master/files/i18n/en-gb.json) and replace the text inside the second quotes of each line. Do not replace the text within `{}`. Click [here](https://github.com/eibex/reaction-light/blob/master/files/i18n/it-it.json) for an example.
+Even if you are not a Python programmer, you can contribute to this project by reporting bugs, requesting new features, or translating the bot in your language. To translate the bot simply copy the [English file](https://github.com/eibex/reaction-light/blob/master/i18n/en-gb.json) and replace the text inside the second quotes of each line. Do not replace the text within `{}`. Click [here](https://github.com/eibex/reaction-light/blob/master/i18n/it-it.json) for an example.
 
 ## License
 [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
