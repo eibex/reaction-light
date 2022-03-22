@@ -22,7 +22,6 @@ Light yet powerful reaction role bot coded in Python.
 You can host the bot yourself by configuring the `config.ini` file (manually or via `setup.py`).
 
 ## Contents
-- [Requirements](#requirements)
 - [Deployment](#deployment)
   - [Docker](#docker)
   - [Git and Zip](#git-and-zip)
@@ -38,14 +37,6 @@ You can host the bot yourself by configuring the `config.ini` file (manually or 
 - [Help](#help)
 - [Contribute](#contribute)
 - [License](#license)
-
-## Requirements
-This bot requires [disnake](https://github.com/DisnakeDev/disnake) and Python 3.8+.
-
-You can get disnake via PyPI or GitHub:
-```
-python3 -m pip install -r requirements.txt
-```
 
 ## Deployment
 ## Docker 
@@ -75,8 +66,10 @@ docker run -d \
 - On your Discord server, go to: `Server Settings > Roles` and move `Reaction Light` in a position that is above all roles that it needs to add/remove. The bot only has permission to manage the roles below its own role.
 - Run `rl!admin @Role` to give users with that role permission to create reaction-role messages (even administrators need it). You need to be a server administrator to use this command.
 ## Git and Zip
+- Download and install python 3.8+ and pip via your preferred method (e.g. `apt-get install python3 python3-pip`)
 - Clone the repository using `git clone https://github.com/eibex/reaction-light.git` (or download it as a `*.zip` file and extract it - it is recommended to use git instead of the zip archive)
   - `git` comes pre-installed on most Linux-based operating systems. On Windows, if you are not familiar with git, you can use [GitHub Desktop](https://desktop.github.com/)
+- Install requirements via pip using `python3 -m pip install -r requirements.txt`
 - Run `setup.py` and follow the instructions or create a `config.ini` file (example provided in `config.ini.sample`) or edit it manually
   - Insert the token of your bot (found at: https://discord.com/developers/applications/)
   - You can set most of the other values via commands later (set manually `name` and `logo`, which appear in the footer of each embed)
