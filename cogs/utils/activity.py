@@ -36,7 +36,7 @@ class Activities:
     def load(self):
         self.activity_list = []
         if not path.isfile(self.file):
-            with open(self.file, "w") as f:
+            with open(self.file, "w", encoding="utf-8") as f:
                 # Create activities.csv from the sample if it does not already exist
                 w = csv.writer(f, delimiter=",", lineterminator="\n")
                 w.writerow(["with reactions"])
