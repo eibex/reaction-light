@@ -9,15 +9,15 @@
 Light yet powerful reaction role bot coded in Python.
 
 ## Key Features
-- Create multiple custom embedded messages with custom reactions and roles
+- Create multiple custom embedded messages with custom reactions and roles, or use other messages and add reactionroles to them
 - Automatically assign/remove roles to users when they select/deselect a certain reaction
 - Optionally limit users to select one reaction (and role) at a time
 - Use the same instance of the bot on multiple servers
-- Easy installation, setup, and updating
-  - No need to rely on developer mode and IDs
+- Easy installation, setup, and updating: no need to rely on developer mode and IDs
 - Optional update notifications and error reporting to your own Discord server
 - Multiple languages
 - Slash command ready
+- Docker support
 
 You can host the bot yourself by configuring the `config.ini` file (manually or via `setup.py`).
 
