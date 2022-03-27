@@ -346,6 +346,8 @@ class Message(commands.Cog):
         inter,
         channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
         number: int = commands.Param(description=response.get("message-edit-option-number")),
+        image: str = commands.Param(description=response.get("message-edit-option-image"), default=None),
+        thumbnail: str = commands.Param(description=response.get("message-edit-option-thumbnail"), default=None)
     ):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.send(response.get("not-admin"))
@@ -393,24 +395,28 @@ class Message(commands.Cog):
                     return
                 await old_msg.edit(suppress=False)
 
+                if (image and "https://" not in image) or (thumbnail and "https://" not in thumbnail):
+                    await inter.send(response.get("invalid-attachment"))
+                    return
+
                 await inter.response.send_modal(
                     title=response.get("modal-edit-title"),
                     custom_id=("edit_reactionrole"),
                     components=[
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-option-message"),
+                            label=response.get("message-edit-modal-message"),
                             required=False,
                             custom_id="message",
                             style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-option-title"),
+                            label=response.get("message-edit-modal-title"),
                             required=False,
                             custom_id="title",
                             style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-option-description"),
+                            label=response.get("message-edit-modal-description"),
                             required=False,
                             custom_id="description",
                             style=disnake.TextInputStyle.paragraph,
@@ -432,6 +438,10 @@ class Message(commands.Cog):
                 await selector_modal_inter.response.defer()
                 selector_embed = disnake.Embed()
                 selector_msg_new_body = None
+                if image:
+                    selector_embed.set_image(url=image)
+                if thumbnail:
+                    selector_embed.set_thumbnail(url=thumbnail)
                 for custom_id, value in selector_modal_inter.text_values.items():
                     if custom_id == "title" and value:
                         selector_embed.title = value
