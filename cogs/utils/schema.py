@@ -146,24 +146,28 @@ class SchemaHandler:
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT reactionrole_id, reaction, role_id FROM reactionroles;")
+        cursor.execute("PRAGMA table_info(reactionroles);")
         result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "message_id" not in columns:
+            cursor.execute("SELECT reactionrole_id, reaction, role_id FROM reactionroles;")
+            result = cursor.fetchall()
 
-        targets = []
-        for reaction_role in result:
-            reaction: str = reaction_role[1]
-            sanitized_reaction = sanitize_emoji(reaction)
-            if reaction != sanitized_reaction:
-                reaction_role = list(reaction_role)
-                reaction_role[1] = sanitized_reaction
-                targets.append(reaction_role)
+            targets = []
+            for reaction_role in result:
+                reaction: str = reaction_role[1]
+                sanitized_reaction = sanitize_emoji(reaction)
+                if reaction != sanitized_reaction:
+                    reaction_role = list(reaction_role)
+                    reaction_role[1] = sanitized_reaction
+                    targets.append(reaction_role)
 
-        if targets:
-            # Repack targets for query
-            # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id
-            targets = [(i[1], i[0], i[2]) for i in targets]
-            cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?;", targets)
-            conn.commit()
+            if targets:
+                # Repack targets for query
+                # reactionrole_id, reaction, role_id -> reaction, reactionrole_id, role_id
+                targets = [(i[1], i[0], i[2]) for i in targets]
+                cursor.executemany("UPDATE reactionroles SET reaction = ? WHERE reactionrole_id = ? AND role_id = ?;", targets)
+                conn.commit()
 
         cursor.close()
         conn.close()
