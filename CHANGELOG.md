@@ -1,10 +1,19 @@
 # Reaction Light - Changelog
+
+### 3.1.0
+- Add `image` and `thumbnail` parameters to `/message edit` ([#59](https://github.com/eibex/reaction-light/issues/59) closed by [#109](https://github.com/eibex/reaction-light/pull/109) by [eibex](https://github.com/eibex))
+- Support docker installations ([#95](https://github.com/eibex/reaction-light/issues/95) closed by [#107](https://github.com/eibex/reaction-light/pull/107) by [Edwinexd](https://github.com/Edwinexd))
+- Add automatic generation of docker images ([#107](https://github.com/eibex/reaction-light/pull/107) by [eibex](https://github.com/eibex))
+- Fix new installations
+- Improved formatting of message deletions
+- New installation guide and [wiki](https://github.com/eibex/reaction-light/wiki)
+
 ### 3.0.5
 - Fix `/message new` and restructure database ([#106](https://github.com/eibex/reaction-light/pull/106) by [eibex](https://github.com/eibex))
 
 ### 3.0.4
 - Rework reaction storage and fix reactionroles with animated emojis ([#105](https://github.com/eibex/reaction-light/pull/105) by [Edwinexd](https://github.com/Edwinexd))
-- Bump timeout for message contents from 2 to 5 minutes ([cad818b](https://github.com/eibex/reaction-light/commit/cad818ba231a63acddb0dffc606abf7959d4fb11) by [eibex](https://github.com/eibex))
+- Bump timeout for message contents from 2 to 5 minutes
 
 ### 3.0.3
 - Allow (once again) new lines via modals ([#101](https://github.com/eibex/reaction-light/issues/101) closed by [#103](https://github.com/eibex/reaction-light/pull/103) by [eibex](https://github.com/eibex))
