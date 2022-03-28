@@ -337,13 +337,8 @@ class Database:
         cursor.execute("SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,))
         results = cursor.fetchall()
         notify = results[0][0]
-        if notify:
-            notify = 0
-            cursor.execute("UPDATE guild_settings SET notify = ? WHERE guild_id = ?", (notify, guild_id))
-
-        else:
-            notify = 1
-            cursor.execute("UPDATE guild_settings SET notify = ? WHERE guild_id = ?", (notify, guild_id))
+        notify = 0 if notify else 1
+        cursor.execute("UPDATE guild_settings SET notify = ? WHERE guild_id = ?", (notify, guild_id))
         conn.commit()
         cursor.close()
         conn.close()
