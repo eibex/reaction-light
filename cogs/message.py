@@ -346,8 +346,6 @@ class Message(commands.Cog):
         inter,
         channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
         number: int = commands.Param(description=response.get("message-edit-option-number")),
-        image: str = commands.Param(description=response.get("message-edit-option-image"), default=None),
-        thumbnail: str = commands.Param(description=response.get("message-edit-option-thumbnail"), default=None)
     ):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.send(response.get("not-admin"))
@@ -395,10 +393,6 @@ class Message(commands.Cog):
                     return
                 await old_msg.edit(suppress=False)
 
-                if (image and "https://" not in image) or (thumbnail and "https://" not in thumbnail):
-                    await inter.send(response.get("invalid-attachment"))
-                    return
-
                 await inter.response.send_modal(
                     title=response.get("modal-edit-title"),
                     custom_id=("edit_reactionrole"),
@@ -421,6 +415,18 @@ class Message(commands.Cog):
                             custom_id="description",
                             style=disnake.TextInputStyle.paragraph,
                         ),
+                        disnake.ui.TextInput(
+                            label=response.get("message-edit-modal-image"),
+                            required=False,
+                            custom_id="image",
+                            style=disnake.TextInputStyle.short,
+                        ),
+                        disnake.ui.TextInput(
+                            label=response.get("message-edit-modal-thumbnail"),
+                            required=False,
+                            custom_id="thumbnail",
+                            style=disnake.TextInputStyle.short,
+                        ),
                     ],
                 )
 
@@ -438,10 +444,6 @@ class Message(commands.Cog):
                 await selector_modal_inter.response.defer()
                 selector_embed = disnake.Embed()
                 selector_msg_new_body = None
-                if image:
-                    selector_embed.set_image(url=image)
-                if thumbnail:
-                    selector_embed.set_thumbnail(url=thumbnail)
                 for custom_id, value in selector_modal_inter.text_values.items():
                     if custom_id == "title" and value:
                         selector_embed.title = value
@@ -455,6 +457,18 @@ class Message(commands.Cog):
 
                     elif custom_id == "message" and value:
                         selector_msg_new_body = value
+
+                    elif custom_id == "image" and value:
+                        if "https://" not in value:
+                            await inter.send(response.get("invalid-attachment"))
+                        else:
+                            selector_embed.set_image(url=value)
+
+                    elif custom_id == "thumbnail" and value:
+                        if "https://" not in value:
+                            await inter.send(response.get("invalid-attachment"))
+                        else:
+                            selector_embed.set_thumbnail(url=value)
 
                 try:
                     if selector_embed.title or selector_embed.description:

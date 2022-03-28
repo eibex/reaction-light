@@ -76,7 +76,10 @@ class Cleaner(commands.Cog):
 
                     await self.bot.report(
                         response.get("db-message-delete-success").format(
-                            message_id=message_id, channel_id=channel_id, guild_id=guild_id, limit_to_one_status=limit_to_one_status
+                            message_id=message_id,
+                            channel_id=channel_id,
+                            guild_id=guild_id,
+                            limit_to_one_status=limit_to_one_status,
                         ),
                         guild_id,
                     )
