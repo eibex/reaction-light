@@ -2,7 +2,7 @@
 [![Reaction Light Discord Server](https://img.shields.io/discord/914952998109716531?color=5865f2&logo=discord&logoColor=ffffff)](https://discord.gg/cqxZQkhhHm)
 [![Reaction Light 3.1.0](https://img.shields.io/badge/Reaction%20Light-3.1.0-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
-[![disnake 2.4.0+](https://img.shields.io/badge/disnake-2.4.0+-blue.svg)](#)
+[![disnake 2.5.0+](https://img.shields.io/badge/disnake-2.5.0+-blue.svg)](#)
 
 ![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)
 

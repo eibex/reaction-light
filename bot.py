@@ -50,8 +50,8 @@ class ReactionLight(commands.Bot):
         self.activities = activity.Activities(f"{self.directory}/files/activities.csv")
         self.db = database.Database(f"{self.directory}/files/reactionlight.db")
         self.version = version.get(self.directory)
-        intents = disnake.Intents(guild_messages=True, guild_reactions=True, guilds=True)
-        super().__init__(command_prefix=self.config.prefix, intents=intents)
+        intents = disnake.Intents(message_content=True, guild_messages=True, guild_reactions=True, guilds=True)
+        super().__init__(intents=intents)
 
         for extension in extensions:
             self.load_extension(extension)
