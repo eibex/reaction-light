@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 
+### 3.1.1
+- Fix message intents ([#110](https://github.com/eibex/reaction-light/pull/110) by [eibex](https://github.com/eibex))
+- Upgrade to disnake 2.5.0 (manual update; if you are on docker you will need to pull a new image - more info on the [wiki](https://github.com/eibex/reaction-light/wiki))
+
 ### 3.1.0
 - Add `image` and `thumbnail` parameters to `/message edit` ([#59](https://github.com/eibex/reaction-light/issues/59) closed by [#109](https://github.com/eibex/reaction-light/pull/109) by [eibex](https://github.com/eibex))
 - Support docker installations ([#95](https://github.com/eibex/reaction-light/issues/95) closed by [#107](https://github.com/eibex/reaction-light/pull/107) by [Edwinexd](https://github.com/Edwinexd))
