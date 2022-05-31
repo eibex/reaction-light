@@ -9,4 +9,4 @@ RUN rm -r /bot/files
 
 WORKDIR /bot
 
-CMD ["python3.9", "bot.py"]
+CMD ["python3.9", "-u", "bot.py"]
