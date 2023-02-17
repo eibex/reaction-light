@@ -79,7 +79,8 @@ class Roles(commands.Cog):
                         for existing_reaction in msg.reactions:
                             if str(existing_reaction.emoji) == reaction:
                                 continue
-                            reaction_users_ids = (reaction_user.id for reaction_user in existing_reaction.users())
+                            reaction_users = await existing_reaction.users().flatten()
+                            reaction_users_ids = (reaction_user.id for reaction_user in reaction_users)
                             if user_id in reaction_users_ids:
                                 await msg.remove_reaction(existing_reaction, user)
                                 # We can safely break since a user can only have one reaction at once
