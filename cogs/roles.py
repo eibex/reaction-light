@@ -79,11 +79,11 @@ class Roles(commands.Cog):
                         for existing_reaction in msg.reactions:
                             if str(existing_reaction.emoji) == reaction:
                                 continue
-                            async for reaction_user in existing_reaction.users():
-                                if reaction_user.id == user_id:
-                                    await msg.remove_reaction(existing_reaction, user)
-                                    # We can safely break since a user can only have one reaction at once
-                                    break
+                            reaction_users_ids = (reaction_user.id for reaction_user in existing_reaction.users())
+                            if user_id in reaction_users_ids:
+                                await msg.remove_reaction(existing_reaction, user)
+                                # We can safely break since a user can only have one reaction at once
+                                break
 
                     try:
                         await member.add_roles(role)
