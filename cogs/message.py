@@ -347,22 +347,23 @@ class Message(commands.Cog):
         channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
         number: int = commands.Param(description=response.get("message-edit-option-number")),
     ):
+        await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.send(response.get("not-admin"))
+            await inter.edit_original_message(response.get("not-admin"))
             return
 
         all_messages = await self.formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await inter.send(content=response.get("edit-reactionrole-one").format(channel_name=channel.name))
+                await inter.edit_original_message(content=response.get("edit-reactionrole-one").format(channel_name=channel.name))
             elif len(all_messages) > 1:
-                await inter.send(
+                await inter.edit_original_message(
                     content=response.get("edit-reactionrole-instructions").format(
                         num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
                     )
                 )
             else:
-                await inter.send(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
         else:
             try:
                 # Tries to edit the reaction-role message
@@ -383,17 +384,17 @@ class Message(commands.Cog):
 
                         counter += 1
                 else:
-                    await inter.send(response.get("reactionrole-not-exists"))
+                    await inter.edit_original_message(response.get("reactionrole-not-exists"))
                     return
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
-                    await inter.send(response.get("select-valid-reactionrole"))
+                    await inter.edit_original_message(response.get("select-valid-reactionrole"))
                     return
                 await old_msg.edit(suppress=False)
 
-                await inter.response.send_modal(
+                await inter.followup.send_modal(
                     title=response.get("modal-edit-title"),
                     custom_id=("edit_reactionrole"),
                     components=[
