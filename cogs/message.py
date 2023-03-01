@@ -408,7 +408,7 @@ class Message(commands.Cog):
                 try:
                     button_ctx = await self.bot.wait_for(
                         "button_click",
-                        check=lambda i: i.custom_id == "message_edit_modal" and i.message.id == sent_message_message.id and i.author.id == inter.author.id,
+                        check=lambda i: i.component.custom_id == "message_edit_modal" and i.message.id == sent_message_message.id and i.author.id == inter.author.id,
                         timeout=60,
                     )
                 except asyncio.TimeoutError:
