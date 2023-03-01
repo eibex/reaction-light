@@ -372,16 +372,14 @@ class Message(commands.Cog):
                 except DatabaseError as error:
                     await self.bot.report(response.get("db-error-fetching-messages").format(message_ids=error), inter.guild.id)
                     return
-                counter = 1
+
                 if all_messages:
                     message_to_edit_id = None
-                    for msg_id in all_messages:
-                        # Loop through all msg_ids and stops when the counter matches the user input
-                        if counter == number:
-                            message_to_edit_id = msg_id
-                            break
+                    try:
+                        message_to_edit_id = all_messages[number-1]
+                    except IndexError:
+                        await inter.send(response.get("reactionrole-not-exists"))
 
-                        counter += 1
                 else:
                     await inter.send(response.get("reactionrole-not-exists"))
                     return
