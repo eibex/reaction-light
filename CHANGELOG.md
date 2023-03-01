@@ -1,5 +1,10 @@
 # Reaction Light - Changelog
 
+### 3.2.0
+- Improve edit modals for slower setups
+- Slight improvement on unique reactionrole checks
+- Add Spanish (MX) translation ([#114](https://github.com/eibex/reaction-light/pull/114) by [Afasany](https://github.com/Afasany))
+
 ### 3.1.1
 - Fix message intents ([#110](https://github.com/eibex/reaction-light/pull/110) by [eibex](https://github.com/eibex))
 - Upgrade to disnake 2.5.0 (manual update; if you are on docker you will need to pull a new image - more info on the [wiki](https://github.com/eibex/reaction-light/wiki))
