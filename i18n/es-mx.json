@@ -34,7 +34,7 @@
     "removed-role-dm": "Ya no tienes el siguiente rol: {role_name}",
     "reaction-edit-one": "Solo hay un mensaje de roles de reacción en este canal. Usa `1` en el parámetro `number`.",
     "reaction-edit-multi": "Hay {num_messages} mensajes de roles de reacción en este canal. Utiliza el número del mensaje que deseas editar en el parámetro `number`. \nLa lista numerada de los mensajes de roles de reacción actuales es:\n\n{message_list}",
-    "reaction-edit-already-exists": "Ese mensaje ya tiene una combinación de roles de reacción con esa reacción."
+    "reaction-edit-already-exists": "Ese mensaje ya tiene una combinación de roles de reacción con esa reacción.",
     "reaction-edit-add-success": "Reacción añadida.",
     "reaction-edit-remove-success": "Reacción eliminada.",
     "reaction-edit-invalid-reaction": "Reacción inválida.",
@@ -140,6 +140,8 @@
     "message-edit-modal-description": "La descripción del incrustado (opcional)",
     "message-edit-modal-image": "La URL de la imagen del incrustado (opcional)",
     "message-edit-modal-thumbnail": "La URL de la miniatura del incrustado (opcional)",
+    "message-edit-button-label": "Editar Mensaje",
+    "message-edit-button-content": "Pulse el botón de abajo para continuar",
     "modal-edit-title": "**Edición de mensaje**",
     "message-reaction-option-channel": "El canal en el que se encuentra el mensaje al que desea agregar/quitar la reacción",
     "message-reaction-option-action": "Use 'añadir' o 'quitar' para agregar/quitar una reacción a un mensaje existente",
