@@ -140,6 +140,8 @@
     "message-edit-modal-description": "The description of the embed (optional)",
     "message-edit-modal-image": "The URL of the embed's image (optional)",
     "message-edit-modal-thumbnail": "The URL of the embed's thumbnail (optional)",
+    "message-edit-button-label": "Edit Message",
+    "message-edit-button-content": "Press the button below to continue",
     "modal-edit-title": "Message Editing",
     "message-reaction-option-channel": "The channel in which the message you want to add/remove the reaction is located",
     "message-reaction-option-action": "Use 'add' or 'remove' to add/remove a reaction to an existing message",

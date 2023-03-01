@@ -343,26 +343,27 @@ class Message(commands.Cog):
     @message_group.sub_command(name="edit", description=response.get("brief-message-edit"))
     async def edit_selector(
         self,
-        inter,
+        inter: disnake.ApplicationCommandInteraction,
         channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
         number: int = commands.Param(description=response.get("message-edit-option-number")),
     ):
+        await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.send(response.get("not-admin"))
+            await inter.edit_original_message(content=response.get("not-admin"))
             return
 
         all_messages = await self.formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await inter.send(content=response.get("edit-reactionrole-one").format(channel_name=channel.name))
+                await inter.edit_original_message(content=response.get("edit-reactionrole-one").format(channel_name=channel.name))
             elif len(all_messages) > 1:
-                await inter.send(
+                await inter.edit_original_message(
                     content=response.get("edit-reactionrole-instructions").format(
                         num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
                     )
                 )
             else:
-                await inter.send(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
         else:
             try:
                 # Tries to edit the reaction-role message
@@ -376,22 +377,47 @@ class Message(commands.Cog):
                 if all_messages:
                     message_to_edit_id = None
                     try:
-                        message_to_edit_id = all_messages[number-1]
+                        message_to_edit_id = all_messages[number - 1]
                     except IndexError:
-                        await inter.send(response.get("reactionrole-not-exists"))
+                        await inter.edit_original_message(response.get("reactionrole-not-exists"))
 
                 else:
-                    await inter.send(response.get("reactionrole-not-exists"))
+                    await inter.edit_original_message(response.get("reactionrole-not-exists"))
                     return
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
-                    await inter.send(response.get("select-valid-reactionrole"))
+                    await inter.edit_original_message(response.get("select-valid-reactionrole"))
                     return
-                await old_msg.edit(suppress=False)
+                await old_msg.edit(suppress_embeds=False)
 
-                await inter.response.send_modal(
+                # Send a message with a button to open a modal
+                sent_message_message = await inter.edit_original_message(
+                    content=response.get("message-edit-button-content"),
+                    components=[
+                        disnake.ui.Button(
+                            label=response.get("message-edit-button-label"),
+                            emoji="🔧",
+                            style=disnake.ButtonStyle.primary,
+                            custom_id="message_edit_modal",
+                        )
+                    ],
+                )
+                # Wait for the button to be pressed
+                try:
+                    button_ctx = await self.bot.wait_for(
+                        "button_click",
+                        check=lambda i: i.custom_id == "message_edit_modal" and i.message.id == sent_message_message.id and i.author.id == inter.author.id,
+                        timeout=60,
+                    )
+                except asyncio.TimeoutError:
+                    try:
+                        await sent_message_message.delete(delay=None)
+                    except disnake.HTTPException:
+                        pass
+                    return
+                await button_ctx.response.send_modal(
                     title=response.get("modal-edit-title"),
                     custom_id=("edit_reactionrole"),
                     components=[
