@@ -88,7 +88,7 @@
     "db-error-admin-check": "Error de base de datos al verificar si el miembro es un administrador:\n```\n{exception}\n```",
     "db-error-add-cleanup": "Error de base de datos al agregar un servidor a la cola de limpieza:\n```\n{exception}\n```",
     "db-error-add-cleanup-removal": "Error de base de datos al agregar un servidor a la cola de limpieza al removerlo:\n```\n{exception}\n```",
-    "db-error-removing-cleanup": "Error de base de datos al eliminar un servidor de la cola de limpieza:\n\n{eception}\n",
+    "db-error-removing-cleanup": "Error de base de datos al eliminar un servidor de la cola de limpieza:\n\n{exception}\n",
     "permission-error-channel": "No puedo leer o enviar mensajes en ese canal.",
     "permission-error-add": "Alguien intentó agregarse un rol a sí mismo, pero no tengo permisos para hacerlo. Asegúrate de que tengo un rol que esté jerárquicamente por encima del rol que debo asignar, y que tenga el permiso Gestionar Roles.",
     "permission-error-remove": "Alguien intentó eliminarse un rol a sí mismo, pero no tengo permisos para hacerlo. Asegúrate de que tengo un rol que esté jerárquicamente por encima del rol que debo eliminar, y que tenga el permiso Gestionar Roles.",
