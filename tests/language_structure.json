@@ -296,7 +296,7 @@
         ]
     },
     "db-error-fetching-systemchannels": {
-        "max_length": 71,
+        "max_length": 1024,
         "parameters": [
             "exception"
         ]
@@ -424,7 +424,9 @@
     },
     "db-error-admin-remove": {
         "max_length": 1024,
-        "parameters": []
+        "parameters": [
+            "exception"
+        ]
     },
     "db-error-admin-check": {
         "max_length": 1024,
