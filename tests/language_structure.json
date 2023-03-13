@@ -1,0 +1,727 @@
+{
+    "LANGUAGE": {
+        "max_length": 50,
+        "parameters": []
+    },
+    "new-reactionrole-init": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-roles-emojis": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-already-used": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-emoji-403": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-timeout": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-limit": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-old-or-new": {
+        "max_length": 1024,
+        "parameters": [
+            "bot_mention"
+        ]
+    },
+    "new-reactionrole-permission-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-already-exists": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-target-channel": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-cancelled": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "invalid-target-channel": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-message-contents": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-which-message": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "new-reactionrole-message-send-permission-error": {
+        "max_length": 1024,
+        "parameters": [
+            "channel_mention"
+        ]
+    },
+    "new-reactionrole-noadmin": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "edit-reactionrole-one": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "edit-reactionrole-instructions": {
+        "max_length": 1024,
+        "parameters": [
+            "num_messages",
+            "message_list"
+        ]
+    },
+    "invalid-attachment": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "no-reactionrole-messages": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "reactionrole-not-exists": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "select-valid-reactionrole": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "message-edited": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "other-author-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "empty-message-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "edit-permission-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "update-notification": {
+        "max_length": 1024,
+        "parameters": [
+            "new_version"
+        ]
+    },
+    "version": {
+        "max_length": 1024,
+        "parameters": [
+            "version",
+            "latest_version"
+        ]
+    },
+    "new-role-dm": {
+        "max_length": 1024,
+        "parameters": [
+            "role_name"
+        ]
+    },
+    "removed-role-dm": {
+        "max_length": 1024,
+        "parameters": [
+            "role_name"
+        ]
+    },
+    "reaction-edit-one": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "reaction-edit-multi": {
+        "max_length": 1024,
+        "parameters": [
+            "num_messages",
+            "message_list"
+        ]
+    },
+    "reaction-edit-already-exists": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "reaction-edit-add-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "reaction-edit-remove-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "reaction-edit-invalid-reaction": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "no-role-mentioned": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "systemchannels-info": {
+        "max_length": 1024,
+        "parameters": [
+            "main_channel",
+            "server_channel"
+        ]
+    },
+    "systemchannels-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "notifications-on": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "notifications-off": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "colour-changed": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "colour-hex-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "activity-no-commas": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "activity-success": {
+        "max_length": 1024,
+        "parameters": [
+            "new_activity"
+        ]
+    },
+    "current-activities": {
+        "max_length": 1024,
+        "parameters": [
+            "activity_list"
+        ]
+    },
+    "no-current-activities": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "rm-activity-success": {
+        "max_length": 1024,
+        "parameters": [
+            "activity_to_delete"
+        ]
+    },
+    "rm-activity-not-exists": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "admin-add-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "admin-remove-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "adminlist-local": {
+        "max_length": 1024,
+        "parameters": [
+            "admin_list"
+        ]
+    },
+    "adminlist-local-empty": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "language-success": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "not-admin": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "not-owner": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "systemchannel-404": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "systemchannel-403": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "db-error-add-reaction": {
+        "max_length": 1024,
+        "parameters": [
+            "channel_mention",
+            "exception"
+        ]
+    },
+    "db-error-remove-reaction": {
+        "max_length": 1024,
+        "parameters": [
+            "channel_mention",
+            "exception"
+        ]
+    },
+    "db-error-fetching-messages": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-guild": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-systemchannels": {
+        "max_length": 71,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-systemchannels-server": {
+        "max_length": 1024,
+        "parameters": [
+            "exception",
+            "text"
+        ]
+    },
+    "db-error-fetching-cleaning": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-cleaning-guild": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-message-exists": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-cleanup-guild": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-fetching-admins": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-adding-systemchannels": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-deleting-cleaning": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-deleting-cleaning-guild": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-reaction-add": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-reaction-remove": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-reaction-get": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-reaction-unique": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-notification-check": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-toggle-notify": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-new-reactionrole": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-message-delete-success": {
+        "max_length": 1024,
+        "parameters": [
+            "message_id",
+            "channel_id",
+            "guild_id",
+            "limit_to_one_status"
+        ]
+    },
+    "db-forbidden-message": {
+        "max_length": 1024,
+        "parameters": [
+            "message_id",
+            "channel_id",
+            "guild_id",
+            "limit_to_one_status"
+        ]
+    },
+    "db-error-admin-add": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-admin-remove": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "db-error-admin-check": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-add-cleanup": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-add-cleanup-removal": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "db-error-removing-cleanup": {
+        "max_length": 1024,
+        "parameters": [
+            "exception"
+        ]
+    },
+    "permission-error-channel": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "permission-error-add": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "permission-error-remove": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "example-embed": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "example-embed-new-colour": {
+        "max_length": 4096,
+        "parameters": []
+    },
+    "shutdown": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "restart": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "attempting-update": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "database-backup": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "windows-error": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "login-failure-intents": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "login-failure-token": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "help-messages-title": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "help-new": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-edit": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-reaction": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-settings-title": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "help-notify": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-colour": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-activity": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-systemchannel": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-language": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-admins-title": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "help-admin": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-bot-control-title": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "help-kill": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-restart": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-update": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-version": {
+        "max_length": 256,
+        "parameters": []
+    },
+    "help-footer": {
+        "max_length": 256,
+        "parameters": [
+            "version"
+        ]
+    },
+    "brief-message-new": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-message-edit": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-message-reaction": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-settings-notify": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-settings-systemchannel": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-settings-language": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-settings-colour": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-settings-activity": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-help": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-admin": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-version": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-kill": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-restart": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "brief-update": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-option-channel": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-option-number": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-modal-message": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-modal-title": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-modal-description": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-modal-image": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-modal-thumbnail": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-edit-button-label": {
+        "max_length": 80,
+        "parameters": []
+    },
+    "message-edit-button-content": {
+        "max_length": 80,
+        "parameters": []
+    },
+    "modal-edit-title": {
+        "max_length": 32,
+        "parameters": []
+    },
+    "message-reaction-option-channel": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-reaction-option-action": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-reaction-option-number": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-reaction-option-reaction": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "message-reaction-option-role": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-systemchannel-option-type": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-systemchannel-option-channel": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-language-option-language": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-colour-option-colour": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-activity-option-action": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "settings-activity-option-activity": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "activity-add-list-remove": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "admin-option-action": {
+        "max_length": 100,
+        "parameters": []
+    },
+    "admin-option-role": {
+        "max_length": 100,
+        "parameters": []
+    }
+}

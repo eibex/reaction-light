@@ -17,7 +17,6 @@
     "new-reactionrole-which-message": "Which message would you like to use? Please react with a 🔧 on the message you would like to use.",
     "new-reactionrole-message-send-permission-error": "I don't have permission to send messages to the channel {channel_mention}. Please check my permissions and try again.",
     "new-reactionrole-noadmin": "You do not have an admin role. You might want to use `/admin add` first.",
-    "edit-reactionrole-nochannel": "You need to mention a channel.",
     "edit-reactionrole-one": "There is only one reaction-role message in this channel. Use `1` in the `number` parameter.",
     "edit-reactionrole-instructions": "There are **{num_messages}** reaction-role messages in this channel. Use the number of the message you want to edit in the `number` parameter. \nThe numbered list of the current reaction-role messages is:\n\n{message_list}",
     "invalid-attachment": "The URL of the attachment is not valid. Ensure it is a correct URL starting with `https://`.",

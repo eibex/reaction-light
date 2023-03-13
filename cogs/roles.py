@@ -73,7 +73,7 @@ class Roles(commands.Cog):
                     try:
                         unique = self.bot.db.isunique(msg_id)
                     except DatabaseError as error:
-                        await self.bot.report(guild_id, response.get("db-error-reaction-unique").format(exception=error))
+                        await self.bot.report(response.get("db-error-reaction-unique").format(exception=error), guild_id)
                         return
                     if unique:
                         for existing_reaction in msg.reactions:

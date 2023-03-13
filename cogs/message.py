@@ -176,9 +176,7 @@ class Message(commands.Cog):
             error_messages = []
             user_messages = []
             if rl_object["old_message"]:
-                sent_oldmessage_message = await inter.channel.send(
-                    response.get("new-reactionrole-which-message").format(bot_mention=self.bot.user.mention)
-                )
+                sent_oldmessage_message = await inter.channel.send(response.get("new-reactionrole-which-message"))
 
                 def reaction_check3(payload):
                     return payload.user_id == inter.author.id and payload.guild_id == inter.guild.id and str(payload.emoji) == "🔧"
@@ -226,11 +224,7 @@ class Message(commands.Cog):
                         except disnake.NotFound:
                             error_messages.append(
                                 (
-                                    await inter.channel.send(
-                                        response.get("new-reactionrole-permission-error").format(
-                                            bot_mention=self.bot.user.mention
-                                        )
-                                    )
+                                    await inter.channel.send(response.get("new-reactionrole-permission-error"))
                                 )
                             )
                         except ValueError:
@@ -355,11 +349,11 @@ class Message(commands.Cog):
         all_messages = await self.formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await inter.edit_original_message(content=response.get("edit-reactionrole-one").format(channel_name=channel.name))
+                await inter.edit_original_message(content=response.get("edit-reactionrole-one"))
             elif len(all_messages) > 1:
                 await inter.edit_original_message(
                     content=response.get("edit-reactionrole-instructions").format(
-                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
+                        num_messages=len(all_messages), message_list="\n".join(all_messages)
                     )
                 )
             else:
@@ -533,12 +527,12 @@ class Message(commands.Cog):
         if number == 0 or not reaction:
             all_messages = await self.formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await inter.edit_original_message(content=response.get("reaction-edit-one").format(channel_name=channel.name))
+                await inter.edit_original_message(content=response.get("reaction-edit-one"))
                 return
             elif len(all_messages) > 1:
                 await inter.edit_original_message(
                     content=response.get("reaction-edit-multi").format(
-                        num_messages=len(all_messages), channel_name=channel.name, message_list="\n".join(all_messages)
+                        num_messages=len(all_messages), message_list="\n".join(all_messages)
                     )
                 )
                 return
