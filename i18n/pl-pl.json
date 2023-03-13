@@ -17,7 +17,6 @@
     "new-reactionrole-which-message": "Którą wiadomość chcesz użyć? Proszę zareagować 🔧 na wiadomości, której chcesz użyć.",
     "new-reactionrole-message-send-permission-error": "Nie mam uprawnień do wysyłania wiadomości do kanału {channel_mention}. Sprawdź moje uprawnienia i spróbuj ponownie.",
     "new-reactionrole-noadmin": "Nie masz roli administratora. Możesz najpierw użyć `/admin add`.",
-    "edit-reactionrole-nochannel": "Musisz podać mi kanał.",
     "edit-reactionrole-one": "W tym kanale znajduje się tylko jedna wiadomość reakcją. Użyj `1` w parametrze `number`.",
     "edit-reactionrole-instructions": "Na tym kanale są **{num_messages}** wiadomości o roli reakcji. Użyj numeru wiadomości, którą chcesz edytować w parametrze `number`. \nLista ponumerowanych wiadomości o bieżącej roli reakcji:\n\n{message_list}",
     "invalid-attachment": "Adres URL załącznika jest nieprawidłowy. Upewnij się, że jest to poprawny adres URL zaczynający się od `https://`.",

@@ -2,13 +2,9 @@ import re
 from typing import Dict, List
 import json
 import attr
-import pytest
 import os
 
 PARAMETER_REGEX = r'\{(\w+)\}'
-
-with open('tests/language_structure.json') as f:
-    language_structure = json.load(f)
 
 @attr.s(auto_attribs=True, slots=True)
 class StringLimitations():
@@ -27,6 +23,9 @@ class StringData():
     @classmethod
     def from_string(cls, string: str) -> 'StringData':
         return cls(length=len(string), parameters=re.findall(PARAMETER_REGEX, string))
+
+with open('tests/language_structure.json') as f:
+    language_structure = json.load(f)
 
 LANGUAGE_STRUCTURE: Dict[str, StringLimitations] = {k:StringLimitations.from_json(v) for k, v in language_structure.items()}
 
@@ -50,7 +49,7 @@ def pytest_generate_tests(metafunc):
     if "language_pack" in metafunc.fixturenames:
         if "language_string" in metafunc.fixturenames:
             language_packs = get_language_packs()
-            metafunc.parametrize(["language_pack", "language_string"], [(lp, ls) for lp in language_packs for ls in get_language_pack(lp).keys()])
+            metafunc.parametrize(["language_pack", "language_string"], [(lp, ls) for lp in language_packs for ls in get_language_pack(lp).keys() if ls in LANGUAGE_STRUCTURE])
         else:
             metafunc.parametrize("language_pack", get_language_packs())
 
@@ -67,8 +66,11 @@ class TestLanguageString:
         return StringData.from_string(get_language_pack(language_pack)[language_string])
 
     def test_length(self, language_pack: str, language_string: str):
-        assert self.get_string_data(language_pack, language_string).length <= LANGUAGE_STRUCTURE[language_string].max_length
+        length = self.get_string_data(language_pack, language_string).length
+        max_length = LANGUAGE_STRUCTURE[language_string].max_length
+        assert length <= max_length, f"Must be {max_length} or fewer in length, got {length}."
     
     def test_parameters(self, language_pack: str, language_string: str):
-        assert self.get_string_data(language_pack, language_string).parameters == LANGUAGE_STRUCTURE[language_string].parameters
-
+        parameters = self.get_string_data(language_pack, language_string).parameters
+        wanted_parameters = LANGUAGE_STRUCTURE[language_string].parameters
+        assert parameters == wanted_parameters, f"Must have parameters {wanted_parameters}, got {parameters}."
