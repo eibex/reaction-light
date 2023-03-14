@@ -1,5 +1,10 @@
 # Reaction Light - Changelog
 
+### 3.2.2
+- Add translation checks ([#119](https://github.com/eibex/reaction-light/pull/119) by [Edwinexd](https://github.com/Edwinexd))
+- Fix translations ([Afasany](https://github.com/Afasany), [eibex](https://github.com/eibex), [erwinowak](https://github.com/erwinowak))
+- Remove deprecation warning
+
 ### 3.2.1
 - Add Polish translation ([#116](https://github.com/eibex/reaction-light/pull/116) by [erwinowak](https://github.com/erwinowak))
 - Fix a few exception messages in en-gb ([#117](https://github.com/eibex/reaction-light/pull/117) by [erwinowak](https://github.com/erwinowak))

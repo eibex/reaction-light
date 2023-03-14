@@ -43,7 +43,7 @@ extensions = (
 )
 
 
-class ReactionLight(commands.Bot):
+class ReactionLight(commands.InteractionBot):
     def __init__(self):
         self.directory = os.path.dirname(os.path.realpath(__file__))
         self.config = config.Config(self.directory)
