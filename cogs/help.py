@@ -30,7 +30,6 @@ from cogs.utils.i18n import response
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.remove_command("help")
 
     @commands.slash_command(name="help", description=response.get("brief-help"))
     async def hlp(self, inter):
