@@ -149,6 +149,7 @@
     "message-reaction-option-role": "The role you want to associate to the new reaction (not necessary for 'remove')",
     "settings-systemchannel-option-type": "Define if it is a 'main' (general errors) or 'server' (guild speficic errors) channel",
     "settings-systemchannel-option-channel": "The channel in which error message will be sent",
+    "settings-language-option-range": "Define if you want to set the language for the bot globally or for the current server",
     "settings-language-option-language": "The language to set",
     "settings-colour-option-colour": "The hex value of the colour you wish to set (e.g. 0xffff00)",
     "settings-activity-option-action": "Use 'add', 'remove', 'list' to add/remove/view bot status messages",

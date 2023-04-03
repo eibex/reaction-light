@@ -26,9 +26,7 @@ from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
 
-from cogs.utils.i18n import response
 from cogs.utils.locks import lock_manager
-
 
 class Roles(commands.Cog):
     def __init__(self, bot):
@@ -45,7 +43,7 @@ class Roles(commands.Cog):
         try:
             exists = self.bot.db.exists(msg_id)
         except DatabaseError as error:
-            await self.bot.report(response.get("db-error-reaction-add").format(exception=error), guild_id)
+            await self.bot.report(self.bot.response.get("db-error-reaction-add", guild_id=guild_id).format(exception=error), guild_id)
             return
         async with (await lock_manager.get_lock(user_id)):
             if not exists:
@@ -54,7 +52,7 @@ class Roles(commands.Cog):
             try:
                 reactions = self.bot.db.get_reactions(msg_id)
             except DatabaseError as error:
-                await self.bot.report(guild_id, response.get("db-error-reaction-get").format(exception=error))
+                await self.bot.report(self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error), guild_id)
                 return
 
             ch = await self.bot.getchannel(ch_id)
@@ -73,7 +71,7 @@ class Roles(commands.Cog):
                     try:
                         unique = self.bot.db.isunique(msg_id)
                     except DatabaseError as error:
-                        await self.bot.report(response.get("db-error-reaction-unique").format(exception=error), guild_id)
+                        await self.bot.report(self.bot.response.get("db-error-reaction-unique", guild_id=guild_id).format(exception=error), guild_id)
                         return
                     if unique:
                         for existing_reaction in msg.reactions:
@@ -91,13 +89,13 @@ class Roles(commands.Cog):
                         try:
                             notify = self.bot.db.notify(guild_id)
                         except DatabaseError as error:
-                            await self.bot.report(response.get("db-error-notification-check").format(exception=error), guild_id)
+                            await self.bot.report(self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error), guild_id)
                             return
 
                         if notify:
-                            await user.send(response.get("new-role-dm").format(role_name=role.name))
+                            await user.send(self.bot.response.get("new-role-dm", guild_id=guild_id).format(role_name=role.name))
                     except disnake.Forbidden:
-                        await self.bot.report(guild_id, response.get("permission-error-add"))
+                        await self.bot.report(guild_id, self.bot.response.get("permission-error-add", guild_id=guild_id))
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: disnake.RawReactionActionEvent):
@@ -108,14 +106,14 @@ class Roles(commands.Cog):
         try:
             exists = self.bot.db.exists(msg_id)
         except DatabaseError as error:
-            await self.bot.report(response.get("db-error-reaction-remove").format(exception=error), guild_id)
+            await self.bot.report(self.bot.response.get("db-error-reaction-remove", guild_id=guild_id).format(exception=error), guild_id)
         if not exists:
             # Checks that the message that was unreacted to is a reaction-role message managed by the bot
             return
         try:
             reactions = self.bot.db.get_reactions(msg_id)
         except DatabaseError as error:
-            await self.bot.report(guild_id, response.get("db-error-reaction-get").format(exception=error))
+            await self.bot.report(guild_id, self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error))
             return
         if sanitized_reaction in reactions:
             role_id = reactions[sanitized_reaction]
@@ -129,13 +127,13 @@ class Roles(commands.Cog):
                 try:
                     notify = self.bot.db.notify(guild_id)
                 except DatabaseError as error:
-                    await self.bot.report(response.get("db-error-notification-check").format(exception=error), guild_id)
+                    await self.bot.report(self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error), guild_id)
                     return
 
                 if notify:
-                    await member.send(response.get("removed-role-dm").format(role_name=role.name))
+                    await member.send(self.bot.response.get("removed-role-dm", guild_id=guild_id).format(role_name=role.name))
             except disnake.Forbidden:
-                await self.bot.report(response.get("permission-error-remove"), guild_id)
+                await self.bot.report(self.bot.response.get("permission-error-remove", guild_id=guild_id), guild_id)
 
 
 def setup(bot):

@@ -22,18 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import os
-from pathlib import Path
-import json
 import configparser
+import json
+import os
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Optional
 
 
-class Response:
-    def __init__(self, directory, language):
+class BaseResponse(ABC):
+    def __init__(self, directory, global_language):
         self.directory = directory
-        self.language = language
+        self.global_language = global_language
         self.responses = self.load()
-
+    
     def load(self):
         data = {}
         for file in os.listdir(self.directory):
@@ -49,22 +51,45 @@ class Response:
             available_languages[long_language] = language
         return available_languages
 
-    def get(self, item):
+    def _get_translation(self, language: str, item: str):
         try:
-            response = self.responses[self.language][item]
+            response = self.responses[language][item]
         except KeyError:
             response = self.responses["en-gb"][item]
             print(
-                f"Could not find a translation ({self.language}) for the requested i18n item: {item}. Please file an issue on GitHub."
+                f"Could not find a translation ({language}) for the requested i18n item: {item}. Please file an issue on GitHub."
             )
         return response
 
+    @abstractmethod
+    def get(self, item: str, *, guild_id: Optional[int] = None) -> str:
+        ...
 
-directory = Path(__file__).parents[2]
+class Response(BaseResponse):
+    def __init__(self, bot, directory, global_language):
+        self.bot = bot
+        super().__init__(directory, global_language)
 
-config = configparser.ConfigParser()
-config.read(f"{directory}/config.ini")
+    def get(self, item, *, guild_id: Optional[int] = None):
+        if guild_id is not None:
+            language = self.bot.db.get_language(guild_id)
+            language = language if language else self.global_language
+        else:
+            language = self.global_language
+        
+        return self._get_translation(language, item)
+    
+class StaticResponse(BaseResponse):
+    """Get language keys without the context of a bot instance."""
+    def __init__(self):
+        directory = Path(__file__).parents[2]
 
-language = str(config.get("server", "language", fallback="en-gb"))
+        config = configparser.ConfigParser()
+        config.read(f"{directory}/config.ini")
 
-response = Response(f"{directory}/i18n", language)
+        language = str(config.get("server", "language", fallback="en-gb"))
+
+        super().__init__(f"{directory}/i18n", language)
+
+    def get(self, item, *, guild_id: Optional[int] = None):
+        return self._get_translation(self.global_language, item)

@@ -28,7 +28,9 @@ from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
 from cogs.utils import database, activity, version, config, schema
-from cogs.utils.i18n import response
+from cogs.utils.i18n import Response, StaticResponse
+
+static_response = StaticResponse()
 
 extensions = (
     "cogs.admin",
@@ -50,6 +52,7 @@ class ReactionLight(commands.InteractionBot):
         self.activities = activity.Activities(f"{self.directory}/files/activities.csv")
         self.db = database.Database(f"{self.directory}/files/reactionlight.db")
         self.version = version.get(self.directory)
+        self.response = Response(self, f"{self.directory}/i18n", self.config.language)
         intents = disnake.Intents(message_content=True, guild_messages=True, guild_reactions=True, guilds=True)
         super().__init__(intents=intents)
 
@@ -61,7 +64,7 @@ class ReactionLight(commands.InteractionBot):
         try:
             admins = self.db.get_admins(guild_id)
         except DatabaseError as error:
-            print(response.get("db-error-admin-check").format(exception=error))
+            print(self.response.get("db-error-admin-check").format(exception=error))
             return False
 
         try:
@@ -104,13 +107,16 @@ class ReactionLight(commands.InteractionBot):
         if handler.version == 4:
             handler.four_to_five()
 
+        if handler.version == 5:
+            handler.five_to_six()
+
     async def report(self, text, guild_id=None, embed=None):
         # Send a message to the system channel (if set)
         if guild_id:
             try:
                 server_channel = self.db.fetch_systemchannel(guild_id)
             except DatabaseError as error:
-                await self.report(response.get("db-error-fetching-systemchannels-server").format(exception=error, text=text))
+                await self.report(self.response.get("db-error-fetching-systemchannels-server").format(exception=error, text=text))
                 return
 
             if server_channel:
@@ -138,9 +144,9 @@ class ReactionLight(commands.InteractionBot):
                 else:
                     await target_channel.send(text)
             except disnake.NotFound:
-                print(response.get("systemchannel-404"))
+                print(self.response.get("systemchannel-404"))
             except disnake.Forbidden:
-                print(response.get("systemchannel-403"))
+                print(self.response.get("systemchannel-403"))
         else:
             print(text)
 
@@ -175,6 +181,6 @@ rl = ReactionLight()
 try:
     rl.run(rl.config.token, reconnect=True)
 except disnake.PrivilegedIntentsRequired:
-    print(response.get("login-failure-intents"))
+    print(static_response.get("login-failure-intents"))
 except disnake.errors.LoginFailure:
-    print(response.get("login-failure-token"))
+    print(static_response.get("login-failure-token"))

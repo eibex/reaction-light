@@ -698,6 +698,10 @@
         "max_length": 100,
         "parameters": []
     },
+    "settings-language-option-range": {
+        "max_length": 100,
+        "parameters": []
+    },
     "settings-language-option-language": {
         "max_length": 100,
         "parameters": []

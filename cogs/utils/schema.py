@@ -211,3 +211,19 @@ class SchemaHandler:
         conn.close()
 
         self.set_version(5)
+
+    def five_to_six(self):
+        """Add language to guild_settings if it does not exist"""
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(guild_settings);")
+        result = cursor.fetchall()
+        columns = [value[1] for value in result]
+        if "language" not in columns:
+            cursor.execute("ALTER TABLE guild_settings ADD COLUMN 'language' TEXT NULL;")
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        self.set_version(6)

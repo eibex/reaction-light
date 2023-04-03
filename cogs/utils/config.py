@@ -33,6 +33,7 @@ class Config:
         self.load()
 
     def load(self):
+        # TODO Expose as public attributes
         self.config.read(f"{self.directory}/config.ini")
         self.token = str(self.config.get("server", "token"))
         self.botname = str(self.config.get("server", "name", fallback="Reaction Light"))
@@ -40,6 +41,7 @@ class Config:
         system_channel = self.config.get("server", "system_channel", fallback=None)
         self.system_channel = int(system_channel) if system_channel else None
         self.logo = str(self.config.get("server", "logo", fallback=None))
+        self.language = str(self.config.get("server", "language", fallback="en-gb"))
 
     def update(self, section, option, value):
         self.config[section][option] = value

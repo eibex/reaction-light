@@ -27,10 +27,11 @@ import asyncio
 from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
-from cogs.utils.i18n import response
 from cogs.utils import database
 from cogs.utils.sanitizing import sanitize_emoji
+from cogs.utils.i18n import StaticResponse
 
+static_response = StaticResponse()
 
 class Message(commands.Cog):
     def __init__(self, bot):
@@ -41,7 +42,7 @@ class Message(commands.Cog):
         try:
             all_messages = self.bot.db.fetch_messages(channel.id)
         except DatabaseError as error:
-            await self.bot.report(response.get("db-error-fetching-messages").format(exception=error), channel.guild.id)
+            await self.bot.report(self.bot.response.get("db-error-fetching-messages", guild_id=channel.guild.id).format(exception=error), channel.guild.id)
             return
 
         formatted_list = []
@@ -64,13 +65,13 @@ class Message(commands.Cog):
     async def message_group(self, inter):
         pass
 
-    @message_group.sub_command(name="new", description=response.get("brief-message-new"))
+    @message_group.sub_command(name="new", description=static_response.get("brief-message-new"))
     async def new(self, inter):
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.send(response.get("new-reactionrole-noadmin"))
+            await inter.send(self.bot.response.get("new-reactionrole-noadmin", guild_id=inter.guild.id))
             return
 
-        await inter.send(response.get("new-reactionrole-init"))
+        await inter.send(self.bot.response.get("new-reactionrole-init", guild_id=inter.guild.id))
         rl_object = {}
         cancelled = False
 
@@ -80,7 +81,7 @@ class Message(commands.Cog):
         if not cancelled:
             error_messages = []
             user_messages = []
-            sent_reactions_message = await inter.channel.send(response.get("new-reactionrole-roles-emojis"))
+            sent_reactions_message = await inter.channel.send(self.bot.response.get("new-reactionrole-roles-emojis", guild_id=inter.guild.id))
             rl_object["reactions"] = {}
             try:
                 while True:
@@ -91,18 +92,18 @@ class Message(commands.Cog):
                         try:
                             role = reactions_message.role_mentions[0].id
                         except IndexError:
-                            error_messages.append((await inter.channel.send(response.get("new-reactionrole-error"))))
+                            error_messages.append((await inter.channel.send(self.bot.response.get("new-reactionrole-error", guild_id=inter.guild.id))))
                             continue
 
                         if reaction in rl_object["reactions"]:
-                            error_messages.append((await inter.channel.send(response.get("new-reactionrole-already-used"))))
+                            error_messages.append((await inter.channel.send(self.bot.response.get("new-reactionrole-already-used", guild_id=inter.guild.id))))
                             continue
                         else:
                             try:
                                 await reactions_message.add_reaction(reaction)
                                 rl_object["reactions"][reaction] = role
                             except disnake.HTTPException:
-                                error_messages.append((await inter.channel.send(response.get("new-reactionrole-emoji-403"))))
+                                error_messages.append((await inter.channel.send(self.bot.response.get("new-reactionrole-emoji-403", guild_id=inter.guild.id))))
                                 continue
                     else:
                         rl_object["reaction_strings"] = [reaction for reaction, _ in (rl_object["reactions"].items())]
@@ -111,7 +112,7 @@ class Message(commands.Cog):
                         )
                         break
             except asyncio.TimeoutError:
-                await inter.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                 cancelled = True
             finally:
                 await sent_reactions_message.delete()
@@ -119,7 +120,7 @@ class Message(commands.Cog):
                     await message.delete()
 
         if not cancelled:
-            sent_limited_message = await inter.channel.send(response.get("new-reactionrole-limit"))
+            sent_limited_message = await inter.channel.send(self.bot.response.get("new-reactionrole-limit", guild_id=inter.guild.id))
 
             def reaction_check(payload):
                 return (
@@ -138,14 +139,14 @@ class Message(commands.Cog):
                 else:
                     rl_object["limit_to_one"] = 0
             except asyncio.TimeoutError:
-                await inter.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                 cancelled = True
             finally:
                 await sent_limited_message.delete()
 
         if not cancelled:
             sent_oldmessagequestion_message = await inter.channel.send(
-                response.get("new-reactionrole-old-or-new").format(bot_mention=self.bot.user.mention)
+                self.bot.response.get("new-reactionrole-old-or-new", guild_id=inter.guild.id).format(bot_mention=self.bot.user.mention)
             )
 
             def reaction_check2(payload):
@@ -167,7 +168,7 @@ class Message(commands.Cog):
                 else:
                     rl_object["old_message"] = False
             except asyncio.TimeoutError:
-                await inter.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                 cancelled = True
             finally:
                 await sent_oldmessagequestion_message.delete()
@@ -176,7 +177,7 @@ class Message(commands.Cog):
             error_messages = []
             user_messages = []
             if rl_object["old_message"]:
-                sent_oldmessage_message = await inter.channel.send(response.get("new-reactionrole-which-message"))
+                sent_oldmessage_message = await inter.channel.send(self.bot.response.get("new-reactionrole-which-message", guild_id=inter.guild.id))
 
                 def reaction_check3(payload):
                     return payload.user_id == inter.author.id and payload.guild_id == inter.guild.id and str(payload.emoji) == "🔧"
@@ -211,7 +212,7 @@ class Message(commands.Cog):
                                 message_already_exists = self.bot.db.exists(message.id)
                             except DatabaseError as error:
                                 await self.bot.report(
-                                    response.get("db-error-message-exists").format(exception=error), inter.guild.id
+                                    self.bot.response.get("db-error-message-exists", guild_id=inter.guild.id).format(exception=error), inter.guild.id
                                 )
                                 return
                             if message_already_exists:
@@ -224,20 +225,20 @@ class Message(commands.Cog):
                         except disnake.NotFound:
                             error_messages.append(
                                 (
-                                    await inter.channel.send(response.get("new-reactionrole-permission-error"))
+                                    await inter.channel.send(self.bot.response.get("new-reactionrole-permission-error", guild_id=inter.guild.id))
                                 )
                             )
                         except ValueError:
-                            error_messages.append((await inter.channel.send(response.get("new-reactionrole-already-exists"))))
+                            error_messages.append((await inter.channel.send(self.bot.response.get("new-reactionrole-already-exists", guild_id=inter.guild.id))))
                 except asyncio.TimeoutError:
-                    await inter.author.send(response.get("new-reactionrole-timeout"))
+                    await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                     cancelled = True
                 finally:
                     await sent_oldmessage_message.delete()
                     for message in error_messages:
                         await message.delete()
             else:
-                sent_channel_message = await inter.channel.send(response.get("new-reactionrole-target-channel"))
+                sent_channel_message = await inter.channel.send(self.bot.response.get("new-reactionrole-target-channel", guild_id=inter.guild.id))
                 try:
                     while True:
                         channel_message = await self.bot.wait_for("message", timeout=120, check=check)
@@ -246,9 +247,9 @@ class Message(commands.Cog):
                             rl_object["target_channel"] = channel_message.channel_mentions[0]
                             break
                         else:
-                            error_messages.append((await message.channel.send(response.get("invalid-target-channel"))))
+                            error_messages.append((await message.channel.send(self.bot.response.get("invalid-target-channel", guild_id=inter.guild.id))))
                 except asyncio.TimeoutError:
-                    await inter.author.send(response.get("new-reactionrole-timeout"))
+                    await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                     cancelled = True
                 finally:
                     await sent_channel_message.delete()
@@ -262,7 +263,7 @@ class Message(commands.Cog):
             selector_embed.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
 
             sent_message_message = await message.channel.send(
-                response.get("new-reactionrole-message-contents"), embed=selector_embed
+                self.bot.response.get("new-reactionrole-message-contents", guild_id=inter.guild.id), embed=selector_embed
             )
             try:
                 while True:
@@ -301,14 +302,14 @@ class Message(commands.Cog):
                             error_messages.append(
                                 (
                                     await message.channel.send(
-                                        response.get("new-reactionrole-message-send-permission-error").format(
+                                        self.bot.response.get("new-reactionrole-message-send-permission-error", guild_id=inter.guild.id).format(
                                             channel_mention=target_channel.mention
                                         )
                                     )
                                 )
                             )
             except asyncio.TimeoutError:
-                await inter.author.send(response.get("new-reactionrole-timeout"))
+                await inter.author.send(self.bot.response.get("new-reactionrole-timeout", guild_id=inter.guild.id))
                 cancelled = True
             finally:
                 await sent_message_message.delete()
@@ -320,10 +321,10 @@ class Message(commands.Cog):
             try:
                 self.bot.db.add_reaction_role(rl_object)
             except database.DuplicateInstance:
-                await inter.channel.send(response.get("new-reactionrole-already-exists"))
+                await inter.channel.send(self.bot.response.get("new-reactionrole-already-exists", guild_id=inter.guild.id))
                 return
             except DatabaseError as error:
-                await self.bot.report(response.get("db-error-new-reactionrole").format(exception=error), inter.guild.id)
+                await self.bot.report(self.bot.response.get("db-error-new-reactionrole", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
                 return
 
             for reaction in rl_object["reaction_strings"]:
@@ -332,32 +333,32 @@ class Message(commands.Cog):
         await inter.delete_original_message()
 
         if cancelled:
-            await inter.channel.send(response.get("new-reactionrole-cancelled"))
+            await inter.channel.send(self.bot.response.get("new-reactionrole-cancelled", guild_id=inter.guild.id))
 
-    @message_group.sub_command(name="edit", description=response.get("brief-message-edit"))
+    @message_group.sub_command(name="edit", description=static_response.get("brief-message-edit"))
     async def edit_selector(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        channel: disnake.TextChannel = commands.Param(description=response.get("message-edit-option-channel")),
-        number: int = commands.Param(description=response.get("message-edit-option-number")),
+        channel: disnake.TextChannel = commands.Param(description=static_response.get("message-edit-option-channel")),
+        number: int = commands.Param(description=static_response.get("message-edit-option-number")),
     ):
         await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.edit_original_message(content=response.get("not-admin"))
+            await inter.edit_original_message(content=self.bot.response.get("not-admin", guild_id=inter.guild.id))
             return
 
         all_messages = await self.formatted_channel_list(channel)
         if number == 0:
             if len(all_messages) == 1:
-                await inter.edit_original_message(content=response.get("edit-reactionrole-one"))
+                await inter.edit_original_message(content=self.bot.response.get("edit-reactionrole-one", guild_id=inter.guild.id))
             elif len(all_messages) > 1:
                 await inter.edit_original_message(
-                    content=response.get("edit-reactionrole-instructions").format(
+                    content=self.bot.response.get("edit-reactionrole-instructions", guild_id=inter.guild.id).format(
                         num_messages=len(all_messages), message_list="\n".join(all_messages)
                     )
                 )
             else:
-                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=self.bot.response.get("no-reactionrole-messages", guild_id=inter.guild.id))
         else:
             try:
                 # Tries to edit the reaction-role message
@@ -365,7 +366,7 @@ class Message(commands.Cog):
                 try:
                     all_messages = self.bot.db.fetch_messages(channel.id)
                 except DatabaseError as error:
-                    await self.bot.report(response.get("db-error-fetching-messages").format(message_ids=error), inter.guild.id)
+                    await self.bot.report(self.bot.response.get("db-error-fetching-messages", guild_id=inter.guild.id).format(message_ids=error), inter.guild.id)
                     return
 
                 if all_messages:
@@ -373,25 +374,25 @@ class Message(commands.Cog):
                     try:
                         message_to_edit_id = all_messages[number - 1]
                     except IndexError:
-                        await inter.edit_original_message(response.get("reactionrole-not-exists"))
+                        await inter.edit_original_message(self.bot.response.get("reactionrole-not-exists", guild_id=inter.guild.id))
 
                 else:
-                    await inter.edit_original_message(response.get("reactionrole-not-exists"))
+                    await inter.edit_original_message(self.bot.response.get("reactionrole-not-exists", guild_id=inter.guild.id))
                     return
 
                 if message_to_edit_id:
                     old_msg = await channel.fetch_message(int(message_to_edit_id))
                 else:
-                    await inter.edit_original_message(response.get("select-valid-reactionrole"))
+                    await inter.edit_original_message(self.bot.response.get("select-valid-reactionrole", guild_id=inter.guild.id))
                     return
                 await old_msg.edit(suppress_embeds=False)
 
                 # Send a message with a button to open a modal
                 sent_message_message = await inter.edit_original_message(
-                    content=response.get("message-edit-button-content"),
+                    content=self.bot.response.get("message-edit-button-content", guild_id=inter.guild.id),
                     components=[
                         disnake.ui.Button(
-                            label=response.get("message-edit-button-label"),
+                            label=self.bot.response.get("message-edit-button-label", guild_id=inter.guild.id),
                             emoji="🔧",
                             style=disnake.ButtonStyle.primary,
                             custom_id="message_edit_modal",
@@ -412,35 +413,35 @@ class Message(commands.Cog):
                         pass
                     return
                 await button_ctx.response.send_modal(
-                    title=response.get("modal-edit-title"),
+                    title=self.bot.response.get("modal-edit-title", guild_id=inter.guild.id),
                     custom_id=("edit_reactionrole"),
                     components=[
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-modal-message"),
+                            label=self.bot.response.get("message-edit-modal-message", guild_id=inter.guild.id),
                             required=False,
                             custom_id="message",
                             style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-modal-title"),
+                            label=self.bot.response.get("message-edit-modal-title", guild_id=inter.guild.id),
                             required=False,
                             custom_id="title",
                             style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-modal-description"),
+                            label=self.bot.response.get("message-edit-modal-description", guild_id=inter.guild.id),
                             required=False,
                             custom_id="description",
                             style=disnake.TextInputStyle.paragraph,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-modal-image"),
+                            label=self.bot.response.get("message-edit-modal-image", guild_id=inter.guild.id),
                             required=False,
                             custom_id="image",
                             style=disnake.TextInputStyle.short,
                         ),
                         disnake.ui.TextInput(
-                            label=response.get("message-edit-modal-thumbnail"),
+                            label=self.bot.response.get("message-edit-modal-thumbnail", guild_id=inter.guild.id),
                             required=False,
                             custom_id="thumbnail",
                             style=disnake.TextInputStyle.short,
@@ -478,13 +479,13 @@ class Message(commands.Cog):
 
                     elif custom_id == "image" and value:
                         if "https://" not in value:
-                            await inter.send(response.get("invalid-attachment"))
+                            await inter.send(self.bot.response.get("invalid-attachment", guild_id=inter.guild.id))
                         else:
                             selector_embed.set_image(url=value)
 
                     elif custom_id == "thumbnail" and value:
                         if "https://" not in value:
-                            await inter.send(response.get("invalid-attachment"))
+                            await inter.send(self.bot.response.get("invalid-attachment", guild_id=inter.guild.id))
                         else:
                             selector_embed.set_thumbnail(url=value)
 
@@ -494,61 +495,61 @@ class Message(commands.Cog):
                     else:
                         await old_msg.edit(content=selector_msg_new_body, embed=None)
 
-                    await selector_modal_inter.edit_original_message(content=response.get("message-edited"))
+                    await selector_modal_inter.edit_original_message(content=self.bot.response.get("message-edited", guild_id=inter.guild.id))
                 except disnake.Forbidden:
-                    await selector_modal_inter.edit_original_message(content=response.get("other-author-error"))
+                    await selector_modal_inter.edit_original_message(content=self.bot.response.get("other-author-error", guild_id=inter.guild.id))
                     return
                 except disnake.HTTPException as e:
                     if e.code == 50006:
-                        await selector_modal_inter.edit_original_message(content=response.get("empty-message-error"))
+                        await selector_modal_inter.edit_original_message(content=self.bot.response.get("empty-message-error", guild_id=inter.guild.id))
                     else:
                         guild_id = inter.guild.id
                         await self.bot.report(str(e), guild_id)
             except IndexError:
-                await inter.send(content=response.get("invalid-target-channel"))
+                await inter.send(content=self.bot.response.get("invalid-target-channel", guild_id=inter.guild.id))
             except disnake.Forbidden:
-                await inter.send(content=response.get("edit-permission-error"))
+                await inter.send(content=self.bot.response.get("edit-permission-error", guild_id=inter.guild.id))
 
-    @message_group.sub_command(name="reaction", description=response.get("brief-message-reaction"))
+    @message_group.sub_command(name="reaction", description=static_response.get("brief-message-reaction"))
     async def edit_reaction(
         self,
         inter,
-        channel: disnake.TextChannel = commands.Param(description=response.get("message-reaction-option-channel")),
-        action: str = commands.Param(description=response.get("message-reaction-option-action"), choices=("add", "remove")),
-        number: int = commands.Param(description=response.get("message-reaction-option-number")),
-        reaction: str = commands.Param(description=response.get("message-reaction-option-reaction"), default=None),
-        role: disnake.Role = commands.Param(description=response.get("message-reaction-option-role"), default=None),
+        channel: disnake.TextChannel = commands.Param(description=static_response.get("message-reaction-option-channel")),
+        action: str = commands.Param(description=static_response.get("message-reaction-option-action"), choices=("add", "remove")),
+        number: int = commands.Param(description=static_response.get("message-reaction-option-number")),
+        reaction: str = commands.Param(description=static_response.get("message-reaction-option-reaction"), default=None),
+        role: disnake.Role = commands.Param(description=static_response.get("message-reaction-option-role"), default=None),
     ):
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.send(response.get("not-admin"))
+            await inter.send(self.bot.response.get("not-admin", guild_id=inter.guild.id))
             return
 
         await inter.response.defer()
         if number == 0 or not reaction:
             all_messages = await self.formatted_channel_list(channel)
             if len(all_messages) == 1:
-                await inter.edit_original_message(content=response.get("reaction-edit-one"))
+                await inter.edit_original_message(content=self.bot.response.get("reaction-edit-one", guild_id=inter.guild.id))
                 return
             elif len(all_messages) > 1:
                 await inter.edit_original_message(
-                    content=response.get("reaction-edit-multi").format(
+                    content=self.bot.response.get("reaction-edit-multi", guild_id=inter.guild.id).format(
                         num_messages=len(all_messages), message_list="\n".join(all_messages)
                     )
                 )
                 return
             else:
-                await inter.edit_original_message(content=response.get("no-reactionrole-messages"))
+                await inter.edit_original_message(content=self.bot.response.get("no-reactionrole-messages", guild_id=inter.guild.id))
                 return
 
         if action == "add":
             if not role:
-                await inter.edit_original_message(content=response.get("no-role-mentioned"))
+                await inter.edit_original_message(content=self.bot.response.get("no-role-mentioned", guild_id=inter.guild.id))
                 return
 
         try:
             all_messages = self.bot.db.fetch_messages(channel.id)
         except DatabaseError as error:
-            await self.bot.report(response.get("db-error-fetching-messages").format(exception=error), inter.guild.id)
+            await self.bot.report(self.bot.response.get("db-error-fetching-messages", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
             return
 
         counter = 1
@@ -562,13 +563,13 @@ class Message(commands.Cog):
 
                 counter += 1
         else:
-            await inter.edit_original_message(content=response.get("reactionrole-not-exists"))
+            await inter.edit_original_message(content=self.bot.response.get("reactionrole-not-exists", guild_id=inter.guild.id))
             return
 
         if message_to_edit_id:
             message_to_edit = await channel.fetch_message(int(message_to_edit_id))
         else:
-            await inter.edit_original_message(content=response.get("select-valid-reactionrole"))
+            await inter.edit_original_message(content=self.bot.response.get("select-valid-reactionrole", guild_id=inter.guild.id))
             return
 
         if action == "add":
@@ -576,14 +577,14 @@ class Message(commands.Cog):
                 # Check that the bot can actually use the emoji
                 await message_to_edit.add_reaction(reaction)
             except disnake.HTTPException:
-                await inter.edit_original_message(content=response.get("new-reactionrole-emoji-403"))
+                await inter.edit_original_message(content=self.bot.response.get("new-reactionrole-emoji-403", guild_id=inter.guild.id))
                 return
 
             try:
                 react = self.bot.db.add_reaction(message_to_edit.id, role.id, sanitize_emoji(reaction))
             except DatabaseError as error:
                 await self.bot.report(
-                    response.get("db-error-add-reaction").format(
+                    self.bot.response.get("db-error-add-reaction", guild_id=inter.guild.id).format(
                         channel_mention=message_to_edit.channel.mention, exception=error
                     ),
                     inter.guild.id,
@@ -591,30 +592,30 @@ class Message(commands.Cog):
                 return
 
             if not react:
-                await inter.edit_original_message(content=response.get("reaction-edit-already-exists"))
+                await inter.edit_original_message(content=self.bot.response.get("reaction-edit-already-exists", guild_id=inter.guild.id))
                 return
 
-            await inter.edit_original_message(content=response.get("reaction-edit-add-success"))
+            await inter.edit_original_message(content=self.bot.response.get("reaction-edit-add-success", guild_id=inter.guild.id))
         elif action == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
 
             except disnake.HTTPException:
-                await inter.edit_original_message(content=response.get("reaction-edit-invalid-reaction"))
+                await inter.edit_original_message(content=self.bot.response.get("reaction-edit-invalid-reaction", guild_id=inter.guild.id))
                 return
 
             try:
                 react = self.bot.db.remove_reaction(message_to_edit.id, sanitize_emoji(reaction))
             except DatabaseError as error:
                 await self.bot.report(
-                    response.get("db-error-remove-reaction").format(
+                    self.bot.response.get("db-error-remove-reaction", guild_id=inter.guild.id).format(
                         channel_mention=message_to_edit.channel.mention, exception=error
                     ),
                     inter.guild.id,
                 )
                 return
 
-            await inter.edit_original_message(content=response.get("reaction-edit-remove-success"))
+            await inter.edit_original_message(content=self.bot.response.get("reaction-edit-remove-success", guild_id=inter.guild.id))
 
 
 def setup(bot):
