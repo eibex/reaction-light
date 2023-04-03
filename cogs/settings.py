@@ -29,6 +29,7 @@ from cogs.utils.i18n import StaticResponse
 
 static_response = StaticResponse()
 
+
 class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -77,7 +78,9 @@ class Settings(commands.Cog):
             )
             server_text = (await self.bot.getchannel(server_channel)).mention if server_channel else "none"
             await inter.edit_original_message(
-                content=self.bot.response.get("systemchannels-info", guild_id=inter.guild.id).format(main_channel=main_text, server_channel=server_text)
+                content=self.bot.response.get("systemchannels-info", guild_id=inter.guild.id).format(
+                    main_channel=main_text, server_channel=server_text
+                )
             )
             return
 
@@ -95,7 +98,10 @@ class Settings(commands.Cog):
             try:
                 self.bot.db.add_systemchannel(inter.guild.id, channel.id)
             except DatabaseError as error:
-                await self.bot.report(self.bot.response.get("db-error-adding-systemchannels", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
+                await self.bot.report(
+                    self.bot.response.get("db-error-adding-systemchannels", guild_id=inter.guild.id).format(exception=error),
+                    inter.guild.id,
+                )
                 return
 
         await inter.edit_original_message(content=self.bot.response.get("systemchannels-success", guild_id=inter.guild.id))
@@ -109,7 +115,9 @@ class Settings(commands.Cog):
         try:
             notify = self.bot.db.toggle_notify(inter.guild.id)
         except DatabaseError as error:
-            await self.bot.report(self.bot.response.get("db-error-toggle-notify", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
+            await self.bot.report(
+                self.bot.response.get("db-error-toggle-notify", guild_id=inter.guild.id).format(exception=error), inter.guild.id
+            )
             return
         if notify:
             await inter.edit_original_message(content=self.bot.response.get("notifications-on", guild_id=inter.guild.id))
@@ -120,10 +128,8 @@ class Settings(commands.Cog):
     async def set_language(
         self,
         inter,
-        
         _range: str = commands.Param(
-            name="range",
-            description=static_response.get("settings-language-option-range"), choices=("global", "server")
+            name="range", description=static_response.get("settings-language-option-range"), choices=("global", "server")
         ),
         language: str = commands.Param(
             description=static_response.get("settings-language-option-language"), choices=static_response.languages()
@@ -141,15 +147,17 @@ class Settings(commands.Cog):
             if not await self.bot.is_owner(inter.author):
                 await inter.send(content=self.bot.response.get("not-owner", guild_id=inter.guild.id))
                 return
-            
+
             self.bot.config.update("server", "language", language)
             self.bot.response.global_language = language
-        
+
         await inter.edit_original_message(content=self.bot.response.get("language-success", guild_id=inter.guild.id))
 
     @commands.is_owner()
     @settings_group.sub_command(name="colour", description=static_response.get("brief-settings-colour"))
-    async def set_colour(self, inter, colour: str = commands.Param(description=static_response.get("settings-colour-option-colour"))):
+    async def set_colour(
+        self, inter, colour: str = commands.Param(description=static_response.get("settings-colour-option-colour"))
+    ):
         await inter.response.defer()
         try:
             self.bot.config.botcolour = disnake.Colour(int(colour, 16))
@@ -159,7 +167,9 @@ class Settings(commands.Cog):
                 description=self.bot.response.get("example-embed-new-colour", guild_id=inter.guild.id),
                 colour=self.bot.config.botcolour,
             )
-            await inter.edit_original_message(content=self.bot.response.get("colour-changed", guild_id=inter.guild.id), embed=example)
+            await inter.edit_original_message(
+                content=self.bot.response.get("colour-changed", guild_id=inter.guild.id), embed=example
+            )
 
         except ValueError:
             await inter.edit_original_message(content=self.bot.response.get("colour-hex-error", guild_id=inter.guild.id))
@@ -188,14 +198,20 @@ class Settings(commands.Cog):
                 for item in self.bot.activities.activity_list:
                     formatted_list.append(f"`{item}`")
 
-                await inter.send(self.bot.response.get("current-activities", guild_id=inter.guild.id).format(activity_list="\n- ".join(formatted_list)))
+                await inter.send(
+                    self.bot.response.get("current-activities", guild_id=inter.guild.id).format(
+                        activity_list="\n- ".join(formatted_list)
+                    )
+                )
 
             else:
                 await inter.send(self.bot.response.get("no-current-activities", guild_id=inter.guild.id))
         elif action == "remove" and activity:
             removed = self.bot.activities.remove(activity)
             if removed:
-                await inter.send(self.bot.response.get("rm-activity-success", guild_id=inter.guild.id).format(activity_to_delete=activity))
+                await inter.send(
+                    self.bot.response.get("rm-activity-success", guild_id=inter.guild.id).format(activity_to_delete=activity)
+                )
             else:
                 await inter.send(self.bot.response.get("rm-activity-not-exists", guild_id=inter.guild.id))
         else:

@@ -35,7 +35,9 @@ def initialize(database):
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT, 'language' TEXT NULL);")
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT, 'language' TEXT NULL);"
+    )
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON guild_settings (guild_id);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS message_idx ON messages (message_id);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);")
@@ -54,7 +56,7 @@ class Database:
         initialize(self.database)
 
         self.reactionrole_creation = {}
-        
+
         self.languages_cache: Dict[int, Optional[str]] = {}
 
     def add_reaction_role(self, rl_dict: dict):
@@ -369,11 +371,11 @@ class Database:
         conn.close()
         self.languages_cache[guild_id] = language
         return True
-    
+
     def get_language(self, guild_id: int) -> Optional[str]:
         if guild_id in self.languages_cache:
             return self.languages_cache[guild_id]
-        
+
         conn = sqlite3.connect(self.database)
         cursor = conn.cursor()
         self.insert_guildsettings(guild_id)
@@ -387,5 +389,5 @@ class Database:
         conn.close()
 
         self.languages_cache[guild_id] = language
-        
+
         return language

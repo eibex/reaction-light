@@ -48,7 +48,10 @@ class Admin(commands.Cog):
             try:
                 admin_ids = self.bot.db.get_admins(inter.guild.id)
             except DatabaseError as error:
-                await self.bot.report(self.bot.response.get("db-error-fetching-admins", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
+                await self.bot.report(
+                    self.bot.response.get("db-error-fetching-admins", guild_id=inter.guild.id).format(exception=error),
+                    inter.guild.id,
+                )
                 return
 
             adminrole_objects = []
@@ -57,7 +60,9 @@ class Admin(commands.Cog):
 
             if adminrole_objects:
                 await inter.edit_original_message(
-                    content=self.bot.response.get("adminlist-local", guild_id=inter.guild.id).format(admin_list="\n- ".join(adminrole_objects))
+                    content=self.bot.response.get("adminlist-local", guild_id=inter.guild.id).format(
+                        admin_list="\n- ".join(adminrole_objects)
+                    )
                 )
             else:
                 await inter.edit_original_message(content=self.bot.response.get("adminlist-local-empty", guild_id=inter.guild.id))
@@ -67,7 +72,9 @@ class Admin(commands.Cog):
             try:
                 self.bot.db.add_admin(role.id, inter.guild.id)
             except DatabaseError as error:
-                await self.bot.report(self.bot.response.get("db-error-admin-add", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
+                await self.bot.report(
+                    self.bot.response.get("db-error-admin-add", guild_id=inter.guild.id).format(exception=error), inter.guild.id
+                )
                 return
 
             await inter.edit_original_message(content=self.bot.response.get("admin-add-success", guild_id=inter.guild.id))
@@ -77,7 +84,10 @@ class Admin(commands.Cog):
             try:
                 self.bot.db.remove_admin(role.id, inter.guild.id)
             except DatabaseError as error:
-                await self.bot.report(self.bot.response.get("db-error-admin-remove", guild_id=inter.guild.id).format(exception=error), inter.guild.id)
+                await self.bot.report(
+                    self.bot.response.get("db-error-admin-remove", guild_id=inter.guild.id).format(exception=error),
+                    inter.guild.id,
+                )
                 return
 
             await inter.edit_original_message(content=self.bot.response.get("admin-remove-success", guild_id=inter.guild.id))

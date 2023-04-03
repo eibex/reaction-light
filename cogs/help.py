@@ -28,6 +28,7 @@ from cogs.utils.i18n import StaticResponse
 
 static_response = StaticResponse()
 
+
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

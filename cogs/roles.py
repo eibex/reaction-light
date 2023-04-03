@@ -28,6 +28,7 @@ from disnake.ext import commands
 
 from cogs.utils.locks import lock_manager
 
+
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -43,7 +44,9 @@ class Roles(commands.Cog):
         try:
             exists = self.bot.db.exists(msg_id)
         except DatabaseError as error:
-            await self.bot.report(self.bot.response.get("db-error-reaction-add", guild_id=guild_id).format(exception=error), guild_id)
+            await self.bot.report(
+                self.bot.response.get("db-error-reaction-add", guild_id=guild_id).format(exception=error), guild_id
+            )
             return
         async with (await lock_manager.get_lock(user_id)):
             if not exists:
@@ -52,7 +55,9 @@ class Roles(commands.Cog):
             try:
                 reactions = self.bot.db.get_reactions(msg_id)
             except DatabaseError as error:
-                await self.bot.report(self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error), guild_id)
+                await self.bot.report(
+                    self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error), guild_id
+                )
                 return
 
             ch = await self.bot.getchannel(ch_id)
@@ -71,7 +76,9 @@ class Roles(commands.Cog):
                     try:
                         unique = self.bot.db.isunique(msg_id)
                     except DatabaseError as error:
-                        await self.bot.report(self.bot.response.get("db-error-reaction-unique", guild_id=guild_id).format(exception=error), guild_id)
+                        await self.bot.report(
+                            self.bot.response.get("db-error-reaction-unique", guild_id=guild_id).format(exception=error), guild_id
+                        )
                         return
                     if unique:
                         for existing_reaction in msg.reactions:
@@ -89,7 +96,10 @@ class Roles(commands.Cog):
                         try:
                             notify = self.bot.db.notify(guild_id)
                         except DatabaseError as error:
-                            await self.bot.report(self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error), guild_id)
+                            await self.bot.report(
+                                self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error),
+                                guild_id,
+                            )
                             return
 
                         if notify:
@@ -106,14 +116,18 @@ class Roles(commands.Cog):
         try:
             exists = self.bot.db.exists(msg_id)
         except DatabaseError as error:
-            await self.bot.report(self.bot.response.get("db-error-reaction-remove", guild_id=guild_id).format(exception=error), guild_id)
+            await self.bot.report(
+                self.bot.response.get("db-error-reaction-remove", guild_id=guild_id).format(exception=error), guild_id
+            )
         if not exists:
             # Checks that the message that was unreacted to is a reaction-role message managed by the bot
             return
         try:
             reactions = self.bot.db.get_reactions(msg_id)
         except DatabaseError as error:
-            await self.bot.report(guild_id, self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error))
+            await self.bot.report(
+                guild_id, self.bot.response.get("db-error-reaction-get", guild_id=guild_id).format(exception=error)
+            )
             return
         if sanitized_reaction in reactions:
             role_id = reactions[sanitized_reaction]
@@ -127,7 +141,9 @@ class Roles(commands.Cog):
                 try:
                     notify = self.bot.db.notify(guild_id)
                 except DatabaseError as error:
-                    await self.bot.report(self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error), guild_id)
+                    await self.bot.report(
+                        self.bot.response.get("db-error-notification-check", guild_id=guild_id).format(exception=error), guild_id
+                    )
                     return
 
                 if notify:

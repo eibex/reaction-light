@@ -76,7 +76,10 @@ class Control(commands.Cog):
         em = disnake.Embed(title=f"Reaction Light v{latest} - Changes", description=changelog, colour=self.bot.config.botcolour)
         em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
         await inter.edit_original_message(
-            content=self.bot.response.get("version", guild_id=inter.guild.id).format(version=self.bot.version, latest_version=latest), embed=em
+            content=self.bot.response.get("version", guild_id=inter.guild.id).format(
+                version=self.bot.version, latest_version=latest
+            ),
+            embed=em,
         )
 
     @commands.is_owner()

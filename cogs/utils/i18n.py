@@ -35,7 +35,7 @@ class BaseResponse(ABC):
         self.directory = directory
         self.global_language = global_language
         self.responses = self.load()
-    
+
     def load(self):
         data = {}
         for file in os.listdir(self.directory):
@@ -65,6 +65,7 @@ class BaseResponse(ABC):
     def get(self, item: str, *, guild_id: Optional[int] = None) -> str:
         ...
 
+
 class Response(BaseResponse):
     def __init__(self, bot, directory, global_language):
         self.bot = bot
@@ -76,11 +77,13 @@ class Response(BaseResponse):
             language = language if language else self.global_language
         else:
             language = self.global_language
-        
+
         return self._get_translation(language, item)
-    
+
+
 class StaticResponse(BaseResponse):
     """Get language keys without the context of a bot instance."""
+
     def __init__(self):
         directory = Path(__file__).parents[2]
 

@@ -26,6 +26,7 @@ SOFTWARE.
 import traceback
 from disnake.ext import commands
 
+
 class Errors(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
