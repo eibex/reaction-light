@@ -3,10 +3,7 @@ from typing import Dict, List
 import json
 import attr
 import os
-import logging
-
-
-log = logging.getLogger(__name__)
+import pytest
 
 
 PARAMETER_REGEX = r"\{(\w+)\}"
@@ -74,7 +71,7 @@ class TestLanguagePack:
 
     def test_all_strings(self, language_pack):
         if set(get_language_pack(language_pack).keys()) != set(LANGUAGE_STRUCTURE.keys()):
-            log.warning(set(get_language_pack(language_pack).keys()) - set(LANGUAGE_STRUCTURE.keys()))
+            pytest.skip(set(get_language_pack(language_pack).keys()) - set(LANGUAGE_STRUCTURE.keys()))
 
 
 class TestLanguageString:
