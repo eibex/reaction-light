@@ -71,7 +71,7 @@ class TestLanguagePack:
 
     def test_all_strings(self, language_pack):
         if set(get_language_pack(language_pack).keys()) != set(LANGUAGE_STRUCTURE.keys()):
-            pytest.skip(str(set(get_language_pack(language_pack).keys()) - set(LANGUAGE_STRUCTURE.keys())))
+            pytest.skip(f"{language_pack}: {set(LANGUAGE_STRUCTURE.keys() - set(get_language_pack(language_pack).keys()))}")
 
 
 class TestLanguageString:
