@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 
+### 3.3.0
+- Add language settings per server ([#121](https://github.com/eibex/reaction-light/pull/121) closed by [#123](https://github.com/eibex/reaction-light/pull/123) by [Edwinexd](https://github.com/Edwinexd)) - known limitation: command descriptions will be set to the global language
+
 ### 3.2.2
 - Add translation checks ([#119](https://github.com/eibex/reaction-light/pull/119) by [Edwinexd](https://github.com/Edwinexd))
 - Fix translations ([Afasany](https://github.com/Afasany), [eibex](https://github.com/eibex), [erwinowak](https://github.com/erwinowak))
