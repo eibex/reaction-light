@@ -27,13 +27,16 @@ from sys import platform
 from shutil import copy
 import disnake
 from disnake.ext import commands, tasks
-from cogs.utils.i18n import response
 from cogs.utils import github
+from cogs.utils.i18n import StaticResponse
+
+static_response = StaticResponse()
 
 
 class Control(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # pylint: disable=no-member
         self.updates.start()
 
     def restart(self):
@@ -55,17 +58,17 @@ class Control(commands.Cog):
                 title=f"Reaction Light v{new_version} - Changes", description=changelog, colour=self.bot.config.botcolour
             )
             em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
-            await self.bot.report(response.get("update-notification").format(new_version=new_version), embed=em)
+            await self.bot.report(self.bot.response.get("update-notification").format(new_version=new_version), embed=em)
 
     @commands.slash_command(name="bot")
     async def controlbot_group(self, inter):
         pass
 
-    @controlbot_group.sub_command(name="version", description=response.get("brief-version"))
+    @controlbot_group.sub_command(name="version", description=static_response.get("brief-version"))
     async def print_version(self, inter):
         await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):
-            await inter.edit_original_message(content=response.get("not-admin"))
+            await inter.edit_original_message(content=self.bot.response.get("not-admin", guild_id=inter.guild.id))
             return
 
         latest = await github.get_latest()
@@ -73,45 +76,48 @@ class Control(commands.Cog):
         em = disnake.Embed(title=f"Reaction Light v{latest} - Changes", description=changelog, colour=self.bot.config.botcolour)
         em.set_footer(text=f"{self.bot.config.botname}", icon_url=self.bot.config.logo)
         await inter.edit_original_message(
-            content=response.get("version").format(version=self.bot.version, latest_version=latest), embed=em
+            content=self.bot.response.get("version", guild_id=inter.guild.id).format(
+                version=self.bot.version, latest_version=latest
+            ),
+            embed=em,
         )
 
     @commands.is_owner()
-    @controlbot_group.sub_command(name="kill", description=response.get("brief-kill"))
+    @controlbot_group.sub_command(name="kill", description=static_response.get("brief-kill"))
     async def kill(self, inter):
         await inter.response.defer()
-        await inter.edit_original_message(content=response.get("shutdown"))
+        await inter.edit_original_message(content=self.bot.response.get("shutdown", guild_id=inter.guild.id))
         await self.bot.close()
 
     @commands.is_owner()
-    @controlbot_group.sub_command(name="restart", description=response.get("brief-restart"))
+    @controlbot_group.sub_command(name="restart", description=static_response.get("brief-restart"))
     async def restart_cmd(self, inter):
         if platform != "win32":
             self.restart()
             await inter.response.defer()
-            await inter.edit_original_message(content=response.get("restart"))
+            await inter.edit_original_message(content=self.bot.response.get("restart", guild_id=inter.guild.id))
             await self.bot.close()
         else:
-            await inter.send(response.get("windows-error"))
+            await inter.send(self.bot.response.get("windows-error", guild_id=inter.guild.id))
 
     @commands.is_owner()
-    @controlbot_group.sub_command(name="update", description=response.get("brief-update"))
+    @controlbot_group.sub_command(name="update", description=static_response.get("brief-update"))
     async def update(self, inter):
         if platform != "win32":
             await inter.response.defer()
-            await inter.edit_original_message(content=response.get("attempting-update"))
+            await inter.edit_original_message(content=self.bot.response.get("attempting-update", guild_id=inter.guild.id))
             os.chdir(self.bot.directory)
             cmd = os.popen("git fetch")
             cmd.close()
             cmd = os.popen("git pull")
             cmd.close()
-            await inter.channel.send(response.get("database-backup"))
+            await inter.channel.send(self.bot.response.get("database-backup", guild_id=inter.guild.id))
             copy(f"{self.bot.directory}/files/reactionlight.db", f"{self.bot.directory}/files/reactionlight.db.bak")
             self.restart()
-            await inter.channel.send(response.get("restart"))
+            await inter.channel.send(self.bot.response.get("restart", guild_id=inter.guild.id))
             await self.bot.close()
         else:
-            await inter.send(response.get("windows-error"))
+            await inter.send(self.bot.response.get("windows-error", guild_id=inter.guild.id))
 
 
 def setup(bot):

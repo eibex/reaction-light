@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
+from typing import Dict, Optional
 import sqlite3
 from random import randint
 
@@ -35,7 +35,9 @@ def initialize(database):
     cursor.execute("CREATE TABLE IF NOT EXISTS 'admins' ('role_id' INT, 'guild_id' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'cleanup_queue_guilds' ('guild_id' INT, 'unix_timestamp' INT);")
     cursor.execute("CREATE TABLE IF NOT EXISTS 'dbinfo' ('version' INT);")
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT);")
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS 'guild_settings' ('guild_id' INT, 'notify' INT, 'systemchannel' INT, 'language' TEXT NULL);"
+    )
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_idx ON guild_settings (guild_id);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS message_idx ON messages (message_id);")
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS guild_id_index ON cleanup_queue_guilds (guild_id);")
@@ -54,6 +56,8 @@ class Database:
         initialize(self.database)
 
         self.reactionrole_creation = {}
+
+        self.languages_cache: Dict[int, Optional[str]] = {}
 
     def add_reaction_role(self, rl_dict: dict):
         conn = sqlite3.connect(self.database)
@@ -356,3 +360,34 @@ class Database:
         cursor.close()
         conn.close()
         return notify
+
+    def set_language(self, guild_id: int, language: str):
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        self.insert_guildsettings(guild_id)
+        cursor.execute("INSERT OR REPLACE INTO guild_settings (guild_id, language) VALUES (?, ?)", (guild_id, language))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        self.languages_cache[guild_id] = language
+        return True
+
+    def get_language(self, guild_id: int) -> Optional[str]:
+        if guild_id in self.languages_cache:
+            return self.languages_cache[guild_id]
+
+        conn = sqlite3.connect(self.database)
+        cursor = conn.cursor()
+        self.insert_guildsettings(guild_id)
+        cursor.execute("SELECT language FROM guild_settings WHERE guild_id = ?", (guild_id,))
+        language = None
+        try:
+            language = cursor.fetchone()[0]
+        except KeyError:
+            pass
+        cursor.close()
+        conn.close()
+
+        self.languages_cache[guild_id] = language
+
+        return language

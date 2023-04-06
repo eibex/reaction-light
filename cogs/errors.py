@@ -25,7 +25,6 @@ SOFTWARE.
 
 import traceback
 from disnake.ext import commands
-from cogs.utils.i18n import response
 
 
 class Errors(commands.Cog):
@@ -35,7 +34,7 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, inter, error):
         if isinstance(error, commands.NotOwner):
-            await inter.send(response.get("not-owner"))
+            await inter.send(self.bot.response.get("not-owner", guild_id=inter.guild.id))
         else:
             traceback.print_tb(error.__traceback__)
             print(error)
