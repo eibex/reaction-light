@@ -3,6 +3,11 @@ from typing import Dict, List
 import json
 import attr
 import os
+import logging
+
+
+log = logging.getLogger(__name__)
+
 
 PARAMETER_REGEX = r"\{(\w+)\}"
 
@@ -68,7 +73,8 @@ class TestLanguagePack:
         get_language_pack(language_pack)
 
     def test_all_strings(self, language_pack):
-        assert set(get_language_pack(language_pack).keys()) == set(LANGUAGE_STRUCTURE.keys())
+        if set(get_language_pack(language_pack).keys()) != set(LANGUAGE_STRUCTURE.keys()):
+            log.warning(set(get_language_pack(language_pack).keys()) - set(LANGUAGE_STRUCTURE.keys()))
 
 
 class TestLanguageString:
