@@ -149,6 +149,7 @@
     "message-reaction-option-role": "Rola, którą chcesz powiązać z nową reakcją (nie jest wymagana dla 'usuń')",
     "settings-systemchannel-option-type": "Zdefiniuj czy jest to kanał 'main' (błędy ogólne) czy 'serwer' (błędy speficic errors)",
     "settings-systemchannel-option-channel": "Kanał, w którym zostanie wysłany komunikat o błędzie",
+    "settings-language-option-range": "Zdefiniuj, czy chcesz ustawić język dla bota globalnie, czy dla bieżącego serwera",
     "settings-language-option-language": "Język do ustawienia",
     "settings-colour-option-colour": "Wartość szesnastkowa koloru, który chcesz ustawić (np. 0xff00)",
     "settings-activity-option-action": "Użyj 'add', 'remove', 'list' aby dodać/usunąć/wyświetlić wiadomości statusu bota",
