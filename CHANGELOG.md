@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 
+### 3.4.0
+- Add Russian translation (#126 by [r-liner](https://github.com/r-liner))
+- Update Polish translation (#125 by [erwinowak](https://github.com/erwinowak))
+
 ### 3.3.0
 - Add language settings per server ([#121](https://github.com/eibex/reaction-light/pull/121) closed by [#123](https://github.com/eibex/reaction-light/pull/123) by [Edwinexd](https://github.com/Edwinexd)) - known limitation: command descriptions will be set to the global language
 
