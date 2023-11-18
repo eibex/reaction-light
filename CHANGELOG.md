@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 
+### 3.4.2
+- Add Portuguese (Brazilian) translation ([#128](https://github.com/eibex/reaction-light/pull/128) by [veenx67](https://github.com/veenx67))
+- Fix disnake 2.9 compatibility ([#127](https://github.com/eibex/reaction-light/issues/127) closed by [#130](https://github.com/eibex/reaction-light/pull/130) by [eibex](https://github.com/eibex))
+
 ### 3.4.1
 - Set maximum disnake version to 2.8.* until the bot is compatible with 2.9+
 
