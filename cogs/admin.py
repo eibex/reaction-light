@@ -39,7 +39,7 @@ class Admin(commands.Cog):
     async def admin(
         self,
         inter,
-        action: str = commands.Param(description=static_response.get("admin-option-action"), choices=("add", "remove", "list")),
+        action: str = commands.Param(description=static_response.get("admin-option-action"), choices={"add", "remove", "list"}),
         role: disnake.Role = commands.Param(description=static_response.get("admin-option-role"), default=None),
     ):
         await inter.response.defer()

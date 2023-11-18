@@ -52,7 +52,7 @@ class Settings(commands.Cog):
         self,
         inter,
         channel_type: str = commands.Param(
-            description=static_response.get("settings-systemchannel-option-type"), choices=("main", "server", "explanation")
+            description=static_response.get("settings-systemchannel-option-type"), choices={"main", "server", "explanation"}
         ),
         channel: disnake.TextChannel = commands.Param(
             description=static_response.get("settings-systemchannel-option-channel"), default=None
@@ -129,7 +129,7 @@ class Settings(commands.Cog):
         self,
         inter,
         _range: str = commands.Param(
-            name="range", description=static_response.get("settings-language-option-range"), choices=("global", "server")
+            name="range", description=static_response.get("settings-language-option-range"), choices={"global", "server"}
         ),
         language: str = commands.Param(
             description=static_response.get("settings-language-option-language"), choices=static_response.languages()
@@ -180,7 +180,7 @@ class Settings(commands.Cog):
         self,
         inter,
         action: str = commands.Param(
-            description=static_response.get("settings-activity-option-action"), choices=("add", "remove", "list")
+            description=static_response.get("settings-activity-option-action"), choices={"add", "remove", "list"}
         ),
         activity: str = commands.Param(description=static_response.get("settings-activity-option-activity"), default=None),
     ):
