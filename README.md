@@ -1,8 +1,9 @@
 # Reaction Light - Discord Role Bot
-[![Reaction Light Discord Server](https://img.shields.io/discord/914952998109716531?color=5865f2&logo=discord&logoColor=ffffff)](https://discord.gg/cqxZQkhhHm)
-[![Reaction Light 3.4.2](https://img.shields.io/badge/Reaction%20Light-3.4.2-yellow.svg)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](#)
-[![disnake 2.5.0+](https://img.shields.io/badge/disnake-2.5.0+-blue.svg)](#)
+[![Reaction Light 3.4.2](https://img.shields.io/badge/Release-3.4.2-yellow.svg?logo=github&logoColor=ffffff&style=for-the-badge)](https://github.com/eibex/reaction-light/blob/master/CHANGELOG.md)
+[![Reaction Light Discord Server](https://img.shields.io/discord/914952998109716531?color=5865f2&logo=discord&logoColor=ffffff&style=for-the-badge)](https://discord.gg/cqxZQkhhHm)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg?logo=python&logoColor=ffffff&style=for-the-badge)](#)
+[![disnake 2.5.0+](https://img.shields.io/badge/disnake-2.5.0+-blue.svg?logo=pypi&logoColor=ffffff&style=for-the-badge)](#)
+[![Docker](https://img.shields.io/badge/Docker-gchr.io-blue.svg?logo=docker&logoColor=ffffff&style=for-the-badge)](https://github.com/eibex/reaction-light/pkgs/container/reaction-light)
 
 [![Reaction Light Embed Example](https://i.imgur.com/f4b9Qye.png)](#)
 
