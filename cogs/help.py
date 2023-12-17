@@ -34,6 +34,7 @@ class Help(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name="help", description=static_response.get("brief-help"))
+    @commands.guild_only()
     async def hlp(self, inter):
         if self.bot.isadmin(inter.author, inter.guild.id):
             await inter.response.defer()

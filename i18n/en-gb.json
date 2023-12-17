@@ -156,5 +156,7 @@
     "settings-activity-option-activity": "The text that appears after 'Playing' in the bot's status message (case sensitive)",
     "activity-add-list-remove": "You need to provide an activity if using `add` or `remove`.",
     "admin-option-action": "Use 'add', 'remove', 'list' to add/remove/view bot admins",
-    "admin-option-role": "The role you want to add/remove as a bot admin"
+    "admin-option-role": "The role you want to add/remove as a bot admin",
+    "no-dm": "This command cannot be used in DMs.",
+    "no-dm-parameters": "This command cannot be used in DMs with the parameter(s) {parameters}."
 }

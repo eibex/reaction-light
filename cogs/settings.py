@@ -48,6 +48,7 @@ class Settings(commands.Cog):
         pass
 
     @settings_group.sub_command(name="systemchannel", description=static_response.get("brief-settings-systemchannel"))
+    @commands.guild_only()
     async def set_systemchannel(
         self,
         inter,
@@ -107,6 +108,7 @@ class Settings(commands.Cog):
         await inter.edit_original_message(content=self.bot.response.get("systemchannels-success", guild_id=inter.guild.id))
 
     @settings_group.sub_command(name="notify", description=static_response.get("brief-settings-notify"))
+    @commands.guild_only()
     async def toggle_notify(self, inter):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             return
@@ -137,6 +139,9 @@ class Settings(commands.Cog):
     ):
         await inter.response.defer()
         if _range == "server":
+            if not inter.guild:
+                await inter.send(content=self.bot.response.get("no-dm-parameters").format(parameters="server"))
+                return
             # Check admin
             if not self.bot.isadmin(inter.author, inter.guild.id):
                 await inter.send(content=self.bot.response.get("not-admin", guild_id=inter.guild.id))
@@ -145,13 +150,13 @@ class Settings(commands.Cog):
         else:
             # Check if bot owner
             if not await self.bot.is_owner(inter.author):
-                await inter.send(content=self.bot.response.get("not-owner", guild_id=inter.guild.id))
+                await inter.send(content=self.bot.response.get("not-owner", guild_id=inter.guild.id if inter.guild else None))
                 return
 
             self.bot.config.update("server", "language", language)
             self.bot.response.global_language = language
 
-        await inter.edit_original_message(content=self.bot.response.get("language-success", guild_id=inter.guild.id))
+        await inter.edit_original_message(content=self.bot.response.get("language-success", guild_id=inter.guild.id if inter.guild else None))
 
     @commands.is_owner()
     @settings_group.sub_command(name="colour", description=static_response.get("brief-settings-colour"))
@@ -159,20 +164,21 @@ class Settings(commands.Cog):
         self, inter, colour: str = commands.Param(description=static_response.get("settings-colour-option-colour"))
     ):
         await inter.response.defer()
+        guild_id_or_none = inter.guild.id if inter.guild else None
         try:
             self.bot.config.botcolour = disnake.Colour(int(colour, 16))
             self.bot.config.update("server", "colour", colour)
             example = disnake.Embed(
-                title=self.bot.response.get("example-embed", guild_id=inter.guild.id),
-                description=self.bot.response.get("example-embed-new-colour", guild_id=inter.guild.id),
+                title=self.bot.response.get("example-embed", guild_id=guild_id_or_none),
+                description=self.bot.response.get("example-embed-new-colour", guild_id=guild_id_or_none),
                 colour=self.bot.config.botcolour,
             )
             await inter.edit_original_message(
-                content=self.bot.response.get("colour-changed", guild_id=inter.guild.id), embed=example
+                content=self.bot.response.get("colour-changed", guild_id=guild_id_or_none), embed=example
             )
 
         except ValueError:
-            await inter.edit_original_message(content=self.bot.response.get("colour-hex-error", guild_id=inter.guild.id))
+            await inter.edit_original_message(content=self.bot.response.get("colour-hex-error", guild_id=guild_id_or_none))
 
     @commands.is_owner()
     @settings_group.sub_command(name="activity", description=static_response.get("brief-settings-activity"))
@@ -185,13 +191,14 @@ class Settings(commands.Cog):
         activity: str = commands.Param(description=static_response.get("settings-activity-option-activity"), default=None),
     ):
         await inter.response.defer()
+        guild_id_or_none = inter.guild.id if inter.guild else None
         if action == "add" and activity:
             if "," in activity:
-                await inter.send(self.bot.response.get("activity-no-commas", guild_id=inter.guild.id))
+                await inter.send(self.bot.response.get("activity-no-commas", guild_id=guild_id_or_none))
 
             else:
                 self.bot.activities.add(activity)
-                await inter.send(self.bot.response.get("activity-success", guild_id=inter.guild.id).format(new_activity=activity))
+                await inter.send(self.bot.response.get("activity-success", guild_id=guild_id_or_none).format(new_activity=activity))
         elif action == "list":
             if self.bot.activities.activity_list:
                 formatted_list = []
@@ -199,23 +206,23 @@ class Settings(commands.Cog):
                     formatted_list.append(f"`{item}`")
 
                 await inter.send(
-                    self.bot.response.get("current-activities", guild_id=inter.guild.id).format(
+                    self.bot.response.get("current-activities", guild_id=guild_id_or_none).format(
                         activity_list="\n- ".join(formatted_list)
                     )
                 )
 
             else:
-                await inter.send(self.bot.response.get("no-current-activities", guild_id=inter.guild.id))
+                await inter.send(self.bot.response.get("no-current-activities", guild_id=guild_id_or_none))
         elif action == "remove" and activity:
             removed = self.bot.activities.remove(activity)
             if removed:
                 await inter.send(
-                    self.bot.response.get("rm-activity-success", guild_id=inter.guild.id).format(activity_to_delete=activity)
+                    self.bot.response.get("rm-activity-success", guild_id=guild_id_or_none).format(activity_to_delete=activity)
                 )
             else:
-                await inter.send(self.bot.response.get("rm-activity-not-exists", guild_id=inter.guild.id))
+                await inter.send(self.bot.response.get("rm-activity-not-exists", guild_id=guild_id_or_none))
         else:
-            await inter.send(self.bot.response.get("activity-add-list-remove", guild_id=inter.guild.id))
+            await inter.send(self.bot.response.get("activity-add-list-remove", guild_id=guild_id_or_none))
 
 
 def setup(bot):

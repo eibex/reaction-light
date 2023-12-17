@@ -70,6 +70,7 @@ class Message(commands.Cog):
         pass
 
     @message_group.sub_command(name="new", description=static_response.get("brief-message-new"))
+    @commands.guild_only()
     async def new(self, inter):
         if not self.bot.isadmin(inter.author, inter.guild.id):
             await inter.send(self.bot.response.get("new-reactionrole-noadmin", guild_id=inter.guild.id))
@@ -388,6 +389,7 @@ class Message(commands.Cog):
             await inter.channel.send(self.bot.response.get("new-reactionrole-cancelled", guild_id=inter.guild.id))
 
     @message_group.sub_command(name="edit", description=static_response.get("brief-message-edit"))
+    @commands.guild_only()
     async def edit_selector(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -578,6 +580,7 @@ class Message(commands.Cog):
                 await inter.send(content=self.bot.response.get("edit-permission-error", guild_id=inter.guild.id))
 
     @message_group.sub_command(name="reaction", description=static_response.get("brief-message-reaction"))
+    @commands.guild_only()
     async def edit_reaction(
         self,
         inter,

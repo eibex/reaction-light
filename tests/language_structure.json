@@ -729,5 +729,15 @@
     "admin-option-role": {
         "max_length": 100,
         "parameters": []
+    },
+    "no-dm": {
+        "max_length": 1024,
+        "parameters": []
+    },
+    "no-dm-parameters": {
+        "max_length": 1024,
+        "parameters": [
+            "parameters"
+        ]
     }
 }
