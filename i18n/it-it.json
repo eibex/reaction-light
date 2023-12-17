@@ -157,4 +157,6 @@
     "activity-add-list-remove": "Devi specificare un'attività se utilizzi `add` o `remove`.",
     "admin-option-action": "Usa 'add', 'remove', 'list' per aggiungere/rimuovere/vedere gli amministratori del bot",
     "admin-option-role": "Il ruolo che vuoi aggiungere/rimuovere come amministratore del bot"
+    "no-dm": "Questo comando non può essere utilizzato nei DM.",
+    "no-dm-parameters": "Questo comando non può essere utilizzato nei DM con i parametri {parameters}."
 }
