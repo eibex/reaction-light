@@ -65,6 +65,7 @@ class Control(commands.Cog):
         pass
 
     @controlbot_group.sub_command(name="version", description=static_response.get("brief-version"))
+    @commands.guild_only()
     async def print_version(self, inter):
         await inter.response.defer()
         if not self.bot.isadmin(inter.author, inter.guild.id):

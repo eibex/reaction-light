@@ -36,6 +36,7 @@ class Admin(commands.Cog):
 
     @commands.slash_command(name="admin", description=static_response.get("brief-admin"))
     @commands.has_permissions(administrator=True)
+    @commands.guild_only()
     async def admin(
         self,
         inter,
