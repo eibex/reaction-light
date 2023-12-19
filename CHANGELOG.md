@@ -1,5 +1,9 @@
 # Reaction Light - Changelog
 
+### 3.4.3
+- Show an error when a guild-only command is being ran in DMs ([#131](https://github.com/eibex/reaction-light/issues/131) closed by [#132](https://github.com/eibex/reaction-light/pull/132) by [Edwinexd](https://github.com/Edwinexd))
+- Update Docker image from Python 3.9 to 3.12
+
 ### 3.4.2
 - Add Portuguese (Brazilian) translation ([#128](https://github.com/eibex/reaction-light/pull/128) by [veenx67](https://github.com/veenx67))
 - Fix disnake 2.9 compatibility ([#127](https://github.com/eibex/reaction-light/issues/127) closed by [#130](https://github.com/eibex/reaction-light/pull/130) by [eibex](https://github.com/eibex))
