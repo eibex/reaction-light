@@ -156,5 +156,7 @@
     "settings-activity-option-activity": "O texto que aparece após 'Jogando' na mensagem de status do bot (sensível a maiúsculas e minúsculas)",
     "activity-add-list-remove": "Você precisa fornecer uma atividade se estiver usando add ou remove.",
     "admin-option-action": "Use 'add', 'remove', 'list' para adicionar/remover/visualizar administradores do bot",
-    "admin-option-role": "O cargo que você deseja adicionar/remover como administrador do bot"
+    "admin-option-role": "O cargo que você deseja adicionar/remover como administrador do bot",
+    "no-dm": "Este comando não pode ser utilizado no DM.",
+    "no-dm-parameters": "Este comando não pode ser utilizado no DM com esses parametros {parameters}."
 }
