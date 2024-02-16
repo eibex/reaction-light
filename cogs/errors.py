@@ -41,6 +41,14 @@ class Errors(commands.Cog):
             traceback.print_tb(error.__traceback__)
             print(error)
 
+    @commands.Cog.listener()
+    async def on_slash_command_error(self, inter, error):
+        if isinstance(error, commands.NoPrivateMessage):
+            await inter.send(self.bot.response.get("no-dm"))
+        else:
+            traceback.print_tb(error.__traceback__)
+            print(error)
+
 
 def setup(bot):
     bot.add_cog(Errors(bot))
