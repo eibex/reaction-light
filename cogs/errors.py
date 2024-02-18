@@ -32,18 +32,10 @@ class Errors(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, inter, error):
+    async def on_slash_command_error(self, inter, error):
         if isinstance(error, commands.NotOwner):
             await inter.send(self.bot.response.get("not-owner", guild_id=inter.guild.id))
         elif isinstance(error, commands.NoPrivateMessage):
-            await inter.send(self.bot.response.get("no-dm"))
-        else:
-            traceback.print_tb(error.__traceback__)
-            print(error)
-
-    @commands.Cog.listener()
-    async def on_slash_command_error(self, inter, error):
-        if isinstance(error, commands.NoPrivateMessage):
             await inter.send(self.bot.response.get("no-dm"))
         else:
             traceback.print_tb(error.__traceback__)
