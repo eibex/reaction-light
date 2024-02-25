@@ -1,4 +1,8 @@
 # Reaction Light - Changelog
+### 3.4.4
+- Update Portuguese (Brazil) translation ( [#133](https://github.com/eibex/reaction-light/pull/133) by [veenx67](https://github.com/veenx67))
+- Update Russian translation ([#134](https://github.com/eibex/reaction-light/pull/134) by [r-liner](https://github.com/r-liner))
+- Fix command error handling
 
 ### 3.4.3
 - Show an error when a guild-only command is being ran in DMs ([#131](https://github.com/eibex/reaction-light/issues/131) closed by [#132](https://github.com/eibex/reaction-light/pull/132) by [Edwinexd](https://github.com/Edwinexd))
