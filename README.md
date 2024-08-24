@@ -67,3 +67,6 @@ Even if you are not a Python programmer, you can contribute to this project by r
 
 ## License
 [MIT](https://github.com/eibex/reaction-light/blob/master/LICENSE)
+
+## Special Thanks
+[Special Thanks](https://github.com/eibex/reaction-light/wiki/Special-Thanks)
