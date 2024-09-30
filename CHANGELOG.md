@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 ### 3.4.4
+- Add German translation ( [#137](https://github.com/eibex/reaction-light/pull/137) by [Marc-R2](https://github.com/Marc-R2))
+
+### 3.4.4
 - Update Portuguese (Brazil) translation ( [#133](https://github.com/eibex/reaction-light/pull/133) by [veenx67](https://github.com/veenx67))
 - Update Russian translation ([#134](https://github.com/eibex/reaction-light/pull/134) by [r-liner](https://github.com/r-liner))
 - Fix command error handling
