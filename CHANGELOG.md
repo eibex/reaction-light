@@ -3,6 +3,7 @@
 ### 3.5.0
 - BREAKING CHANGE: `./config.ini` needs to be moved to `/config/config.ini` (change needed to better support Docker - sorry!)
 - Add the possibility to define a Discord bot token on Docker startup with the environment variable `TOKEN`, eliminating the need to manually create a `config.ini` file. The `TOKEN` environment variable will have no effect if a `config.ini` file already exists.
+- 3.5.0a: fixed startup issue
 
 ### 3.4.5
 - Add German translation ([#137](https://github.com/eibex/reaction-light/pull/137) by [Marc-R2](https://github.com/Marc-R2))

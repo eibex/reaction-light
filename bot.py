@@ -27,7 +27,7 @@ import os
 from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
-from cogs.utils import database, activity, version, config, schema
+from cogs.utils import database, activity, parser, version, schema
 from cogs.utils.i18n import Response, StaticResponse
 from config import docker
 
@@ -50,7 +50,7 @@ extensions = (
 class ReactionLight(commands.InteractionBot):
     def __init__(self):
         self.directory = os.path.dirname(os.path.realpath(__file__))
-        self.config = config.Config(self.directory)
+        self.config = parser.Config(self.directory)
         self.activities = activity.Activities(f"{self.directory}/files/activities.csv")
         self.db = database.Database(f"{self.directory}/files/reactionlight.db")
         self.version = version.get(self.directory)
