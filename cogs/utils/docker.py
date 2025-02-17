@@ -38,7 +38,7 @@ def setup(directory):
                 os.remove(f"{bot_folder}/config/config.ini")
 
         config = configparser.ConfigParser()
-        config.read(f"{bot_folder}/config/config.ini.sample")
+        config.read(f"{bot_folder}/config.ini.sample")
         config["server"]["token"] = token
         with open(f"{bot_folder}/config/config.ini", "w") as f:
             config.write(f)

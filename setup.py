@@ -116,7 +116,7 @@ while True:
 
 
 config = configparser.ConfigParser()
-config.read(f"{folder}/config/config.ini.sample")
+config.read(f"{folder}/config.ini.sample")
 config["server"]["token"] = token
 config["server"]["name"] = name
 config["server"]["logo"] = logo
