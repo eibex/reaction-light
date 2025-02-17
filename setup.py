@@ -115,17 +115,16 @@ while True:
     else:
         break
 
-copy("{}/config.ini.sample".format(folder), "{}/config.ini".format(folder))
 
 config = configparser.ConfigParser()
-config.read("{}/config.ini".format(folder))
+config.read(f"{folder}/config/config.ini.sample")
 config["server"]["token"] = token
 config["server"]["name"] = name
 config["server"]["logo"] = logo
 config["server"]["system_channel"] = system_channel
 config["server"]["colour"] = colour
 
-with open("{}/config.ini".format(folder), "w") as f:
+with open(f"{folder}/config/config.ini", "w") as f:
     config.write(f)
 
 input("Done. You can now start the bot.")

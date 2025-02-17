@@ -29,6 +29,8 @@ import disnake
 from disnake.ext import commands
 from cogs.utils import database, activity, version, config, schema
 from cogs.utils.i18n import Response, StaticResponse
+from config import docker
+
 
 static_response = StaticResponse()
 
@@ -175,6 +177,7 @@ class ReactionLight(commands.InteractionBot):
             member = await guild.fetch_member(user_id)
         return member
 
+docker.setup(os.path.realpath(__file__))
 
 rl = ReactionLight()
 
