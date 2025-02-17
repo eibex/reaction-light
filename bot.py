@@ -27,9 +27,8 @@ import os
 from sqlite3 import Error as DatabaseError
 import disnake
 from disnake.ext import commands
-from cogs.utils import database, activity, parser, version, schema
+from cogs.utils import database, activity, parser, version, schema, docker
 from cogs.utils.i18n import Response, StaticResponse
-from config import docker
 
 
 static_response = StaticResponse()

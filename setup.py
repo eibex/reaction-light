@@ -24,7 +24,6 @@ SOFTWARE.
 
 
 from os import path
-from shutil import copy
 import configparser
 
 
