@@ -1,7 +1,7 @@
 # Reaction Light - Changelog
 
 ### 3.5.0
-- BREAKING CHANGE: `./config.ini` needs to be moved to `/config/config.ini` (you will have to ceeate the `config` directory manually). This change is needed to better support Docker - sorry!
+- BREAKING CHANGE: `./config.ini` needs to be moved to `/config/config.ini` (you will have to create the `config` directory manually). This change is needed to better support Docker - sorry!
 - Add the possibility to define a Discord bot token on Docker startup with the environment variable `TOKEN`, eliminating the need to manually create a `config.ini` file. The `TOKEN` environment variable will have no effect if a `config.ini` file already exists.
 - 3.5.0c: fixed startup issue
 
