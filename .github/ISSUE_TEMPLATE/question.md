@@ -2,7 +2,7 @@
 name: Question
 about: Need help with running the bot?
 title: ''
-labels: question
+labels: support
 assignees: ''
 
 ---
