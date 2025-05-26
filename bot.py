@@ -50,7 +50,7 @@ class ReactionLight(commands.InteractionBot):
     def __init__(self):
         self.directory = os.path.dirname(os.path.realpath(__file__))
         self.config = parser.Config(self.directory)
-        self.activities = activity.Activities(f"{self.directory}/files/activities.csv")
+        #self.activities = activity.Activities(f"{self.directory}/files/activities.csv")
         self.db = database.Database(f"{self.directory}/files/reactionlight.db")
         self.version = version.get(self.directory)
         self.response = Response(self, f"{self.directory}/i18n", self.config.language)
