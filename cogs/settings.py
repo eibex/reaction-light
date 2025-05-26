@@ -34,7 +34,7 @@ class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # pylint: disable=no-member
-        self.maintain_presence.start()
+        # self.maintain_presence.start()
 
     # @tasks.loop(seconds=30)
     # async def maintain_presence(self):
