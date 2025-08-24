@@ -651,18 +651,7 @@ class Message(commands.Cog):
 
         if action == "add":
             try:
-                # Check that the bot can actually use the emoji (the bot will auto remove it since it hasn't been added to db yet)
-                await message_to_edit.add_reaction(reaction)
-            except disnake.HTTPException:
-                await inter.edit_original_message(
-                    content=self.bot.response.get("new-reactionrole-emoji-403", guild_id=inter.guild.id)
-                )
-                return
-
-            try:
                 react = self.bot.db.add_reaction(message_to_edit.id, role.id, sanitize_emoji(reaction))
-                # Actually use the emoji this time
-                await message_to_edit.add_reaction(reaction)
             except DatabaseError as error:
                 await self.bot.report(
                     self.bot.response.get("db-error-add-reaction", guild_id=inter.guild.id).format(
@@ -670,6 +659,26 @@ class Message(commands.Cog):
                     ),
                     inter.guild.id,
                 )
+                return
+
+            try:
+                # Try to add the reaction, this will fail if the bot cannot actually use the emoji
+                await message_to_edit.add_reaction(reaction)
+            except disnake.HTTPException:
+                await inter.edit_original_message(
+                    content=self.bot.response.get("new-reactionrole-emoji-403", guild_id=inter.guild.id)
+                )
+                try:
+                    # We remove the db entry since the edit failed
+                    react = self.bot.db.remove_reaction(message_to_edit.id, sanitize_emoji(reaction))
+                except DatabaseError as error:
+                    await self.bot.report(
+                        self.bot.response.get("db-error-add-reaction", guild_id=inter.guild.id).format(
+                            channel_mention=message_to_edit.channel.mention, exception=error
+                        ),
+                        inter.guild.id,
+                    )
+                    return
                 return
 
             if not react:
