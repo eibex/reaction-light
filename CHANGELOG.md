@@ -1,5 +1,8 @@
 # Reaction Light - Changelog
 
+### 3.5.2
+- Fix adding new reactions to reaction messages ([#142](https://github.com/eibex/reaction-light/issues/142) closed by [#143](https://github.com/eibex/reaction-light/pull/143) by [eibex](https://github.com/eibex))
+
 ### 3.5.1
 - Add ARM Docker build ([#141](https://github.com/eibex/reaction-light/issues/141))
 

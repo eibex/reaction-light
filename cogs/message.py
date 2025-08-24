@@ -651,7 +651,7 @@ class Message(commands.Cog):
 
         if action == "add":
             try:
-                # Check that the bot can actually use the emoji
+                # Check that the bot can actually use the emoji (the bot will auto remove it since it hasn't been added to db yet)
                 await message_to_edit.add_reaction(reaction)
             except disnake.HTTPException:
                 await inter.edit_original_message(
@@ -661,6 +661,8 @@ class Message(commands.Cog):
 
             try:
                 react = self.bot.db.add_reaction(message_to_edit.id, role.id, sanitize_emoji(reaction))
+                # Actually use the emoji this time
+                await message_to_edit.add_reaction(reaction)
             except DatabaseError as error:
                 await self.bot.report(
                     self.bot.response.get("db-error-add-reaction", guild_id=inter.guild.id).format(
@@ -677,6 +679,7 @@ class Message(commands.Cog):
                 return
 
             await inter.edit_original_message(content=self.bot.response.get("reaction-edit-add-success", guild_id=inter.guild.id))
+
         elif action == "remove":
             try:
                 await message_to_edit.clear_reaction(reaction)
